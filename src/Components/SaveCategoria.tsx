@@ -8,8 +8,8 @@ import CategoriaService from "../Functions/Services/CategoriaService";
 export default function SaveCategoria() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [show, setShow] = useState(false);
-    const handleClose = () => setShow(false);
+    // const [show, setShow] = useState(false);
+    // const handleClose = () => setShow(false);
     const [categoria, setCategoria] = useState<ICategoria>({
         id: Number(id),
         denominacion: '',
@@ -18,18 +18,18 @@ export default function SaveCategoria() {
         articulos: []
     });
 
-    const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const formData = new FormData();
-        const file = event.target.files?.[0];
+    // const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    //     const formData = new FormData();
+    //     const file = event.target.files?.[0];
     
-        if (!file) {
-            console.log("No file selected");
-            return;
-        }
+    //     if (!file) {
+    //         console.log("No file selected");
+    //         return;
+    //     }
     
-        formData.append("file", file);
-        console.log(formData);
-    }
+    //     formData.append("file", file);
+    //     console.log(formData);
+    // }
     
     //     const result = new ImagenArticuloService("http://localhost:8080/imagenArticulos");
     //     result.postImagen(formData)
@@ -77,7 +77,7 @@ export default function SaveCategoria() {
             await new CategoriaService("http://localhost:8080/categorias").post(categoria);
         }
         alert("Categoria guardada con exito!");
-        handleClose();
+        // handleClose(false);
         navigate(-1);
     };
     // const handleFileChange = (e)=>{

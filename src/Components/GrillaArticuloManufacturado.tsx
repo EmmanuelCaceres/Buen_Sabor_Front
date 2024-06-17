@@ -40,7 +40,7 @@ export default function GrillaArticulo() {
 
     const handleDelete = (id:number) => {
         //console.log(event);
-        const result = new ArticuloManufacturadoService("http://localhost:8080/articuloManufacturados").delete(id);
+        new ArticuloManufacturadoService("http://localhost:8080/articuloManufacturados").delete(id);
         alert("Articulo removido con éxito!")
         window.location.reload;
     }

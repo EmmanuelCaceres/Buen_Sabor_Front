@@ -1,4 +1,3 @@
-import IArticulo from "./IArticulo";
 import IArticuloInsumo from "./IArticuloInsumo";
 import IArticuloManufacturado from "./IArticuloManufacturado";
 

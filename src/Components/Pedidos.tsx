@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { CButton, CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter } from '@coreui/react';
-import { Container, Row, Col, InputGroup, Table, Button, Form } from 'react-bootstrap';
+import { Container, Row, Col, Table } from 'react-bootstrap';
 import IPedido from '../Entities/IPedido';
 import PedidoService from '../Functions/Services/PedidoService';
 import IDetallePedido from '../Entities/IDetallePedido';
