@@ -5,7 +5,7 @@ import IArticuloInsumo from "../../Entities/IArticuloInsumo.ts";
 import ArticuloInsumoService from "../../Functions/Services/ArticuloInsumoService.ts";
 import { CCard, CCardImage, CCardBody, CCardTitle, CCardText, CButton } from "@coreui/react"
 import { useCarrito } from "./context/useCarrito.ts";
-import { CarritoContextProvider } from "./context/CarritoContext.tsx";
+// import { CarritoContextProvider } from "./context/CarritoContext.tsx";
 import Carrito from "./Carrito.tsx";
 
 export default function Menu(){
@@ -24,7 +24,7 @@ export default function Menu(){
                 console.log(error)
             })
     }
-    const [articulosInsumos, setArticulosinsumos] = useState<IArticuloInsumo[]>([]);
+    const [articulosInsumos, setArticulosinsumos] = useState<IArticuloInsumo[] | null>([]);
 
     const mostrarDatosInsumos =(url:string)=>{
         const result = new ArticuloInsumoService(url);
@@ -68,19 +68,23 @@ export default function Menu(){
                 <h2>Insumos</h2>
                 <div style={{display:"flex",flexWrap:"wrap",justifyContent:"center",gap:"1rem"}}>
                     {
-                        articulosInsumos.map((articuloInsumo:IArticuloInsumo,index:number)=>(
+                       articulosInsumos && articulosInsumos.length > 0 ? (
+                        articulosInsumos.map((articuloInsumo: IArticuloInsumo, index: number) => (
                             <CCard key={index} style={{ width: '18rem' }}>
-                        <CCardImage orientation="top" src={'http://localhost:8080/imagenArticulos/uploads/' +articuloInsumo.imagenes[0].url } />
-                        <CCardBody className="text-center">
-                            <CCardTitle>{articuloInsumo.denominacion}</CCardTitle>
-                            <CCardText>
-                            ${articuloInsumo.precioVenta}
-                            </CCardText>
-                            <CButton color="primary" onClick={() => addCarrito(articuloInsumo) }>Añadir item</CButton>
-                            <CButton color="primary" onClick={() => removeItemCarrito(articuloInsumo)}>Eliminar item</CButton>
-                        </CCardBody>
-                    </CCard>
+                                <CCardImage orientation="top" src={'http://localhost:8080/imagenArticulos/uploads/' + articuloInsumo.imagenes[0].url} />
+                                <CCardBody className="text-center">
+                                    <CCardTitle>{articuloInsumo.denominacion}</CCardTitle>
+                                    <CCardText>
+                                        ${articuloInsumo.precioVenta}
+                                    </CCardText>
+                                    <CButton color="primary" onClick={() => addCarrito(articuloInsumo)}>Añadir item</CButton>
+                                    <CButton color="primary" onClick={() => removeItemCarrito(articuloInsumo)}>Eliminar item</CButton>
+                                </CCardBody>
+                            </CCard>
                         ))
+                    ) : (
+                        <p>No hay artículos disponibles</p>
+                    )
                     }
                 </div>
             </div>

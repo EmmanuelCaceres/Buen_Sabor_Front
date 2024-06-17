@@ -40,7 +40,7 @@ export default function GrillaArticulo() {
 
     const handleDelete = (id:number) => {
         //console.log(event);
-        const result = new CategoriaService("http://localhost:8080/categorias").delete(id);
+        new CategoriaService("http://localhost:8080/categorias").delete(id);
         alert("Categoria removido con éxito!")
         window.location.reload;
     }

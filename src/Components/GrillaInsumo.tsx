@@ -39,8 +39,7 @@ export default function GrillaArticulo() {
     };
 
     const handleDelete = (id:number) => {
-        console.log(event);
-        const result = new ArticuloInsumoService("http://localhost:8080/articuloInsumos").delete(id);
+        new ArticuloInsumoService("http://localhost:8080/articuloInsumos").delete(id);
         window.location.reload;
     }
 

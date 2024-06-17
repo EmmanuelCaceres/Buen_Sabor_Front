@@ -1,4 +1,4 @@
-import { useState } from "react"
+// import { useState } from "react"
 import { useCarrito } from "./context/useCarrito"
 // import { PostPedidoData } from "../Functions/FunctionsApi"
 // import iconDeleteCart from "../assets/img/iconDeleteCart.svg"
@@ -22,7 +22,6 @@ function ItemCarrito(props: { item: IDetallePedido }) {
 
 export default function Carrito() {
     const { cart, totalPedido, fechaActual } = useCarrito()
-    const [status, setStatus] = useState<number>(0);
 
     const handleCheckout = async () => {
         if (totalPedido == 0) {

@@ -15,8 +15,8 @@ export default function SaveInsumo() {
     const navigate = useNavigate();
     const [categoria, setCategoria] = useState<ICategoria[]>([])
     const [unidadMedida, setUnidadMedida] = useState<IUnidadMedida[]>([]);
-    const [show, setShow] = useState(false);
-    const handleClose = () => setShow(false);
+    // const [show, setShow] = useState(false);
+    // const handleClose = () => setShow(false);
     const [articuloInsumo, setArticulosInsumo] = useState<IArticuloInsumo>({
         id: Number(id),
         denominacion: '',
@@ -133,7 +133,7 @@ export default function SaveInsumo() {
             await new ArticuloInsumoService("http://localhost:8080/articuloInsumos").post(articuloInsumo);
         }
         alert("Insumo guardado con exito!");
-        handleClose();
+        // handleClose();
         navigate(-1);
     };
     // const handleFileChange = (e)=>{

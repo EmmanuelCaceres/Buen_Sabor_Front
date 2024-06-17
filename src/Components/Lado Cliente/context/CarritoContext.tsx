@@ -1,5 +1,4 @@
 import { createContext, ReactNode, useState, useEffect } from "react";
-import IPedido from "../../../Entities/IPedido";
 import IDetallePedido from "../../../Entities/IDetallePedido";
 import IArticulo from "../../../Entities/IArticulo";
 import IArticuloManufacturado from "../../../Entities/IArticuloManufacturado";

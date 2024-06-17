@@ -9,7 +9,7 @@ import arrow_left from "../assets/arrow-circle-left-svgrepo-com.svg";
 import ArticuloManufacturadoService from "../Functions/Services/ArticuloManufacturadoService";
 import ArticuloInsumoService from "../Functions/Services/ArticuloInsumoService";
 import IArticuloManufacturadoDetalles from "../Entities/IArticuloManufacturadoDetalle";
-import IImagenArticulo from "../Entities/IImagenArticulo";
+// import IImagenArticulo from "../Entities/IImagenArticulo";
 import ICategoria from "../Entities/ICategoria";
 import CatetgoriaService from "../Functions/Services/CategoriaService";
 import IUnidadMedida from "../Entities/IUnidadMedida";
@@ -21,12 +21,12 @@ export default function SaveArticulo() {
     const navigate = useNavigate();
     const [inputValue, setInputValue] = useState('');
     const [insumos, setInsumos] = useState<IArticuloInsumo[]>([]);
-    const [imgUrl, setImgUrl] = useState<IImagenArticulo>(
-        {
-            id: 0,
-            url: ''
-        }
-    );
+    // const [imgUrl, setImgUrl] = useState<IImagenArticulo>(
+    //     {
+    //         id: 0,
+    //         url: ''
+    //     }
+    // );
     const [categoria, setCategoria] = useState<ICategoria[]>([])
     const [unidadMedida, setUnidadMedida] = useState<IUnidadMedida[]>([]);
 
