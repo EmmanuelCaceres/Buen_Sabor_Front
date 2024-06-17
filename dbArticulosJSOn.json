@@ -1,0 +1,300 @@
+{
+    "articulosManufacturados": [
+    {
+      "id": 1,
+      "denominacion": "Pizza Muzarella",
+      "precioVenta": 130,
+      "imagenes": [
+        {
+          "id": 5,
+          "url": "https://storage.googleapis.com/fitia-api-bucket/media/images/recipe_images/1002846.jpg"
+        }
+      ],
+      "unidadMedida": {
+        "id": 4,
+        "denominacion": "Porciones"
+      },
+      "descripcion": "Una pizza clasica",
+      "tiempoEstimadoMinutos": 15,
+      "preparacion": "Pasos de preparacion de una muzza de toda la vida",
+      "articuloManufacturadoDetalles": [
+        {
+          "id": 2,
+          "cantidad": 600,
+          "articuloInsumo": {
+            "id": 3,
+            "denominacion": "Queso",
+            "precioVenta": 66.6,
+            "imagenes": [
+              {
+                "id": 3,
+                "url": "https://superdepaso.com.ar/wp-content/uploads/2021/06/SANTAROSA-PATEGRAS-04.jpg"
+              }
+            ],
+            "unidadMedida": {
+              "id": 2,
+              "denominacion": "Gramos"
+            },
+            "categoria":{
+              "id":1,
+              "denominacion":"Comida"
+            },
+            "precioCompra": 23.6,
+            "stockActual": 20,
+            "stockMaximo": 50,
+            "esParaElaborar": true
+          }
+        },
+        {
+          "id": 1,
+          "cantidad": 300,
+          "articuloInsumo": {
+            "id": 2,
+            "denominacion": "Harina",
+            "precioVenta": 60.5,
+            "imagenes": [
+              {
+                "id": 2,
+                "url": "https://mandolina.co/wp-content/uploads/2023/03/648366622-1024x683.jpg"
+              }
+            ],
+            "unidadMedida": {
+              "id": 2,
+              "denominacion": "Gramos"
+            },
+            "categoria":{
+              "id":1,
+              "denominacion":"Comida"
+            },
+            "precioCompra": 40,
+            "stockActual": 4,
+            "stockMaximo": 40,
+            "esParaElaborar": true
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "denominacion": "Pizza Margarita",
+      "precioVenta": 150,
+      "imagenes": [
+        {
+          "id": 6,
+          "url": "https://assets.elgourmet.com/wp-content/uploads/2023/03/8metlvp345_portada-pizza-1024x686.jpg.webp"
+        }
+      ],
+      "unidadMedida": {
+        "id": 4,
+        "denominacion": "Porciones"
+      },
+      "descripcion": "Típica pizza napolitana elaborada con tomate, mozzarella, albahaca fresca, sal y aceite.",
+      "tiempoEstimadoMinutos": 15,
+      "preparacion": "Pasos de preparacion de una pizza napolitana italiana",
+      "articuloManufacturadoDetalles": [
+        {
+          "id": 5,
+          "cantidad": 2,
+          "articuloInsumo": {
+            "id": 4,
+            "denominacion": "Tomate",
+            "precioVenta": 66.6,
+            "imagenes": [
+              {
+                "id": 4,
+                "url": "https://thefoodtech.com/wp-content/uploads/2020/06/Componentes-de-calidad-en-el-tomate-828x548.jpg"
+              }
+            ],
+            "unidadMedida": {
+              "id": 3,
+              "denominacion": "Cantidad"
+            },
+            "precioCompra": 23.6,
+            "stockActual": 20,
+            "stockMaximo": 50,
+            "esParaElaborar": true
+          }
+        },
+        {
+          "id": 3,
+          "cantidad": 350,
+          "articuloInsumo": {
+            "id": 2,
+            "denominacion": "Harina",
+            "precioVenta": 60.5,
+            "imagenes": [
+              {
+                "id": 2,
+                "url": "https://mandolina.co/wp-content/uploads/2023/03/648366622-1024x683.jpg"
+              }
+            ],
+            "unidadMedida": {
+              "id": 2,
+              "denominacion": "Gramos"
+            },
+            "categoria":{
+              "id":1,
+              "denominacion":"Comida"
+            },
+            "precioCompra": 40,
+            "stockActual": 4,
+            "stockMaximo": 40,
+            "esParaElaborar": true
+          }
+        },
+        {
+          "id": 4,
+          "cantidad": 650,
+          "articuloInsumo": {
+            "id": 3,
+            "denominacion": "Queso",
+            "precioVenta": 66.6,
+            "imagenes": [
+              {
+                "id": 3,
+                "url": "https://superdepaso.com.ar/wp-content/uploads/2021/06/SANTAROSA-PATEGRAS-04.jpg"
+              }
+            ],
+            "unidadMedida": {
+              "id": 2,
+              "denominacion": "Gramos"
+            },
+            "categoria":{
+              "id":1,
+              "denominacion":"Comida"
+            },
+            "precioCompra": 23.6,
+            "stockActual": 20,
+            "stockMaximo": 50,
+            "esParaElaborar": true
+          }
+        }
+      ]
+    }
+  ],
+  "articulosInsumos": [
+    {
+      "id": 1,
+      "denominacion": "Coca cola",
+      "precioVenta": 70,
+      "imagenes": [
+        {
+          "id": 1,
+          "url": "https://m.media-amazon.com/images/I/51v8nyxSOYL._SL1500_.jpg"
+        }
+      ],
+      "unidadMedida": {
+        "id": 1,
+        "denominacion": "Litros"
+      },
+      "precioCompra": 50,
+      "stockActual": 5,
+      "stockMaximo": 50,
+      "esParaElaborar": false
+    },
+    {
+      "id": 2,
+      "denominacion": "Harina",
+      "precioVenta": 60.5,
+      "imagenes": [
+        {
+          "id": 2,
+          "url": "https://mandolina.co/wp-content/uploads/2023/03/648366622-1024x683.jpg"
+        }
+      ],
+      "unidadMedida": {
+        "id": 2,
+        "denominacion": "Gramos"
+      },
+      "precioCompra": 40,
+      "stockActual": 4,
+      "stockMaximo": 40,
+      "esParaElaborar": true
+    },
+    {
+      "id": 3,
+      "denominacion": "Queso",
+      "precioVenta": 66.6,
+      "imagenes": [
+        {
+          "id": 3,
+          "url": "https://superdepaso.com.ar/wp-content/uploads/2021/06/SANTAROSA-PATEGRAS-04.jpg"
+        }
+      ],
+      "unidadMedida": {
+        "id": 2,
+        "denominacion": "Gramos"
+      },
+      "precioCompra": 23.6,
+      "stockActual": 20,
+      "stockMaximo": 50,
+      "esParaElaborar": true
+    },
+    {
+      "id": 4,
+      "denominacion": "Tomate",
+      "precioVenta": 66.6,
+      "imagenes": [
+        {
+          "id": 4,
+          "url": "https://thefoodtech.com/wp-content/uploads/2020/06/Componentes-de-calidad-en-el-tomate-828x548.jpg"
+        }
+      ],
+      "unidadMedida": {
+        "id": 3,
+        "denominacion": "Cantidad"
+      },
+      "precioCompra": 23.6,
+      "stockActual": 20,
+      "stockMaximo": 50,
+      "esParaElaborar": true
+    },
+    {
+      "id": 5,
+      "denominacion": "Lechuga",
+      "precioVenta": 20.5,
+      "imagenes": [
+        {
+          "id": 4,
+          "url": "https://example.com/tomate.jpg"
+        }
+      ],
+      "unidadMedida": {
+        "id": 1,
+        "denominacion": "Unidad"
+      },
+      "categoria": {
+        "id": 1,
+        "denominacion": "Comida"
+      },
+      "precioCompra": 10.2,
+      "stockActual": 30,
+      "stockMaximo": 100,
+      "esParaElaborar": false
+    },
+    {
+      "id": 6,
+      "denominacion": "Leche",
+      "precioVenta": 30.0,
+      "imagenes": [
+        {
+          "id": 6,
+          "url": "https://example.com/leche.jpg"
+        }
+      ],
+      "unidadMedida": {
+        "id": 3,
+        "denominacion": "Litros"
+      },
+      "categoria": {
+        "id": 1,
+        "denominacion": "Comida"
+      },
+      "precioCompra": 18.0,
+      "stockActual": 50,
+      "stockMaximo": 100,
+      "esParaElaborar": false
+    }
+    
+  ]
+}

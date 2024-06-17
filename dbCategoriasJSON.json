@@ -1,0 +1,10 @@
+ [
+    { "id": 1, "denominacion": "Bebida" },
+    { "id": 2, "denominacion": "Comida" },
+    { "id": 3, "denominacion": "Postre" },
+    { "id": 4, "denominacion": "Vegetales" },
+    { "id": 5, "denominacion": "Frutas" },
+    { "id": 6, "denominacion": "Carnes" },
+    { "id": 7, "denominacion": "Lácteos" },
+    { "id": 8, "denominacion": "Panadería" }
+]
