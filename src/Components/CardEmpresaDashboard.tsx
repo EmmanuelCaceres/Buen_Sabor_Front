@@ -12,7 +12,7 @@ export default function CardEmpresaDashboard(props:{data:IEmpresa}) {
             <div className="cardEmpresaBody">
                 <div>
                     {
-                        props.data.eliminado ? (
+                        props.data.baja ? (
                             <div className="chip-default chip-delete">
                                 <img width="24" height="24" src={deleteRed} alt="deleteRed" />
                                 <div>Eliminado</div>

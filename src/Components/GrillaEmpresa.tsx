@@ -22,7 +22,7 @@ export default function GrillaEmpresa() {
     }
 
     useEffect(() => {
-        mostrarDatos("http://localhost:8080/empresa")
+        mostrarDatos("http://localhost:8080/empresas/includeDeleted")
     }, [])
     return (
         <section className="containerColumn">
@@ -33,7 +33,7 @@ export default function GrillaEmpresa() {
             </Link>
             <div className="containerCardEmpresa">
                 {
-                    empresas.map((empresa: IEmpresa,key=empresa.id) => (
+                   empresas && empresas.map((empresa: IEmpresa,key=empresa.id) => (
                         <CardEmpresaDashboard key={key} data={empresa}></CardEmpresaDashboard>
                     ))
                 }

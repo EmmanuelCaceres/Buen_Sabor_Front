@@ -2,7 +2,7 @@ import ISucursal from "./ISucursal";
 
 export default interface IEmpresa{
     id:number
-    eliminado:boolean
+    baja:boolean
     nombre:string;
     razonSocial:string;
     cuil:number;
