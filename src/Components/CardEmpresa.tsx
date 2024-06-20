@@ -1,8 +1,6 @@
 import { CCard, CCardBody, CCardTitle, CCardText, CButton } from "@coreui/react"
 import { Link } from "react-router-dom"
-import IEmpresa from "../Entities/IEmpresa"
 export default function CardEmpresa({ empresa }) {
-
 
     return (
         <div>

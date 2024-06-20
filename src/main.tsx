@@ -20,6 +20,7 @@ import Sucursales from './Components/Sucursales.tsx';
 import Menu from './Components/Lado Cliente/Menu.tsx';
 import Pedidos from './Components/Pedidos.tsx';
 import { CarritoContextProvider } from './Components/Lado Cliente/context/CarritoContext.tsx';
+import SaveEmpresa from './Components/SaveEmpresa.tsx';
 
 const router = createBrowserRouter([
   {
@@ -46,6 +47,10 @@ const router = createBrowserRouter([
       {
         path:"empresas",
         element:<GrillaEmpresa/>
+      },
+      {
+        path:"empresas/save/:id",
+        element:<SaveEmpresa/>
       },
       {
         path:"categorias",
