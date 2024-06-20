@@ -5,7 +5,7 @@ import NavBar from "./NavBar"
 export default function Root() {
     return (
         <div style={{display: "flex", flexDirection: "column", minHeight: "100vh"}}>
-            <NavBar />
+            {/* <NavBar /> */}
             <div style={{ display: "flex",flex:"1" }}>
                 <SideBar />
                 <Outlet />

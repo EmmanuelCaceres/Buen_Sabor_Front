@@ -191,6 +191,123 @@ p{
   margin-bottom: 1rem; 
 }
 
+.containerCardEmpresa{
+  width: 100%;
+  margin-top: 1rem;
+  /* margin: 2rem 3rem; */
+  display: grid;
+  grid-template-columns: repeat(auto-fill,minmax(250px,1fr));
+  grid-auto-rows: 350px;
+  column-gap: 1rem;
+  row-gap: 1rem;
+}
+
+.cardEmpresa{
+  background-color: white;
+  border-radius: 10px;
+  padding: 1rem 2rem;
+  box-shadow: 10px 10px 20px -2px rgba(15, 45, 107,.3);
+  transition-duration: .5s;
+  transition-property: scale;
+}
+.cardEmpresa:hover{
+  scale: 1.05;
+}
+.cardEmpresa>div{
+  width: 100%;
+  height: 50%;
+  overflow: hidden;
+}
+.cardEmpresa>div>img{
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  object-fit: cover;
+}
+.cardEmpresaBody{
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  justify-content: space-between;
+
+}
+.cardEmpresaBody > div{
+  width: 100%;
+  height: fit-content;
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+.cardEmpresaBody > div > p{
+  margin-top: 1rem;
+  font-weight: 500;
+  color: #0F2D6B;
+}
+.chip-default{
+  width: fit-content;
+  padding: 0.75rem;
+  text-align: center;
+  border-radius: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 14.5px;
+  height: 2.25rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  padding-left: 14px;
+  padding-right: 14px;
+}
+.chip-default.chip-delete{
+  border: 1px solid #CC0F41;
+  color: #CC0F41;
+}
+
+.chip-default.chip-active{
+  border: 1px solid #00BAA3;
+  color: #00BAA3;
+}
+
+.btnPropio{
+  padding: 10px;
+  border-radius: 10px;
+  background-color: transparent;
+  height: 2.75rem;
+  display: flex;
+  gap: 0.25rem;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.btnPropio:hover{
+  text-decoration: none;
+}
+
+.btn-secondary-propio{
+  color: #0d6efd;
+  border: 1px solid #0d6efd;
+  font-weight: 500;
+  transition: background-color 0.3s;
+}
+.btn-secondary-propio:hover{
+  background-color: #EFF3F9;
+}
+
+.containerColumn{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin:1rem 2rem;
+}
+
+
 /* Card de empresas */
 
 /*Color azul DARK  #0F2D6B */

@@ -13,7 +13,6 @@ export default function SaveCategoria() {
     const [categoria, setCategoria] = useState<ICategoria>({
         id: Number(id),
         denominacion: '',
-        sucursales: [],
         subCategorias: [],
         articulos: []
     });
