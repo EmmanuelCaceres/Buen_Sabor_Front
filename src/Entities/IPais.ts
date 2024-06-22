@@ -1,5 +1,5 @@
 export default interface IPais{
     id:number;
-    baja:number;
+    baja:boolean;
     nombre:string;
 }

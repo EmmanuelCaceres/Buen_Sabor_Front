@@ -12,7 +12,7 @@ export default function Sucursales() {
 
     const getSucursalesByEmpresaId = async () => {
         const result = await new SucursalService("http://localhost:8080/sucursal/");
-        result.getSucursalesById(Number(id))
+        result.getSucursalesByEmpresa(Number(id))
             .then(data => {
                 console.log(data)
                 setSucursales(data);

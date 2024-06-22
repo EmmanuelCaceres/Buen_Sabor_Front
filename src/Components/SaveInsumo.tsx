@@ -29,7 +29,6 @@ export default function SaveInsumo() {
         categoria: {
             id: 0,
             denominacion: '',
-            sucursales: [],
             subCategorias: [],
             articulos: []
         },

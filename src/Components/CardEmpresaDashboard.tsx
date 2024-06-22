@@ -44,7 +44,7 @@ export default function CardEmpresaDashboard(props: { data: IEmpresa }) {
                     <p>{props.data.nombre}</p>
                 </div>
                 <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-                    <div onClick={openModal} onMouseEnter={handleHover} onMouseLeave={handleHover} className={`image-container ${hover && "eyeBlue"}`}>
+                    <div onClick={typeof openModal === 'function' ? openModal: undefined} onMouseEnter={handleHover} onMouseLeave={handleHover} className={`image-container ${hover && "eyeBlue"}`}>
                         {
                             !hover ? (
                                 <img width={24} height={24} src={eyeCloseDarkBlue} alt="eyeCloseDarkBlue" />
@@ -56,7 +56,7 @@ export default function CardEmpresaDashboard(props: { data: IEmpresa }) {
                         <span>Ver</span>
                     </div>
                     <div>
-                    <div onClick={openModalAdd} className={`image-container`}>
+                    <div onClick={typeof openModalAdd === 'function' ? openModalAdd: undefined} className={`image-container`}>
                         <img width={24} height={24} src={addCyan} alt="" />
                         <span>Añadir</span>
                     </div>

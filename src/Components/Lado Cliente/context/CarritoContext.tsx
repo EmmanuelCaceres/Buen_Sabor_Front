@@ -29,7 +29,7 @@ export const CartContext = createContext<CartContextType>({
 export function CarritoContextProvider({ children }: { children: ReactNode }) {
     const [cart, setCart] = useState<IDetallePedido[]>([]);
     const [totalPedido, setTotalPedido] = useState<number>(0);
-    const [fechaActual, setFechaActual] = useState<Date>(new Date())
+    const [fechaActual] = useState<Date>(new Date())
 
     const addCarrito = (product: IArticuloManufacturado | IArticuloInsumo) => {
         let existe: boolean = false

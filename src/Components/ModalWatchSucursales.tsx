@@ -1,20 +1,29 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom"
-import ISucursal from "../Entities/ISucursalDto";
 import SucursalService from "../Functions/Services/SucursalService";
 import cruz_blue from "../assets/cruz-azul.svg"
+import ISucursalDto from "../Entities/ISucursalDto";
 
-export default function ModalWatchSucursales({ isOpen, closeModal, idEmpresa }) {
+
+interface ModalWatchSucursalesProps {
+    isOpen: boolean;
+    closeModal: () => void;
+    idEmpresa: number;
+}
+
+export default function ModalWatchSucursales({ isOpen, closeModal, idEmpresa }:ModalWatchSucursalesProps) {
     const handleModalContainer = (e: any) => e.stopPropagation();
 
-    const [sucursales, setSucursales] = useState<ISucursal[]>([]);
+    const [sucursales, setSucursales] = useState<ISucursalDto[]>([]);
 
     const getSucursalesByEmpresa = (path: string, idEmpresa: number) => {
         const result = new SucursalService(path);
         result.getSucursalesByEmpresa(idEmpresa)
             .then(data => {
-                console.log(data);
-                setSucursales(data);
+                if(data != null){
+                    console.log(data);
+                    setSucursales(data);
+                }
             })
             .catch(error => {
                 console.log(error)
@@ -44,7 +53,7 @@ export default function ModalWatchSucursales({ isOpen, closeModal, idEmpresa }) 
                         </thead>
                         <tbody >
                             {
-                                sucursales && sucursales.map((sucursal: ISucursal, key = sucursal.id) => (
+                                sucursales && sucursales.map((sucursal: ISucursalDto, key = sucursal.id) => (
                                     <tr key={key}>
                                         <td>
                                             <span>{sucursal.nombre}</span>
