@@ -1,4 +1,4 @@
-import ISucursal from "./ISucursal";
+import ISucursal from "./ISucursalDto";
 
 export default interface IEmpresa{
     id:number

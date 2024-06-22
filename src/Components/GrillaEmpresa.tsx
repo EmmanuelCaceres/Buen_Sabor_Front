@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react"
 import { Link } from 'react-router-dom';
-import masObject from '../assets/circle-plus-svgrepo-com.svg';
 import IEmpresa from "../Entities/IEmpresa";
 import EmpresaService from "../Functions/Services/EmpresaService";
 import CardEmpresaDashboard from "./CardEmpresaDashboard";
 
+
 export default function GrillaEmpresa() {
+
+   
 
     const [empresas, setEmpresas] = useState<IEmpresa[]>([]);
 
@@ -26,17 +28,20 @@ export default function GrillaEmpresa() {
     }, [])
     return (
         <section className="containerColumn">
-            
-            <Link to={'save/0'} className='btn btn-primary'>
+
+            {/* <Link to={'save/0'} className='btn btn-primary'>
                         <img src={masObject} alt="Crear Artículo" style={{ marginRight: '8px' }} />
                         Añadir empresa
-            </Link>
+            </Link> */}
             <div className="containerCardEmpresa">
                 {
-                   empresas && empresas.map((empresa: IEmpresa,key=empresa.id) => (
+                    empresas && empresas.map((empresa: IEmpresa, key = empresa.id) => (
                         <CardEmpresaDashboard key={key} data={empresa}></CardEmpresaDashboard>
                     ))
                 }
+                <Link to={'save/0'} className="cardEmpresa cardEmpresaSave">
+                    Agregar Empresa
+                </Link>
             </div>
         </section>
 

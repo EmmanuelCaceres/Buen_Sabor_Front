@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import ISucursal from "../Entities/ISucursal"
+import ISucursal from "../Entities/ISucursalDto"
 import { useParams } from "react-router-dom"
 import SucursalService from "../Functions/Services/SucursalService";
 import { CCard, CCardBody, CCardTitle, CListGroup, CListGroupItem } from "@coreui/react"
@@ -12,7 +12,7 @@ export default function Sucursales() {
 
     const getSucursalesByEmpresaId = async () => {
         const result = await new SucursalService("http://localhost:8080/sucursal/");
-        result.getSucursalesById(Number(id))
+        result.getSucursalesByEmpresa(Number(id))
             .then(data => {
                 console.log(data)
                 setSucursales(data);

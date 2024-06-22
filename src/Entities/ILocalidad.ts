@@ -2,7 +2,7 @@ import IProvincia from "./IProvincia";
 
 export default interface ILocalidad{
     id:number;
-    eliminado:number;
+    baja:boolean;
     nombre:string;
     provincia:IProvincia
 }

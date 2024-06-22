@@ -24,7 +24,6 @@ export default function SaveEmpresa() {
             await new EmpresaService("http://localhost:8080/empresas").post(empresa);
         }
         alert("Empresa guardada con exito!");
-        // handleClose(false);
         navigate(-1);
     };
 
