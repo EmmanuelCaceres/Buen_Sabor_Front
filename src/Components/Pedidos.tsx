@@ -54,7 +54,6 @@ export default function Pedidos() {
                 <tbody>
                     {pedidos.map((pedido: IPedido) => (
                         <tr key={pedido.id}>
-                            <td>{pedido.fechaPedido}</td>
                             <td>{pedido.total}</td>
                             <td>{pedido.totalCosto}</td>
                             <td>

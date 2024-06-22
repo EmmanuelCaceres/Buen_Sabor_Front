@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import ISucursal from "../Entities/ISucursal"
+import ISucursal from "../Entities/ISucursalDto"
 import { useParams } from "react-router-dom"
 import SucursalService from "../Functions/Services/SucursalService";
 import { CCard, CCardBody, CCardTitle, CListGroup, CListGroupItem } from "@coreui/react"

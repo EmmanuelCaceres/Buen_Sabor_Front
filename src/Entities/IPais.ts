@@ -1,5 +1,5 @@
 export default interface IPais{
     id:number;
-    eliminado:number;
+    baja:number;
     nombre:string;
 }

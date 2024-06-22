@@ -224,6 +224,18 @@ p{
   border-radius: 10px;
   object-fit: cover;
 }
+
+.cardEmpresaSave{
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #0F2D6B;
+  text-decoration: none;
+}
+
 .cardEmpresaBody{
   display: flex;
   width: 100%;
@@ -231,7 +243,7 @@ p{
   justify-content: space-between;
 
 }
-.cardEmpresaBody > div{
+.cardEmpresaBody .cardEmpresaBody-title{
   width: 100%;
   height: fit-content;
   margin-top: 12px;
@@ -300,6 +312,23 @@ p{
   background-color: #EFF3F9;
 }
 
+.image-container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px;
+  width: fit-content;
+  cursor: pointer;
+}
+.image-container span{
+  margin-left: 1rem;
+  margin-right: .5rem;
+}
+.image-container.eyeBlue{
+  border-radius: 10px;
+  background-color: #EFF3F9;
+}
+
 .containerColumn{
   width: 100%;
   display: flex;
@@ -307,6 +336,59 @@ p{
   margin:1rem 2rem;
 }
 
+.modalPropio{
+  position: fixed;
+  z-index:999;
+  top: 0;
+  left: 0;
+  width: 100%;
+  min-height: 100vh;
+  background-color: rgba(15, 45, 107, 0.6);
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+.modalPropio.is-open{
+  display: flex;
+}
+
+.modalPropio .container{
+  position: relative;
+}
+
+.modalPropio-close{
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  cursor: pointer;
+  border-radius: 50%;
+}
+.modalPropio-close:hover{
+  background-color: #D4E1FF;
+}
+
+.grillaSucursales{
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 1rem;
+}
+
+.grillaSucursales thead tr th{
+  color: rgb(15, 45, 107);
+  font-weight: 500;
+  padding: 1rem 0;
+  text-align: center;
+}
+.grillaSucursales tbody tr {
+  background-color: #ececec;
+  border-radius: 100px;
+}
+.grillaSucursales tbody tr td{
+  color: #62626B;
+  font-weight: 400;
+  padding: 1rem 0;
+  text-align: center
+}
 
 /* Card de empresas */
 
