@@ -5,6 +5,8 @@ import { useState } from "react";
 import IEmpresa from "../Entities/IEmpresa";
 
 export default function SaveEmpresa() {
+    const apiUrl = import.meta.env.VITE_URL_API_BACK
+
     const { id } = useParams();
     const navigate = useNavigate();
 
@@ -19,9 +21,9 @@ export default function SaveEmpresa() {
 
     const SaveCategoria = async () => {
         if (Number(id) !== 0) {
-            await new EmpresaService("http://localhost:8080/empresas").put(Number(id), empresa);
+            await new EmpresaService(`${apiUrl}empresas`).put(Number(id), empresa);
         } else {
-            await new EmpresaService("http://localhost:8080/empresas").post(empresa);
+            await new EmpresaService(`${apiUrl}empresas`).post(empresa);
         }
         alert("Empresa guardada con exito!");
         navigate(-1);

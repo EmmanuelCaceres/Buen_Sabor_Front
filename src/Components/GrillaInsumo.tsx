@@ -4,7 +4,11 @@ import ArticuloInsumoService from '../Functions/Services/ArticuloInsumoService';
 import masObject from '../assets/circle-plus-svgrepo-com.svg';
 import IArticuloInsumo from '../Entities/IArticuloInsumo';
 import { Button, Form, InputGroup, Table } from 'react-bootstrap';
+
 export default function GrillaArticulo() {
+
+    const apiUrl = import.meta.env.VITE_URL_API_BACK
+
     const [inputValue, setInputValue] = useState('');
 
     const [articulosInsumos, setArticulosinsumos] = useState<IArticuloInsumo[]>([]);
@@ -20,7 +24,7 @@ export default function GrillaArticulo() {
             })
     }
     const searchItem = (value: string) => {
-        const result = new ArticuloInsumoService("http://localhost:8080/articuloInsumos/name?nombre=");
+        const result = new ArticuloInsumoService(`${apiUrl}articuloInsumos/name?nombre=`);
         result.getInsumoByDenominacion(value)
             .then(data => {
                 // Verifica si 'data' es 'null' y proporciona un array vacío en su lugar
@@ -39,7 +43,7 @@ export default function GrillaArticulo() {
     };
 
     const handleDelete = (id:number) => {
-        new ArticuloInsumoService("http://localhost:8080/articuloInsumos").delete(id);
+        new ArticuloInsumoService(`${apiUrl}articulosInsumos`).delete(id);
         window.location.reload;
     }
 
@@ -48,7 +52,7 @@ export default function GrillaArticulo() {
     };
 
     useEffect(() => {
-        mostrarDatos("http://localhost:8080/articuloInsumos")
+        mostrarDatos(`${apiUrl}articuloInsumos`)
     }, ([]))
 
     return (
@@ -82,7 +86,7 @@ export default function GrillaArticulo() {
                     {articulosInsumos.map((insumo: IArticuloInsumo) => (
                         <tr key={insumo.id}>
                             <td>
-                                <img width={50} height={50} src={'http://localhost:8080/imagenArticulos/uploads/' + insumo.imagenes[0].url} alt="imagenArticulo" />
+                                <img width={50} height={50} src={`${apiUrl}imagenArticulos/uploads/${insumo.imagenes[0].url}`} alt="imagenArticulo" />
                             </td>
                             <td>{insumo.denominacion}</td>
                             <td>{insumo.categoria.denominacion}</td>

@@ -7,6 +7,7 @@ import CardEmpresaDashboard from "./CardEmpresaDashboard";
 
 export default function GrillaEmpresa() {
 
+    const apiUrl = import.meta.env.VITE_URL_API_BACK
    
 
     const [empresas, setEmpresas] = useState<IEmpresa[]>([]);
@@ -24,7 +25,7 @@ export default function GrillaEmpresa() {
     }
 
     useEffect(() => {
-        mostrarDatos("http://localhost:8080/empresas/includeDeleted")
+        mostrarDatos(`${apiUrl}empresas/includeDeleted`)
     }, [])
     return (
         <section className="containerColumn">

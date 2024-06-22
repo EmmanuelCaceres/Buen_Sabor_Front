@@ -5,6 +5,9 @@ import { Container, Row, Col, InputGroup, Table, Button, Form } from 'react-boot
 import ICategoria from '../Entities/ICategoria';
 import CategoriaService from '../Functions/Services/CategoriaService';
 export default function GrillaArticulo() {
+
+    const apiUrl = import.meta.env.VITE_URL_API_BACK
+
     const [inputValue, setInputValue] = useState('');
 
     const [categorias, setCategorias] = useState<ICategoria[]>([]);
@@ -20,7 +23,7 @@ export default function GrillaArticulo() {
             })
     }
     const searchItem = (value: string) => {
-        const result = new CategoriaService("http://localhost:8080/categorias/name?nombre=");
+        const result = new CategoriaService(`${apiUrl}categorias/name?nombre=`);
         result.getCategoryByDenominacion(value)
             .then(data => {
                 // Verifica si 'data' es 'null' y proporciona un array vacío en su lugar
@@ -40,7 +43,7 @@ export default function GrillaArticulo() {
 
     const handleDelete = (id:number) => {
         //console.log(event);
-        new CategoriaService("http://localhost:8080/categorias").delete(id);
+        new CategoriaService(`${apiUrl}categorias`).delete(id);
         alert("Categoria removido con éxito!")
         window.location.reload;
     }
@@ -50,7 +53,7 @@ export default function GrillaArticulo() {
     };
 
     useEffect(() => {
-        mostrarDatos("http://localhost:8080/categorias")
+        mostrarDatos(`${apiUrl}categorias`)
     }, ([]))
 
     return (

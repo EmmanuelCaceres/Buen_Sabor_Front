@@ -15,6 +15,7 @@ interface ModalAddSucursalesProps {
 
 export default function ModalAddSucursales({ isOpen, closeModal }: ModalAddSucursalesProps) {
 
+    const apiUrl = import.meta.env.VITE_URL_API_BACK
     const [localidades, setLocalidades] = useState<ILocalidad[]>([]);
     const [provincias, setProvincias] = useState<IProvincia[]>([]);
 
@@ -57,7 +58,7 @@ export default function ModalAddSucursales({ isOpen, closeModal }: ModalAddSucur
     const handleModalContainer = (e: any) => e.stopPropagation();
 
     const getAllProvincias = () => {
-        const result = new ProvinciaService("http://localhost:8080/provincias/findByPais/")
+        const result = new ProvinciaService(`${apiUrl}provincias/findByPais/`)
         result.getProvinciasByPais(1)
             .then(data => {
                 if (data !== null) {

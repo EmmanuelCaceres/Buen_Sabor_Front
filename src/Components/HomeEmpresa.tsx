@@ -4,12 +4,14 @@ import EmpresaService from "../Functions/Services/EmpresaService";
 import CardEmpresa from "./CardEmpresa";
 
 export default function HomeEmpresa(){
+    const apiUrl = import.meta.env.VITE_URL_API_BACK
+
 
     const [empresas,setEmpresas] = useState<IEmpresa[]>([]);
 
     const getAllEmpresas = async () =>{
 
-        const result = await new EmpresaService("http://localhost:8080/empresa");
+        const result = await new EmpresaService(`${apiUrl}empresa`);
         result.getAll()
             .then(data =>{
                 setEmpresas(data);
