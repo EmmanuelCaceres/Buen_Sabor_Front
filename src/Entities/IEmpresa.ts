@@ -1,8 +1,8 @@
-import ISucursal from "./ISucursal";
+import ISucursal from "./ISucursalDto";
 
 export default interface IEmpresa{
     id:number
-    eliminado:boolean
+    baja:boolean
     nombre:string;
     razonSocial:string;
     cuil:number;

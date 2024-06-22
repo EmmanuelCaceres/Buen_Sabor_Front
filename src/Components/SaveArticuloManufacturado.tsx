@@ -17,6 +17,8 @@ import UnidadMedidaService from "../Functions/Services/UnidadMedidaService";
 import ImagenArticuloService from "../Functions/Services/ImagenArticuloService";
 
 export default function SaveArticulo() {
+    const apiUrl = import.meta.env.VITE_URL_API_BACK
+
     const { id } = useParams();
     const navigate = useNavigate();
     const [inputValue, setInputValue] = useState('');
@@ -46,7 +48,7 @@ export default function SaveArticulo() {
         formData.append("file", file);
         console.log(formData);
     
-        const result = new ImagenArticuloService("http://localhost:8080/imagenArticulos");
+        const result = new ImagenArticuloService(`${apiUrl}imagenArticulos`);
         result.postImagen(formData)
             .then(data => {
                 if (data) {
@@ -83,7 +85,6 @@ export default function SaveArticulo() {
             categoria: {
                 id: 0,
                 denominacion: '',
-                sucursales: [],
                 subCategorias: [],
                 articulos: []
             },
@@ -111,7 +112,7 @@ export default function SaveArticulo() {
     }
 
     const buscarInsumoXDenominacion = async () => {
-        const result = new ArticuloInsumoService("http://localhost:8080/articuloInsumos/search?denominacion=");
+        const result = new ArticuloInsumoService(`${apiUrl}articuloInsumos/search?denominacion=`);
         const insumosResult = await result.getInsumoByDenominacion(inputValue);
         if (insumosResult) {
             setInsumos(insumosResult);
@@ -121,13 +122,13 @@ export default function SaveArticulo() {
 
     }
     const getAllCategories = async () => {
-        const result = new CatetgoriaService("http://localhost:8080/categorias")
+        const result = new CatetgoriaService(`${apiUrl}categorias`)
         const categoriaResult = await result.getAll();
         setCategoria(categoriaResult);
     }
 
     const getAllUnidad = async () => {
-        const result = new UnidadMedidaService("http://localhost:8080/unidadMedidas")
+        const result = new UnidadMedidaService(`${apiUrl}unidadMedidas`)
         const unidadMedidaResult = await result.getAll();
         setUnidadMedida(unidadMedidaResult)
     }
@@ -183,9 +184,9 @@ export default function SaveArticulo() {
     const saveArticulo = async () => {
         //console.log(articuloManufacturado);
         if (Number(id) !== 0) {
-            await new ArticuloManufacturadoService("http://localhost:8080/articuloManufacturados").put(Number(id), articuloManufacturado);
+            await new ArticuloManufacturadoService(`${apiUrl}articuloManufacturados`).put(Number(id), articuloManufacturado);
         } else {
-            await new ArticuloManufacturadoService("http://localhost:8080/articuloManufacturados").post(articuloManufacturado);
+            await new ArticuloManufacturadoService(`${apiUrl}articuloManufacturados`).post(articuloManufacturado);
         }
         alert("Articulo guardado con exito!");
         handleClose();
@@ -207,7 +208,7 @@ export default function SaveArticulo() {
         getAllCategories()
         getAllUnidad()
         if (Number(id) != 0) {
-            getArticuloManufacturado("http://localhost:8080/articuloManufacturados", Number(id))
+            getArticuloManufacturado(`${apiUrl}articuloManufacturados`, Number(id))
 
         }
         // console.log(articuloManufacturado.articuloManufacturadoDetalles)

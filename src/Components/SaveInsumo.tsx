@@ -11,6 +11,8 @@ import ImagenArticuloService from "../Functions/Services/ImagenArticuloService";
 import CategoriaService from "../Functions/Services/CategoriaService";
 
 export default function SaveInsumo() {
+    const apiUrl = import.meta.env.VITE_URL_API_BACK
+
     const { id } = useParams();
     const navigate = useNavigate();
     const [categoria, setCategoria] = useState<ICategoria[]>([])
@@ -29,7 +31,6 @@ export default function SaveInsumo() {
         categoria: {
             id: 0,
             denominacion: '',
-            sucursales: [],
             subCategorias: [],
             articulos: []
         },
@@ -51,7 +52,7 @@ export default function SaveInsumo() {
         formData.append("file", file);
         console.log(formData);
     
-        const result = new ImagenArticuloService("http://localhost:8080/imagenArticulos");
+        const result = new ImagenArticuloService(`${apiUrl}imagenArticulos`);
         result.postImagen(formData)
             .then(data => {
                 if (data) {
@@ -92,13 +93,13 @@ export default function SaveInsumo() {
 
 
     const getAllCategories = async () => {
-        const result = new CategoriaService("http://localhost:8080/categorias")
+        const result = new CategoriaService(`${apiUrl}categorias`)
         const categoriaResult = await result.getAll();
         setCategoria(categoriaResult);
     }
 
     const getAllUnidad = async () => {
-        const result = new UnidadMedidaService("http://localhost:8080/unidadMedidas")
+        const result = new UnidadMedidaService(`${apiUrl}unidadMedidas`)
         const unidadMedidaResult = await result.getAll();
         setUnidadMedida(unidadMedidaResult)
     }
@@ -128,9 +129,9 @@ export default function SaveInsumo() {
 
     const saveArticulo = async () => {
         if (Number(id) !== 0) {
-            await new ArticuloInsumoService("http://localhost:8080/articuloInsumos").put(Number(id), articuloInsumo);
+            await new ArticuloInsumoService(`${apiUrl}articuloInsumo`).put(Number(id), articuloInsumo);
         } else {
-            await new ArticuloInsumoService("http://localhost:8080/articuloInsumos").post(articuloInsumo);
+            await new ArticuloInsumoService(`${apiUrl}articuloInsumo`).post(articuloInsumo);
         }
         alert("Insumo guardado con exito!");
         // handleClose();
@@ -159,7 +160,7 @@ export default function SaveInsumo() {
         getAllCategories()
         getAllUnidad()
         if (Number(id) !== 0) {
-            getArticuloInsumo("http://localhost:8080/articuloInsumos", Number(id))
+            getArticuloInsumo(`${apiUrl}articuloInsumo`, Number(id))
         }
     }, [id])
 
