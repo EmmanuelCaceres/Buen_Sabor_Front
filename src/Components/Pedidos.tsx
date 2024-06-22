@@ -7,6 +7,8 @@ import IDetallePedido from '../Entities/IDetallePedido';
 
 export default function Pedidos() {
 
+    const apiUrl = import.meta.env.VITE_URL_API_BACK
+
     const [visible, setVisible] = useState(false);
 
     const [pedidos, setPedidos] = useState<IPedido[]>([]);
@@ -31,7 +33,7 @@ export default function Pedidos() {
     }
 
     useEffect(() => {
-        getPedidos("http://localhost:8080/pedido");
+        getPedidos(`${apiUrl}pedido`);
     }, [])
 
 
@@ -76,7 +78,7 @@ export default function Pedidos() {
                     {
                         detallePedidos.map((detalle: IDetallePedido,index:number) => (
                             <div key={index} style={{padding:"1rem 1rem ",margin:"1rem .5rem",display:"flex",flexDirection:"row",gap:"1rem",border:"1px solid rgb(239 243 249)",borderRadius:"10px"}}>
-                                <img width={80} height={80} src={'http://localhost:8080/imagenArticulos/uploads/' +detalle.articulo.imagenes[0].url} alt="" />
+                                <img width={80} height={80} src={`${apiUrl}imagenArticulos/uploads/${detalle.articulo.imagenes[0].url}}`} alt="" />
                                 <div>
                                     <p>Cantidad: {detalle.cantidad}</p>
                                     <p>{detalle.articulo.denominacion} - ${detalle.articulo.precioVenta}</p>

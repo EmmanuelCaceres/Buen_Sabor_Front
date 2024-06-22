@@ -12,6 +12,8 @@ interface ModalWatchSucursalesProps {
 }
 
 export default function ModalWatchSucursales({ isOpen, closeModal, idEmpresa }:ModalWatchSucursalesProps) {
+    const apiUrl = import.meta.env.VITE_URL_API_BACK
+
     const handleModalContainer = (e: any) => e.stopPropagation();
 
     const [sucursales, setSucursales] = useState<ISucursalDto[]>([]);
@@ -31,7 +33,7 @@ export default function ModalWatchSucursales({ isOpen, closeModal, idEmpresa }:M
     }
 
     useEffect(() => {
-        getSucursalesByEmpresa("http://localhost:8080/sucursales/empresa/", idEmpresa)
+        getSucursalesByEmpresa(`${apiUrl}sucursales/empresa/`, idEmpresa)
     }, [])
 
 

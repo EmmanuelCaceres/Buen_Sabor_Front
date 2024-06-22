@@ -6,6 +6,7 @@ import ICategoria from "../Entities/ICategoria";
 import CategoriaService from "../Functions/Services/CategoriaService";
 
 export default function SaveCategoria() {
+    const apiUrl = import.meta.env.VITE_URL_API_BACK
     const { id } = useParams();
     const navigate = useNavigate();
     // const [show, setShow] = useState(false);
@@ -71,9 +72,9 @@ export default function SaveCategoria() {
 
     const SaveCategoria = async () => {
         if (Number(id) !== 0) {
-            await new CategoriaService("http://localhost:8080/categorias").put(Number(id), categoria);
+            await new CategoriaService(`${apiUrl}categorias`).put(Number(id), categoria);
         } else {
-            await new CategoriaService("http://localhost:8080/categorias").post(categoria);
+            await new CategoriaService(`${apiUrl}categorias`).post(categoria);
         }
         alert("Categoria guardada con exito!");
         // handleClose(false);
@@ -92,7 +93,7 @@ export default function SaveCategoria() {
 
     useEffect(() => {
         if (Number(id) !== 0) {
-            getCategoryByDenominacion("http://localhost:8080/categorias", Number(id))
+            getCategoryByDenominacion(`${apiUrl}categorias`, Number(id))
         }
     }, [id])
 

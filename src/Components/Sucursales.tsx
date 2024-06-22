@@ -5,13 +5,14 @@ import SucursalService from "../Functions/Services/SucursalService";
 import { CCard, CCardBody, CCardTitle, CListGroup, CListGroupItem } from "@coreui/react"
 
 export default function Sucursales() {
-
+    
+    const apiUrl = import.meta.env.VITE_URL_API_BACK
     const { id } = useParams();
 
     const [sucursales, setSucursales] = useState<ISucursal[] | null>([])
 
     const getSucursalesByEmpresaId = async () => {
-        const result = await new SucursalService("http://localhost:8080/sucursal/");
+        const result = await new SucursalService(`${apiUrl}sucursal/`);
         result.getSucursalesByEmpresa(Number(id))
             .then(data => {
                 console.log(data)

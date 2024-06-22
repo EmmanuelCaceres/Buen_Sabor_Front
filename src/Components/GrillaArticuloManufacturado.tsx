@@ -5,6 +5,9 @@ import IArticuloManufacturado from '../Entities/IArticuloManufacturado';
 import masObject from '../assets/circle-plus-svgrepo-com.svg';
 import { Container, Row, Col, InputGroup, Table, Button, Form } from 'react-bootstrap';
 export default function GrillaArticulo() {
+
+    const apiUrl = import.meta.env.VITE_URL_API_BACK
+
     const [inputValue, setInputValue] = useState('');
 
     const [articulosManufacturados, setArticulosManufacturados] = useState<IArticuloManufacturado[]>([]);
@@ -20,7 +23,7 @@ export default function GrillaArticulo() {
             })
     }
     const searchItem = (value: string) => {
-        const result = new ArticuloManufacturadoService("http://localhost:8080/articuloManufacturados/name?nombre=");
+        const result = new ArticuloManufacturadoService(`${apiUrl}articuloManufacturados/name?nombre=`);
         result.getArticuloByName(value)
             .then(data => {
                 // Verifica si 'data' es 'null' y proporciona un array vacío en su lugar
@@ -40,7 +43,7 @@ export default function GrillaArticulo() {
 
     const handleDelete = (id:number) => {
         //console.log(event);
-        new ArticuloManufacturadoService("http://localhost:8080/articuloManufacturados").delete(id);
+        new ArticuloManufacturadoService(`${apiUrl}articuloManufacturados`).delete(id);
         alert("Articulo removido con éxito!")
         window.location.reload;
     }
@@ -50,7 +53,7 @@ export default function GrillaArticulo() {
     };
 
     useEffect(() => {
-        mostrarDatos("http://localhost:8080/articuloManufacturados")
+        mostrarDatos(`${apiUrl}articuloManufacturados`)
     }, ([]))
 
     return (
@@ -90,7 +93,7 @@ export default function GrillaArticulo() {
                     {articulosManufacturados.map((articulo: IArticuloManufacturado) => (
                         <tr key={articulo.id}>
                             <td>
-                                <img width={64} height={64} src={'http://localhost:8080/imagenArticulos/uploads/' + articulo.imagenes[0].url} alt="imagenArticulo" />
+                                <img width={64} height={64} src={`${apiUrl}imagenArticulos/uploads/${articulo.imagenes[0].url}`} alt="imagenArticulo" />
                             </td>
                             <td>{articulo.denominacion}</td>
                             <td>{articulo.descripcion}</td>
