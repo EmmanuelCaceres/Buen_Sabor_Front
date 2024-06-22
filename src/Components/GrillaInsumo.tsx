@@ -82,7 +82,7 @@ export default function GrillaArticulo() {
                     {articulosInsumos.map((insumo: IArticuloInsumo) => (
                         <tr key={insumo.id}>
                             <td>
-                                <img width={50} height={50} src={'http://localhost:8080/imagenArticulos/uploads/' + insumo.imagenes[0].url} alt="imagenArticulo" />
+                                {/*<img width={50} height={50} src={'http://localhost:8080/imagenArticulos/uploads/' + insumo.imagenes[0].url} alt="imagenArticulo" />*/}
                             </td>
                             <td>{insumo.denominacion}</td>
                             <td>{insumo.categoria.denominacion}</td>
