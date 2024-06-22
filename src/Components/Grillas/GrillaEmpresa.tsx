@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react"
 import { Link } from 'react-router-dom';
-import IEmpresa from "../Entities/IEmpresa";
-import EmpresaService from "../Functions/Services/EmpresaService";
-import CardEmpresaDashboard from "./CardEmpresaDashboard";
+import IEmpresa from "../../Entities/IEmpresa";
+import EmpresaService from "../../Functions/Services/EmpresaService";
+import CardEmpresaDashboard from "../CardEmpresaDashboard";
 
 
 export default function GrillaEmpresa() {

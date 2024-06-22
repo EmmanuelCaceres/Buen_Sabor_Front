@@ -1,9 +1,9 @@
 import { SetStateAction, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
-import masObject from '../assets/circle-plus-svgrepo-com.svg';
+import masObject from '../../assets/circle-plus-svgrepo-com.svg';
 import { Container, Row, Col, InputGroup, Table, Button, Form } from 'react-bootstrap';
-import ICategoria from '../Entities/ICategoria';
-import CategoriaService from '../Functions/Services/CategoriaService';
+import ICategoria from '../../Entities/ICategoria';
+import CategoriaService from '../../Functions/Services/CategoriaService';
 export default function GrillaArticulo() {
 
     const apiUrl = import.meta.env.VITE_URL_API_BACK

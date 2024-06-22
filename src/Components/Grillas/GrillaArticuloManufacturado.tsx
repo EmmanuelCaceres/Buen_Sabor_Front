@@ -1,8 +1,8 @@
 import { SetStateAction, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
-import ArticuloManufacturadoService from '../Functions/Services/ArticuloManufacturadoService';
-import IArticuloManufacturado from '../Entities/IArticuloManufacturado';
-import masObject from '../assets/circle-plus-svgrepo-com.svg';
+import ArticuloManufacturadoService from '../../Functions/Services/ArticuloManufacturadoService';
+import IArticuloManufacturado from '../../Entities/IArticuloManufacturado';
+import masObject from '../../assets/circle-plus-svgrepo-com.svg';
 import { Container, Row, Col, InputGroup, Table, Button, Form } from 'react-bootstrap';
 export default function GrillaArticulo() {
 

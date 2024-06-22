@@ -3,24 +3,24 @@ import ReactDOM from 'react-dom/client'
 import {createBrowserRouter,RouterProvider} from "react-router-dom";
 import Root from './Components/Root.tsx';
 import ErrorPage from './Components/ErrorPage.tsx';
-import SaveArticulo from './Components/SaveArticuloManufacturado.tsx';
-import GrillaArticulo from './Components/GrillaArticuloManufacturado.tsx';
+import SaveArticulo from './FormSave/SaveArticuloManufacturado.tsx';
+import GrillaArticulo from './Components/Grillas/GrillaArticuloManufacturado.tsx';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
-import GrillaEmpresa from './Components/GrillaEmpresa.tsx';
-import GrillaCategoria from './Components/GrillaCategoria.tsx';
-import GrillaEmpleado from './Components/GrillaEmpleado.tsx';
-import GrillaRol from './Components/GrillaRol.tsx';
-import GrillaPromocion from './Components/GrillaPromocion.tsx';
-import GrillaInsumo from './Components/GrillaInsumo.tsx';
-import SaveInsumo from './Components/SaveInsumo.tsx';
-import SaveCategoria from './Components/SaveCategoria.tsx';
+import GrillaEmpresa from './Components/Grillas/GrillaEmpresa.tsx';
+import GrillaCategoria from './Components/Grillas/GrillaCategoria.tsx';
+import GrillaEmpleado from './Components/Grillas/GrillaEmpleado.tsx';
+import GrillaRol from './Components/Grillas/GrillaRol.tsx';
+import GrillaPromocion from './Components/Grillas/GrillaPromocion.tsx';
+import GrillaInsumo from './Components/Grillas/GrillaInsumo.tsx';
+import SaveInsumo from './FormSave/SaveInsumo.tsx';
+import SaveCategoria from './FormSave/SaveCategoria.tsx';
 import HomeEmpresa from './Components/HomeEmpresa.tsx';
 import Sucursales from './Components/Sucursales.tsx';
 import Menu from './Components/Lado Cliente/Menu.tsx';
 import Pedidos from './Components/Pedidos.tsx';
 import { CarritoContextProvider } from './Components/Lado Cliente/context/CarritoContext.tsx';
-import SaveEmpresa from './Components/SaveEmpresa.tsx';
+import SaveEmpresa from './FormSave/SaveEmpresa.tsx';
 
 const router = createBrowserRouter([
   {

@@ -1,8 +1,8 @@
 import { SetStateAction, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
-import ArticuloInsumoService from '../Functions/Services/ArticuloInsumoService';
-import masObject from '../assets/circle-plus-svgrepo-com.svg';
-import IArticuloInsumo from '../Entities/IArticuloInsumo';
+import ArticuloInsumoService from '../../Functions/Services/ArticuloInsumoService';
+import masObject from '../../assets/circle-plus-svgrepo-com.svg';
+import IArticuloInsumo from '../../Entities/IArticuloInsumo';
 import { Button, Form, InputGroup, Table } from 'react-bootstrap';
 
 export default function GrillaArticulo() {
