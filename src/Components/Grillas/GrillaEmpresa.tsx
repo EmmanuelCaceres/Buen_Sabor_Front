@@ -16,7 +16,6 @@ export default function GrillaEmpresa() {
         const result = new EmpresaService(url);
         result.getAll()
             .then(data => {
-                console.log(data);
                 setEmpresas(data);
             })
             .catch(error => {

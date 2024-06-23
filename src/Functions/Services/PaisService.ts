@@ -3,7 +3,7 @@ import { GenericFetch } from "../GenericFetch";
 
 export default class PaisService extends GenericFetch<IPais>{
     async getPaises():Promise<IPais[] | null>{
-        const response = await fetch(`${this.baseUrl}1`);
+        const response = await fetch(`${this.baseUrl}`);
         if (!response.ok) {
             return null;
         }

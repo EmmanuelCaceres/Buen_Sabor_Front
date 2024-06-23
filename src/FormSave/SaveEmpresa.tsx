@@ -19,7 +19,7 @@ export default function SaveEmpresa() {
         sucursales: []
     });
 
-    const SaveCategoria = async () => {
+    const SaveEmpresa = async () => {
         if (Number(id) !== 0) {
             await new EmpresaService(`${apiUrl}empresas`).put(Number(id), empresa);
         } else {
@@ -47,7 +47,7 @@ export default function SaveEmpresa() {
                     <input type="number" id="cuil" name="cuil" value={empresa.cuil} onChange={(e) => setEmpresa({ ...empresa, cuil: Number(e.target.value) })} />
                 </form>
 
-                <button className="btn btn-primary" onClick={SaveCategoria}>Guardar</button>
+                <button className="btn btn-primary" onClick={SaveEmpresa}>Guardar</button>
             </div>
         </>
     )
