@@ -1,15 +1,17 @@
-import { createPortal } from "react-dom";
-import { useNavigate, useParams } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import cruz_blue from "../assets/cruz-azul.svg";
-import { useState, useEffect } from "react";
 import ILocalidad from "../Entities/ILocalidad";
 import IProvincia from "../Entities/IProvincia";
+import IPais from "../Entities/IPais";
+import ISucursalDto from "../Entities/ISucursalDto";
 import ProvinciaService from "../Functions/Services/ProvinciaService";
 import LocalidadService from "../Functions/Services/LocalidadService";
 import PaisService from "../Functions/Services/PaisService";
-import ISucursalDto from "../Entities/ISucursalDto";
-import IPais from "../Entities/IPais";
 import SucursalService from "../Functions/Services/SucursalService";
+import DomicilioService from "../Functions/Services/DomicilioService";
+import { Button, ProgressBar } from 'react-bootstrap';
 
 interface ModalAddSucursalesProps {
     isOpen: boolean;
@@ -23,6 +25,7 @@ export default function ModalAddSucursales({ isOpen, closeModal }: ModalAddSucur
     const [paises, setPaises] = useState<IPais[]>([]);
     const { id } = useParams();
     const navigate = useNavigate();
+    const [step, setStep] = useState(1);
 
     const [sucursal, setSucursal] = useState<ISucursalDto>({
         id: 0,
@@ -127,14 +130,56 @@ export default function ModalAddSucursales({ isOpen, closeModal }: ModalAddSucur
         }
     };
 
+    const handleDomicilioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = event.target;
+        setSucursal({
+            ...sucursal,
+            domicilio: {
+                ...sucursal.domicilio,
+                [name]: value
+            }
+        });
+    };
+
+    const handleSucursalChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = event.target;
+        setSucursal({
+            ...sucursal,
+            [name]: value
+        });
+    };
+
+    const nextStep = () => {
+        setStep(step + 1);
+    };
+
+    const prevStep = () => {
+        setStep(step - 1);
+    };
+
     const SaveSucursal = async () => {
-        if (Number(id) !== 0) {
-            await new SucursalService(`${apiUrl}sucursales`).put(Number(id), sucursal);
-        } else {
-            await new SucursalService(`${apiUrl}sucursales`).post(sucursal);
+        const domicilioService = new DomicilioService(`${apiUrl}domicilios`);
+        let savedDomicilio;
+        try {
+            savedDomicilio = await domicilioService.post(sucursal.domicilio);
+        } catch (error) {
+            console.error('Error saving domicilio:', error);
+            return;
         }
-        alert("Empresa guardada con exito!");
-        navigate(-1);
+
+        const updatedSucursal = { ...sucursal, domicilio: savedDomicilio };
+        
+        try {
+            if (Number(id) !== 0) {
+                await new SucursalService(`${apiUrl}sucursales`).put(Number(id), updatedSucursal);
+            } else {
+                await new SucursalService(`${apiUrl}sucursales`).post(updatedSucursal);
+            }
+            alert("Sucursal guardada con exito!");
+            navigate(-1);
+        } catch (error) {
+            console.error('Error saving sucursal:', error);
+        }
     };
 
     return createPortal(
@@ -145,42 +190,70 @@ export default function ModalAddSucursales({ isOpen, closeModal }: ModalAddSucur
                 </div>
 
                 <div>
+                    <ProgressBar now={(step / 2) * 100} />
                     <form action="" className="formContainer">
-                        <label htmlFor="nombre">Nombre de la sucursal</label>
-                        <input type="text" id="nombre" name="nombre" value={sucursal.nombre} onChange={(e) => setSucursal({ ...sucursal, nombre: e.target.value })} />
+                        {step === 1 && (
+                            <>
+                                <label htmlFor="nombre">Nombre de la sucursal</label>
+                                <input type="text" id="nombre" name="nombre" value={sucursal.nombre} onChange={handleSucursalChange} />
 
-                        <label htmlFor="horarioApert">Horario Apertura</label>
-                        <input type="text" id="horarioApert" name="horarioApert" value={sucursal.horarioApertura} onChange={(e) => setSucursal({ ...sucursal, horarioApertura: e.target.value })} />
+                                <label htmlFor="horarioApert">Horario Apertura</label>
+                                <input type="text" id="horarioApert" name="horarioApertura" value={sucursal.horarioApertura} onChange={handleSucursalChange} />
 
-                        <label htmlFor="horarioClose">Horario Cierre</label>
-                        <input type="text" id="horarioClose" name="horarioClose" value={sucursal.horarioCierre} onChange={(e) => setSucursal({ ...sucursal, horarioCierre: e.target.value })} />
+                                <label htmlFor="horarioClose">Horario Cierre</label>
+                                <input type="text" id="horarioClose" name="horarioCierre" value={sucursal.horarioCierre} onChange={handleSucursalChange} />
 
-                        <label htmlFor="casaMatriz">¿Es casa matriz?</label><input type="checkbox" id="casaMatriz" name="casaMatriz" checked={sucursal.casaMatriz} onChange={(e) => setSucursal({ ...sucursal, casaMatriz: e.target.checked })} />
+                                <label htmlFor="casaMatriz">¿Es casa matriz?</label>
+                                <input type="checkbox" id="casaMatriz" name="casaMatriz" checked={sucursal.casaMatriz} onChange={(e) => setSucursal({ ...sucursal, casaMatriz: e.target.checked })} />
 
-                        <label htmlFor="pais">País</label>
-                        <select name="pais" id="pais" defaultValue="Elija un país" onChange={handleSelectPaisChange}>
-                            <option disabled value="Elija un país">Elija un país</option>
-                            {paises.map((pais) => (
-                                <option key={pais.id} value={pais.nombre}>{pais.nombre}</option>
-                            ))}
-                        </select>
+                                <Button variant="primary" onClick={nextStep}>Siguiente</Button>
+                            </>
+                        )}
+                        {step === 2 && (
+                            <>
+                                <label htmlFor="pais">País</label>
+                                <select name="pais" id="pais" defaultValue="Elija un país" onChange={handleSelectPaisChange}>
+                                    <option disabled value="Elija un país">Elija un país</option>
+                                    {paises.map((pais) => (
+                                        <option key={pais.id} value={pais.nombre}>{pais.nombre}</option>
+                                    ))}
+                                </select>
 
-                        <label htmlFor="provincia">Provincia</label>
-                        <select name="provincia" id="provincia" defaultValue="Elija una provincia" onChange={handleSelectProvinciaChange}>
-                            <option disabled value="Elija una provincia">Elija una provincia</option>
-                            {provincias.map((provincia) => (
-                                <option key={provincia.id} value={provincia.nombre}>{provincia.nombre}</option>
-                            ))}
-                        </select>
+                                <label htmlFor="provincia">Provincia</label>
+                                <select name="provincia" id="provincia" defaultValue="Elija una provincia" onChange={handleSelectProvinciaChange}>
+                                    <option disabled value="Elija una provincia">Elija una provincia</option>
+                                    {provincias.map((provincia) => (
+                                        <option key={provincia.id} value={provincia.nombre}>{provincia.nombre}</option>
+                                    ))}
+                                </select>
 
-                        <label htmlFor="localidad">Localidad</label>
-                        <select name="localidad" id="localidad" defaultValue="Elija una localidad" onChange={handleSelectLocalidadChange}>
-                            <option disabled value="Elija una localidad">Elija una localidad</option>
-                            {localidades.map((localidad) => (
-                                <option key={localidad.id} value={localidad.nombre}>{localidad.nombre}</option>
-                            ))}
-                        </select>
-                        <button className="btn btn-primary" onClick={SaveSucursal}>Guardar</button>
+                                <label htmlFor="localidad">Localidad</label>
+                                <select name="localidad" id="localidad" defaultValue="Elija una localidad" onChange={handleSelectLocalidadChange}>
+                                    <option disabled value="Elija una localidad">Elija una localidad</option>
+                                    {localidades.map((localidad) => (
+                                        <option key={localidad.id} value={localidad.nombre}>{localidad.nombre}</option>
+                                    ))}
+                                </select>
+
+                                <label htmlFor="calle">Calle</label>
+                                <input type="text" id="calle" name="calle" value={sucursal.domicilio.calle} onChange={handleDomicilioChange} />
+
+                                <label htmlFor="numero">Número</label>
+                                <input type="number" id="numero" name="numero" value={sucursal.domicilio.numero} onChange={handleDomicilioChange} />
+
+                                <label htmlFor="cp">Código Postal</label>
+                                <input type="text" id="cp" name="cp" value={sucursal.domicilio.cp} onChange={handleDomicilioChange} />
+
+                                <label htmlFor="piso">Piso</label>
+                                <input type="number" id="piso" name="piso" value={sucursal.domicilio.piso} onChange={handleDomicilioChange} />
+
+                                <label htmlFor="nroDpto">Número de Departamento</label>
+                                <input type="number" id="nroDpto" name="nroDpto" value={sucursal.domicilio.nroDpto} onChange={handleDomicilioChange} />
+
+                                <Button variant="secondary" onClick={prevStep}>Anterior</Button>
+                                <Button variant="success" onClick={SaveSucursal}>Guardar</Button>
+                            </>
+                        )}
                     </form>
                 </div>
             </div>
