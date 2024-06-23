@@ -23,7 +23,6 @@ export default function ModalWatchSucursales({ isOpen, closeModal, idEmpresa }:M
         result.getSucursalesByEmpresa(idEmpresa)
             .then(data => {
                 if(data != null){
-                    console.log(data);
                     setSucursales(data);
                 }
             })
