@@ -1,7 +1,7 @@
 import ILocalidad from "./ILocalidad";
 
 export default interface IDomicilio{
-    id:number;
+    id?:number;
     baja:boolean
     calle:string;
     numero:number;

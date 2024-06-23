@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate} from 'react-router-dom';
 import cruz_blue from "../assets/cruz-azul.svg";
 import ILocalidad from "../Entities/ILocalidad";
 import IProvincia from "../Entities/IProvincia";
@@ -10,20 +10,20 @@ import ProvinciaService from "../Functions/Services/ProvinciaService";
 import LocalidadService from "../Functions/Services/LocalidadService";
 import PaisService from "../Functions/Services/PaisService";
 import SucursalService from "../Functions/Services/SucursalService";
-import DomicilioService from "../Functions/Services/DomicilioService";
 import { Button, ProgressBar } from 'react-bootstrap';
+import IEmpresa from '../Entities/IEmpresa';
 
 interface ModalAddSucursalesProps {
     isOpen: boolean;
     closeModal: () => void;
+    empresa: IEmpresa;
 }
 
-export default function ModalAddSucursales({ isOpen, closeModal }: ModalAddSucursalesProps) {
+export default function ModalAddSucursales({ isOpen, closeModal, empresa }: ModalAddSucursalesProps) {
     const apiUrl = import.meta.env.VITE_URL_API_BACK;
     const [localidades, setLocalidades] = useState<ILocalidad[]>([]);
     const [provincias, setProvincias] = useState<IProvincia[]>([]);
     const [paises, setPaises] = useState<IPais[]>([]);
-    const { id } = useParams();
     const navigate = useNavigate();
     const [step, setStep] = useState(1);
 
@@ -35,7 +35,6 @@ export default function ModalAddSucursales({ isOpen, closeModal }: ModalAddSucur
         baja: false,
         casaMatriz: false,
         domicilio: {
-            id: 0,
             baja: false,
             calle: '',
             numero: 0,
@@ -58,6 +57,7 @@ export default function ModalAddSucursales({ isOpen, closeModal }: ModalAddSucur
                 },
             },
         },
+        empresa: empresa
     });
 
     useEffect(() => {
@@ -158,23 +158,23 @@ export default function ModalAddSucursales({ isOpen, closeModal }: ModalAddSucur
     };
 
     const SaveSucursal = async () => {
-        const domicilioService = new DomicilioService(`${apiUrl}domicilios`);
-        let savedDomicilio;
-        try {
-            savedDomicilio = await domicilioService.post(sucursal.domicilio);
-        } catch (error) {
-            console.error('Error saving domicilio:', error);
-            return;
-        }
+        console.log(empresa);
+        console.log(sucursal);
+        // const domicilioService = new DomicilioService(`${apiUrl}domicilios`);
+        // let savedDomicilio;
+        // try {
+        //     savedDomicilio = await domicilioService.post(sucursal.domicilio);
+        // } catch (error) {
+        //     console.error('Error saving domicilio:', error);
+        //     return;
+        // }
 
-        const updatedSucursal = { ...sucursal, domicilio: savedDomicilio };
-        
+        // const updatedSucursal = { ...sucursal, domicilio: savedDomicilio };
+
         try {
-            if (Number(id) !== 0) {
-                await new SucursalService(`${apiUrl}sucursales`).put(Number(id), updatedSucursal);
-            } else {
-                await new SucursalService(`${apiUrl}sucursales`).post(updatedSucursal);
-            }
+            
+            await new SucursalService(`${apiUrl}sucursales`).post(sucursal);
+            
             alert("Sucursal guardada con exito!");
             navigate(-1);
         } catch (error) {
@@ -235,26 +235,37 @@ export default function ModalAddSucursales({ isOpen, closeModal }: ModalAddSucur
                                     ))}
                                 </select>
 
-                                <label htmlFor="calle">Calle</label>
-                                <input type="text" id="calle" name="calle" value={sucursal.domicilio.calle} onChange={handleDomicilioChange} />
+                                <article style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)" }}>
 
-                                <label htmlFor="numero">Número</label>
-                                <input type="number" id="numero" name="numero" value={sucursal.domicilio.numero} onChange={handleDomicilioChange} />
+                                    <label htmlFor="calle">Calle
+                                        <input type="text" id="calle" name="calle" value={sucursal.domicilio.calle} onChange={handleDomicilioChange} />
+                                    </label>
 
-                                <label htmlFor="cp">Código Postal</label>
-                                <input type="text" id="cp" name="cp" value={sucursal.domicilio.cp} onChange={handleDomicilioChange} />
+                                    <label htmlFor="numero">Número
+                                        <input type="number" id="numero" name="numero" value={sucursal.domicilio.numero} onChange={handleDomicilioChange} />
+                                    </label>
 
-                                <label htmlFor="piso">Piso</label>
-                                <input type="number" id="piso" name="piso" value={sucursal.domicilio.piso} onChange={handleDomicilioChange} />
+                                    <label htmlFor="cp">Código Postal
 
-                                <label htmlFor="nroDpto">Número de Departamento</label>
-                                <input type="number" id="nroDpto" name="nroDpto" value={sucursal.domicilio.nroDpto} onChange={handleDomicilioChange} />
+                                        <input type="text" id="cp" name="cp" value={sucursal.domicilio.cp} onChange={handleDomicilioChange} />
+                                    </label>
 
-                                <Button variant="secondary" onClick={prevStep}>Anterior</Button>
-                                <Button variant="success" onClick={SaveSucursal}>Guardar</Button>
+                                    <label htmlFor="piso">Piso
+
+                                        <input type="number" id="piso" name="piso" value={sucursal.domicilio.piso} onChange={handleDomicilioChange} />
+                                    </label>
+
+                                    <label htmlFor="nroDpto">Número de Departamento
+
+                                        <input type="number" id="nroDpto" name="nroDpto" value={sucursal.domicilio.nroDpto} onChange={handleDomicilioChange} />
+                                    </label>
+                                </article>
+
                             </>
                         )}
                     </form>
+                    <Button variant="secondary" onClick={prevStep}>Anterior</Button>
+                    <Button variant="success" onClick={SaveSucursal}>Guardar</Button>
                 </div>
             </div>
         </article>,

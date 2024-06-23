@@ -1,4 +1,5 @@
 import IDomicilio from "./IDomicilio";
+import IEmpresa from "./IEmpresa";
 
 export default interface ISucursalDto{
     id?:number;
@@ -8,4 +9,5 @@ export default interface ISucursalDto{
     baja: boolean;
     casaMatriz: boolean,
     domicilio:IDomicilio
+    empresa:IEmpresa
 }

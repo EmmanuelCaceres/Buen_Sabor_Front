@@ -64,7 +64,7 @@ export default function CardEmpresaDashboard(props: { data: IEmpresa }) {
                 </div>
 
                 <ModalWatchSucursales isOpen={isOpenModal} closeModal={closeModal} idEmpresa={props.data.id}></ModalWatchSucursales>
-                <ModalAddSucursales isOpen={isOpenModalAdd} closeModal={closeModalAdd}></ModalAddSucursales>
+                <ModalAddSucursales isOpen={isOpenModalAdd} closeModal={closeModalAdd} empresa={props.data}></ModalAddSucursales>
             </div>
         </div>
     )
