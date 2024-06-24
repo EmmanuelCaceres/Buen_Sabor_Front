@@ -23,7 +23,7 @@ export default function GrillaArticulo() {
             })
     }
     const searchItem = (value: string) => {
-        const result = new ArticuloManufacturadoService(`${apiUrl}articuloManufacturados/name?nombre=`);
+        const result = new ArticuloManufacturadoService(`${apiUrl}articulosManufacturados/name?nombre=`);
         result.getArticuloByName(value)
             .then(data => {
                 // Verifica si 'data' es 'null' y proporciona un array vacío en su lugar
@@ -43,7 +43,7 @@ export default function GrillaArticulo() {
 
     const handleDelete = (id:number) => {
         //console.log(event);
-        new ArticuloManufacturadoService(`${apiUrl}articuloManufacturados`).delete(id);
+        new ArticuloManufacturadoService(`${apiUrl}articulosManufacturados`).delete(id);
         alert("Articulo removido con éxito!")
         window.location.reload;
     }
@@ -53,7 +53,7 @@ export default function GrillaArticulo() {
     };
 
     useEffect(() => {
-        mostrarDatos(`${apiUrl}articuloManufacturados`)
+        mostrarDatos(`${apiUrl}articulosManufacturados`)
     }, ([]))
 
     return (

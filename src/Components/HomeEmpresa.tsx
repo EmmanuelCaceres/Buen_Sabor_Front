@@ -31,7 +31,7 @@ export default function HomeEmpresa(){
         <div style={{height:"100vh",width:"100%",display:"flex",flexDirection:"column",justifyContent:"center",alignItems:"center",flexWrap:"wrap"}}>
             {
                 empresas.map((empresa:IEmpresa)=>(
-                    <CardEmpresa key={empresa.id} empresa={{id:empresa.id, cuil:empresa.cuil, nombre:empresa.nombre, razonSocial:empresa.razonSocial, baja:empresa.baja, sucursales:empresa.sucursales}}></CardEmpresa>
+                    <CardEmpresa key={empresa.id} empresa={{id:empresa.id, cuil:empresa.cuil, nombre:empresa.nombre, razonSocial:empresa.razonSocial, baja:empresa.baja}}></CardEmpresa>
                 ))
             }
         </div>

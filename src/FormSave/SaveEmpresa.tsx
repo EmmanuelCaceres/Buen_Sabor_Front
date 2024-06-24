@@ -15,8 +15,7 @@ export default function SaveEmpresa() {
         baja: false,
         nombre: "",
         razonSocial: "",
-        cuil: 0,
-        sucursales: []
+        cuil: 0
     });
 
     const SaveEmpresa = async () => {

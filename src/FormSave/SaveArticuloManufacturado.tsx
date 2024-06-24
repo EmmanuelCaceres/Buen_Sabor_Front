@@ -112,7 +112,7 @@ export default function SaveArticulo() {
     }
 
     const buscarInsumoXDenominacion = async () => {
-        const result = new ArticuloInsumoService(`${apiUrl}articuloInsumos/search?denominacion=`);
+        const result = new ArticuloInsumoService(`${apiUrl}articulosInsumos/search?denominacion=`);
         const insumosResult = await result.getInsumoByDenominacion(inputValue);
         if (insumosResult) {
             setInsumos(insumosResult);
@@ -184,9 +184,9 @@ export default function SaveArticulo() {
     const saveArticulo = async () => {
         //console.log(articuloManufacturado);
         if (Number(id) !== 0) {
-            await new ArticuloManufacturadoService(`${apiUrl}articuloManufacturados`).put(Number(id), articuloManufacturado);
+            await new ArticuloManufacturadoService(`${apiUrl}articulosManufacturados`).put(Number(id), articuloManufacturado);
         } else {
-            await new ArticuloManufacturadoService(`${apiUrl}articuloManufacturados`).post(articuloManufacturado);
+            await new ArticuloManufacturadoService(`${apiUrl}articulosManufacturados`).post(articuloManufacturado);
         }
         alert("Articulo guardado con exito!");
         handleClose();
@@ -208,7 +208,7 @@ export default function SaveArticulo() {
         getAllCategories()
         getAllUnidad()
         if (Number(id) != 0) {
-            getArticuloManufacturado(`${apiUrl}articuloManufacturados`, Number(id))
+            getArticuloManufacturado(`${apiUrl}articulosManufacturados`, Number(id))
 
         }
         // console.log(articuloManufacturado.articuloManufacturadoDetalles)
