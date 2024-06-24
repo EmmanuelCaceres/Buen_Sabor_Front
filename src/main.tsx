@@ -21,6 +21,7 @@ import Menu from './Components/Lado Cliente/Menu.tsx';
 import Pedidos from './Components/Pedidos.tsx';
 import { CarritoContextProvider } from './Components/Lado Cliente/context/CarritoContext.tsx';
 import SaveEmpresa from './FormSave/SaveEmpresa.tsx';
+import SavePromocion from './FormSave/SavePromocion.tsx';
 
 const router = createBrowserRouter([
   {
@@ -67,6 +68,10 @@ const router = createBrowserRouter([
       {
         path:"promociones",
         element:<GrillaPromocion/>
+      },
+      {
+        path:"promociones/save/:id",
+        element:<SavePromocion/>
       },
       {
         path:"insumos",
