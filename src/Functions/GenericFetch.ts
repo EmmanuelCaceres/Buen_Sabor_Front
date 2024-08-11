@@ -1,63 +1,57 @@
-import { AbstractFetch } from "./AbstractFetch";
+// GenericFetch.ts
+export class GenericFetch<T> {
+    private baseUrl: string;
 
-export abstract class GenericFetch<T> extends AbstractFetch<T> {
     constructor(baseUrl: string) {
-        super(baseUrl);
+        this.baseUrl = baseUrl;
     }
 
-    async getAll(): Promise<T[]> {
-        const response = await fetch(`${this.baseUrl}`);
-        const data = await response.json();
-        return data as T[];
+    public async getAll(): Promise<T[]> {
+        const response = await fetch(this.baseUrl);
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
     }
 
-    async getById(id: number): Promise<T | null> {
+    public async get(id: number): Promise<T> {
         const response = await fetch(`${this.baseUrl}/${id}`);
         if (!response.ok) {
-            return null;
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
-        const data = await response.json();
-        return data as T;
+        return response.json();
     }
 
-    async post(data: T): Promise<T> {
-        const response = await fetch(`${this.baseUrl}`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
+    public async post(data: T): Promise<T> {
+        const response = await fetch(this.baseUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
         });
         if (!response.ok) {
-            throw new Error(`Error: ${response.status} ${response.statusText}`);
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
-        const newData = await response.json();
-        return newData as T;
+        return response.json();
     }
 
-    async put(id: number, data: T): Promise<T> {
+    public async put(id: number, data: T): Promise<T> {
         const response = await fetch(`${this.baseUrl}/${id}`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
         });
         if (!response.ok) {
-            throw new Error(`Error: ${response.status} ${response.statusText}`);
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
-        const newData = await response.json();
-        return newData as T;
+        return response.json();
     }
 
-    // Método para eliminar un elemento por su ID
-    async delete(id: number): Promise<void> {
+    public async delete(id: number): Promise<void> {
         const response = await fetch(`${this.baseUrl}/${id}`, {
-            method: "DELETE",
+            method: 'DELETE'
         });
-        console.log(response);
-        // if (!response.ok) {
-        //     throw new Error(`Error al eliminar el elemento con ID ${id}`);
-        // }
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
     }
 }
