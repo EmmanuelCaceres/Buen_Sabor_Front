@@ -3,5 +3,5 @@ export default interface IEmpresa{
     baja:boolean
     nombre:string;
     razonSocial:string;
-    cuil:number;
+    cuil:string;
 }

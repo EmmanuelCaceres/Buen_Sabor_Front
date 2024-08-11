@@ -1,11 +1,11 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 import arrow_left from "../assets/arrow-circle-left-svgrepo-com.svg";
 import EmpresaService from "../Functions/Services/EmpresaService";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import IEmpresa from "../Entities/IEmpresa";
 
 export default function SaveEmpresa() {
-    const apiUrl = import.meta.env.VITE_URL_API_BACK
+    const apiUrl = import.meta.env.VITE_URL_API_BACK;
 
     const { id } = useParams();
     const navigate = useNavigate();
@@ -15,20 +15,31 @@ export default function SaveEmpresa() {
         baja: false,
         nombre: "",
         razonSocial: "",
-        cuil: 0
+        cuil: ""
     });
 
-    const SaveEmpresa = async () => {
+    useEffect(() => {
         if (Number(id) !== 0) {
-            await new EmpresaService(`${apiUrl}empresas`).put(Number(id), empresa);
-        } else {
-            await new EmpresaService(`${apiUrl}empresas`).post(empresa);
+            new EmpresaService(`${apiUrl}/empresas`).get(Number(id))
+                .then(data => setEmpresa(data))
+                .catch(error => console.error("Error al cargar la empresa:", error));
         }
-        alert("Empresa guardada con exito!");
-        navigate(-1);
+    }, [id, apiUrl]);
+
+    const SaveEmpresa = async () => {
+        try {
+            if (Number(id) !== 0) {
+                await new EmpresaService(`${apiUrl}/empresas`).put(Number(id), empresa);
+            } else {
+                await new EmpresaService(`${apiUrl}/empresas`).post(empresa);
+            }
+            alert("Empresa guardada con éxito!");
+            navigate(-1);
+        } catch (error) {
+            console.error("Error al guardar la empresa:", error);
+            alert("Error al guardar la empresa.");
+        }
     };
-
-
 
     return (
         <>
@@ -39,15 +50,33 @@ export default function SaveEmpresa() {
                 </Link>
                 <form action="" className="formContainer">
                     <label htmlFor="nombre">Nombre de la empresa</label>
-                    <input type="text" id="nombre" name="nombre" value={empresa.nombre} onChange={(e) => setEmpresa({ ...empresa, nombre: e.target.value })} />
-                    <label htmlFor="razonSoc">Razon social</label>
-                    <input type="text" id="razonSoc" name="razonSoc" value={empresa.razonSocial} onChange={(e) => setEmpresa({ ...empresa, razonSocial: e.target.value })} />
-                    <label htmlFor="cuil">Cuil</label>
-                    <input type="number" id="cuil" name="cuil" value={empresa.cuil} onChange={(e) => setEmpresa({ ...empresa, cuil: Number(e.target.value) })} />
+                    <input
+                        type="text"
+                        id="nombre"
+                        name="nombre"
+                        value={empresa.nombre}
+                        onChange={(e) => setEmpresa({ ...empresa, nombre: e.target.value })}
+                    />
+                    <label htmlFor="razonSoc">Razón social</label>
+                    <input
+                        type="text"
+                        id="razonSoc"
+                        name="razonSoc"
+                        value={empresa.razonSocial}
+                        onChange={(e) => setEmpresa({ ...empresa, razonSocial: e.target.value })}
+                    />
+                    <label htmlFor="cuil">CUIL</label>
+                    <input
+                        type="text"
+                        id="cuil"
+                        name="cuil"
+                        value={empresa.cuil}
+                        onChange={(e) => setEmpresa({ ...empresa, cuil: e.target.value })}
+                    />
                 </form>
 
                 <button className="btn btn-primary" onClick={SaveEmpresa}>Guardar</button>
             </div>
         </>
-    )
+    );
 }
