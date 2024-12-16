@@ -1,6 +1,6 @@
 // GenericFetch.ts
 export class GenericFetch<T> {
-    private baseUrl: string;
+    protected baseUrl: string;
 
     constructor(baseUrl: string) {
         this.baseUrl = baseUrl;
