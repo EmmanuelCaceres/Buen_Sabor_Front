@@ -1,11 +1,11 @@
-import { SetStateAction, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ArticuloInsumoService from '../../Functions/Services/ArticuloInsumoService';
 import masObject from '../../assets/circle-plus-svgrepo-com.svg';
 import IArticuloInsumo from '../../Entities/IArticuloInsumo';
-import { Button, Form, InputGroup, Table } from 'react-bootstrap';
+import { Button, Form, Table } from 'react-bootstrap';
+import { IPaginatedResponse } from '../../Entities/IPaginatedResponse';
 
-// Define el tipo para sucursales, como ISucursalDto
 interface ISucursalDto {
     id: number;
     nombre: string;
@@ -17,40 +17,51 @@ interface ISucursalDto {
 export default function GrillaArticulo() {
     const apiUrl = import.meta.env.VITE_URL_API_BACK;
 
-    const [inputValue, setInputValue] = useState('');
     const [sucursales, setSucursales] = useState<ISucursalDto[]>([]);
     const [sucursalSeleccionada, setSucursalSeleccionada] = useState<number | null>(null);
-    const [articulosInsumos, setArticulosinsumos] = useState<IArticuloInsumo[]>([]);
+    const [articulosInsumos, setArticulosInsumos] = useState<IArticuloInsumo[]>([]);
 
     // Función para obtener lista de sucursales
     const obtenerSucursales = () => {
-        const result = new ArticuloInsumoService(apiUrl); // Asegúrate de pasar solo la base URL aquí
-        result.getSucursales() // Usa el método que creaste para obtener sucursales
-            .then((data: ISucursalDto[] | null) => { // Aquí especificamos el tipo esperado para 'data'
-                if (data) {
-                    setSucursales(data);
+        const result = new ArticuloInsumoService(apiUrl);
+        result.getSucursales()
+            .then((data: IPaginatedResponse<ISucursalDto> | null) => {
+                if (data && Array.isArray(data)) {
+                    setSucursales(data); // Asigna el contenido de la respuesta
+                } else {
+                    setSucursales([]); // Si no hay contenido, asigna un arreglo vacío
+                    console.log("No se encontraron sucursales.");
                 }
             })
             .catch(error => {
-                console.log(error);
+                console.error("Error al obtener sucursales:", error);
+                setSucursales([]); // Vaciar el estado de sucursales en caso de error
             });
     };
     
-
+    
+    
+    
 
     // Función para obtener insumos de la sucursal seleccionada
     const mostrarDatos = (idSucursal: number) => {
         const result = new ArticuloInsumoService(`${apiUrl}articulosInsumos/porSucursal/${idSucursal}`);
-        result.getAll()
+        result.getInsumoParaVentas()
             .then((data) => {
-                console.log("Datos obtenidos:", data);
-                setArticulosinsumos(data || []); // Accede a `content` si el backend devuelve una página
+                if (data && Array.isArray(data.content)) {
+                    //console.log("Datos obtenidos:", data.content);
+                    setArticulosInsumos(data.content); // Accede al contenido paginado
+                } else {
+                    console.error("No se encontraron datos o content no es un arreglo.");
+                    setArticulosInsumos([]); // Aseguramos que el estado se vacíe correctamente
+                }
             })
             .catch(error => {
                 console.error("Error al obtener los datos:", error);
+                setArticulosInsumos([]); // Asegura que el estado se vacíe en caso de error
             });
     };
-    
+
     useEffect(() => {
         obtenerSucursales();
     }, []);
@@ -61,13 +72,9 @@ export default function GrillaArticulo() {
         mostrarDatos(idSucursal); // Llama a mostrarDatos con el idSucursal seleccionado
     };
 
-    const handleDelete = (id:number) => {
+    const handleDelete = (id: number) => {
         new ArticuloInsumoService(`${apiUrl}articulosInsumos`).delete(id);
         window.location.reload();
-    }
-
-    const handleInputChange = (event: { target: { value: SetStateAction<string>; }; }) => {
-        setInputValue(event.target.value);
     };
 
     return (
@@ -102,24 +109,39 @@ export default function GrillaArticulo() {
                     </tr>
                 </thead>
                 <tbody>
-                    {articulosInsumos.map((insumo: IArticuloInsumo) => (
-                        <tr key={insumo.id}>
-                            <td>
-                                <img width={50} height={50} src={`${apiUrl}imagenArticulos/uploads/${insumo.imagenes[0].url}`} alt="imagenArticulo" />
-                            </td>
-                            <td>{insumo.denominacion}</td>
-                            <td>{insumo.categoria.denominacion}</td>
-                            <td>{insumo.unidadMedida.denominacion}</td>
-                            <td>
-                                <Link to={"save/" + insumo.id} className="btn btn-warning me-2">
-                                    Editar
-                                </Link>
-                                <Button variant="danger" onClick={() => handleDelete(insumo.id)}>
-                                    Eliminar
-                                </Button>
-                            </td>
+                    {articulosInsumos.length > 0 ? (
+                        articulosInsumos.map((insumo: IArticuloInsumo) => (
+                            <tr key={insumo.id}>
+                                <td>
+                                    {/* Solo muestra la imagen si existe */}
+                                    {insumo.imagenes?.[0]?.url ? (
+                                        <img 
+                                            width={50} 
+                                            height={50}
+                                            style={{ objectFit: 'contain', maxWidth: '50px', maxHeight: '50px' }}
+                                            src={`${insumo.imagenes[0].url}`} 
+                                            alt="imagenArticulo" 
+                                        />
+                                    ) : null}
+                                </td>
+                                <td>{insumo.denominacion}</td>
+                                <td>{insumo.categoria.denominacion}</td>
+                                <td>{insumo.unidadMedida.denominacion}</td>
+                                <td>
+                                    <Link to={"save/" + insumo.id} className="btn btn-warning me-2">
+                                        Editar
+                                    </Link>
+                                    <Button variant="danger" onClick={() => handleDelete(insumo.id)}>
+                                        Eliminar
+                                    </Button>
+                                </td>
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan={5}>No se encontraron insumos.</td>
                         </tr>
-                    ))}
+                    )}
                 </tbody>
             </Table>
         </div>
