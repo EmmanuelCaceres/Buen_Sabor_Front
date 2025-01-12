@@ -9,6 +9,8 @@ import IUnidadMedida from "../Entities/IUnidadMedida";
 import UnidadMedidaService from "../Functions/Services/UnidadMedidaService";
 import ImagenArticuloService from "../Functions/Services/ImagenArticuloService";
 import CategoriaService from "../Functions/Services/CategoriaService";
+import SucursalService from "../Functions/Services/SucursalService";
+import ISucursalDto from "../Entities/ISucursalDto";
 
 export default function SaveInsumo() {
     const apiUrl = import.meta.env.VITE_URL_API_BACK
@@ -18,11 +20,53 @@ export default function SaveInsumo() {
     const [categoria, setCategoria] = useState<ICategoria[]>([])
     const [unidadMedida, setUnidadMedida] = useState<IUnidadMedida[]>([]);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [sucursales, setSucursales] = useState<{ id: number, nombre: string }[]>([]);
+    const [sucursalesSeleccionadas, setSucursalesSeleccionadas] = useState<number[]>([]);
+
     // const [show, setShow] = useState(false);
     // const handleClose = () => setShow(false);
     const [articuloInsumo, setArticulosInsumo] = useState<IArticuloInsumo>({
         id: Number(id),
         denominacion: '',
+        sucursal: {
+            id: 0,
+            nombre: '',
+            horarioApertura: '',
+            horarioCierre: '',
+            baja: false,
+            casaMatriz: false,
+            domicilio:{
+                id: 0,
+                baja: false,
+                calle: '',
+                numero: 0,
+                cp: 0,
+                piso: 0,
+                nroDpto: 0,
+                localidad: {
+                    id: 0,
+                    baja: false,
+                    nombre: '',
+                    provincia: {
+                        id: 0,
+                        baja: false,
+                        nombre: '',
+                        pais: {
+                            id: 0,
+                            baja: false,
+                            nombre: '',
+                        },
+                    },
+                },
+            },
+            empresa: {
+                id: 0,
+                baja: false,
+                nombre: '',
+                razonSocial: '',
+                cuil: '',
+            },
+        },
         precioVenta: 0,
         unidadMedida: {
             id: 0,
@@ -33,13 +77,16 @@ export default function SaveInsumo() {
             id: 0,
             denominacion: '',
             subCategorias: [],
-            articulos: []
+            articulos: [],
         },
         precioCompra: 0,
         stockActual: 0,
         stockMaximo: 0,
         esParaElaborar: true,
     });
+    
+    
+    
 
     const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -52,6 +99,7 @@ export default function SaveInsumo() {
         // Mostrar la nueva imagen en una etiqueta img
         const imageUrl = URL.createObjectURL(file);
         setSelectedImage(imageUrl);  // Establece la imagen seleccionada
+        console.log("File uploaded: ", imageUrl);
     };
     
 
@@ -118,109 +166,132 @@ export default function SaveInsumo() {
             setUnidadMedida([]); // Maneja errores y asegura un estado consistente
         }
     };
-    
-    
 
-
+    async function obtenerSucursalPorId(id: number): Promise<ISucursalDto> {
+        const sucursalService = new SucursalService(`${apiUrl}sucursales`);
+        const sucursal = await sucursalService.get(id);
+        return sucursal; // Retorna el objeto completo de la sucursal
+    }
+    
     const handleChangeCategorySelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const categoriaSeleccionadaId = parseInt(e.target.value); // Convertir a número
         const categoriaSeleccionada = categoria.find(c => c.id === categoriaSeleccionadaId);
         if (categoriaSeleccionada) {
             setArticulosInsumo(prevState => ({
-                ...prevState, // Mantiene las demás propiedades
-                categoria: categoriaSeleccionada // Actualiza solo la categoría
+                ...prevState,
+                categoria: categoriaSeleccionada // Asegúrate de asignar el objeto completo
             }));
         }
-    }
-
-
+    };
+   
     const handleChangeUnidadSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const unidadSeleccionadaId = parseInt(e.target.value); // Convertir a número
         const unidadSeleccionada = unidadMedida.find(c => c.id === unidadSeleccionadaId);
         if (unidadSeleccionada) {
             setArticulosInsumo(prevState => ({
-                ...prevState, // Mantiene las demás propiedades
-                unidadMedida: unidadSeleccionada // Actualiza solo la unidad de medida
+                ...prevState,
+                unidadMedida: unidadSeleccionada // Asegúrate de asignar el objeto completo
             }));
         }
-    }
+    };
 
-    
+    const getAllSucursales = async () => {
+        try {
+            const result = await fetch(`${apiUrl}sucursales`);
+            const data = await result.json();
+            setSucursales(data);
+        } catch (error) {
+            console.error("Error al obtener las sucursales:", error);
+        }
+    };
 
     const saveArticulo = async () => {
-        // Primero, si ya hay una imagen anterior, la eliminamos
+        console.log("Sucursales seleccionadas al guardar:", sucursalesSeleccionadas);  // Log para ver las sucursales seleccionadas al guardar
+        if (sucursalesSeleccionadas.length === 0) {
+            alert("Debe seleccionar al menos una sucursal.");
+            return;
+        }
+    
+        // Eliminar imagen anterior si existe
         if (articuloInsumo.imagenes.length > 0) {
-            const imageUrl = articuloInsumo.imagenes[0].url;  // URL de la imagen anterior
-            const publicIdToDelete = imageUrl.split('/')[6].split('.')[0];  // Extraer el publicId de la URL
-        
-            // Llamamos al endpoint para eliminar la imagen anterior
+            const imageUrl = articuloInsumo.imagenes[0].url;
+            const publicIdToDelete = imageUrl.split('/')[6].split('.')[0];
             try {
                 const resultDelete = new ImagenArticuloService(`${apiUrl}images`);
                 await resultDelete.deleteImagen(publicIdToDelete, articuloInsumo.imagenes[0].id);
                 console.log("Imagen anterior eliminada correctamente");
             } catch (error) {
-                console.log("Error al eliminar la imagen anterior:", error);
+                console.error("Error al eliminar la imagen anterior:", error);
                 alert("Error al eliminar la imagen anterior. El artículo no será guardado.");
-                return; // Si ocurre un error al eliminar, no seguimos con la carga del artículo.
+                return;
             }
         }
     
-        console.log("Imagen seleccionada:", selectedImage);
-        // Luego, subimos la nueva imagen si fue seleccionada
+        // Subir nueva imagen si está seleccionada
         if (selectedImage) {
-            // Convertir el Blob a File
-            const blob = await fetch(selectedImage).then(res => res.blob());  // Convertimos la URL de la imagen a un Blob
-            const file = new File([blob], 'imagen.jpg', { type: 'image/jpeg' }); // Convertimos el Blob a File
-    
-            const formData = new FormData();
-            formData.append("upload", file);  // Aquí aseguramos que el parámetro se llama 'upload'
-        
-            // Verifica el contenido del FormData (solo en desarrollo, no en producción)
-            console.log(formData);
-        
-            // Subimos la nueva imagen
             try {
+                const blob = await fetch(selectedImage).then((res) => res.blob());
+                const file = new File([blob], "imagen.jpg", { type: "image/jpeg" });
+                const formData = new FormData();
+                formData.append("upload", file);
                 const result = new ImagenArticuloService(`${apiUrl}images/uploads`);
                 const uploadedImage = await result.postImagen(formData);
-        
-                if (uploadedImage) {
-                    setArticulosInsumo(prevState => ({
-                        ...prevState,
-                        imagenes: [{
-                            id: uploadedImage.id,
-                            url: uploadedImage.url
-                        }]
-                    }));
+                if (uploadedImage && uploadedImage.id) {
+                    articuloInsumo.imagenes = [{
+                        id: uploadedImage.id,
+                        url: uploadedImage.url,
+                    }];
                     console.log("Imagen subida correctamente:", uploadedImage);
                 } else {
-                    console.log("No data received from the image upload");
+                    console.error("Error en la subida de imagen: No se recibió ID válido.");
+                    return;
                 }
             } catch (error) {
-                console.log("Error al subir la imagen:", error);
+                console.error("Error al subir la imagen:", error);
                 alert("Error al subir la nueva imagen. El artículo no será guardado.");
                 return;
             }
         }
     
-        // Ahora que la imagen ha sido eliminada (si era necesario) y la nueva imagen cargada, guardamos el artículo
+        // Verificar datos del artículo con sucursales asociadas
+        console.log("Datos finales del artículo a guardar:", JSON.stringify(articuloInsumo, null, 2));
+    
+        // Guardar el artículo en el backend
         try {
+            const articuloService = new ArticuloInsumoService(`${apiUrl}articulosInsumos`);
+
             if (Number(id) !== 0) {
-                // Actualizar artículo existente
-                await new ArticuloInsumoService(`${apiUrl}articulosInsumos`).put(Number(id), articuloInsumo);
+                console.log("Actualizando artículo existente...");
+                await articuloService.put(Number(id), articuloInsumo);
             } else {
-                // Crear nuevo artículo
-                await new ArticuloInsumoService(`${apiUrl}articulosInsumos`).post(articuloInsumo);
+                console.log("Creando nuevo artículo...");
+                
+                for (const sucursalId of sucursalesSeleccionadas) {
+                    // Aquí obtienes los datos de la sucursal, puede ser una llamada a la API
+                    const sucursal = await obtenerSucursalPorId(sucursalId); // Suponiendo que tienes una función que trae la sucursal completa
+
+                    const articuloConSucursal = {
+                        ...articuloInsumo,
+                        sucursal: {
+                            ...sucursal, // Aquí asignas los datos completos de la sucursal
+                            id: sucursalId // Incluyes el id si es necesario
+                        }
+                    };
+
+                    console.log("Artículo con sucursal antes de guardar:", articuloConSucursal);
+                    await articuloService.post(articuloConSucursal);
+                }
             }
+
             alert("Insumo guardado con éxito!");
-            navigate(-1); // Volver a la página anterior
+            navigate(-1);
         } catch (error) {
-            console.log("Error al guardar el artículo:", error);
+            console.error("Error al guardar el artículo:", error);
             alert("Error al guardar el artículo.");
         }
     };
     
-    
-    
+  
     // const handleFileChange = (e)=>{
     //     const selectedFile = e.target.files[0];
     //     const imageUrl = selectedFile.name; // Suponiendo que aquí guardas la URL de la imagen
@@ -239,6 +310,16 @@ export default function SaveInsumo() {
         });
     };
 
+    const handleSucursalChange = (sucursalId: number) => {
+        setSucursalesSeleccionadas(prevState => {
+            if (prevState.includes(sucursalId)) {
+                return prevState.filter(id => id !== sucursalId); // Desmarcar
+            } else {
+                return [...prevState, sucursalId]; // Marcar
+            }
+        });
+    };
+
 
     useEffect(() => {
         getAllCategories();
@@ -246,6 +327,7 @@ export default function SaveInsumo() {
         if (Number(id) !== 0) {
             getArticuloInsumo(`${apiUrl}articulosInsumos`, Number(id));
         }
+        getAllSucursales();
     }, [id]);
 
     return (
@@ -333,6 +415,23 @@ export default function SaveInsumo() {
                         />
                     </>
                 )}
+                <br />
+                <div>
+                    <label>Sucursales</label>
+                    <div>
+                        {sucursales.map(sucursal => (
+                            <label key={sucursal.id}>
+                                <input 
+                                    type="checkbox" 
+                                    value={sucursal.id}
+                                    checked={sucursalesSeleccionadas.includes(sucursal.id)} 
+                                    onChange={() => handleSucursalChange(sucursal.id)}
+                                />
+                                {sucursal.nombre}
+                            </label>
+                        ))}
+                    </div>
+                </div>
             </form>
 
             <button className="btn btn-primary" onClick={saveArticulo}>Guardar</button>

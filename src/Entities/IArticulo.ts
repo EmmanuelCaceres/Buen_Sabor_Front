@@ -1,6 +1,7 @@
 import IUnidadMedida from "./IUnidadMedida";
 import IImagenArticulo from "./IImagenArticulo";
 import ICategoria from "./ICategoria";
+import ISucursalDto from "./ISucursalDto";
 
 export default interface IArticulo{
     id:number;
@@ -8,5 +9,6 @@ export default interface IArticulo{
     precioVenta:number;
     unidadMedida:IUnidadMedida;
     imagenes: IImagenArticulo[];
-    categoria: ICategoria; 
+    categoria: ICategoria;
+    sucursal: ISucursalDto;
 }

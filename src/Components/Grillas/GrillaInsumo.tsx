@@ -20,6 +20,7 @@ export default function GrillaArticulo() {
     const [sucursales, setSucursales] = useState<ISucursalDto[]>([]);
     const [sucursalSeleccionada, setSucursalSeleccionada] = useState<number | null>(null);
     const [articulosInsumos, setArticulosInsumos] = useState<IArticuloInsumo[]>([]);
+    
 
     // Función para obtener lista de sucursales
     const obtenerSucursales = () => {

@@ -10,13 +10,23 @@ export default class ImagenArticuloService extends GenericFetch<IImagenArticulo>
                 method: "POST",
                 body: file,
             });
+    
+            // Depurar la respuesta del servidor
+            console.log("Respuesta bruta del servidor:", response);
+            if (!response.ok) {
+                throw new Error(`Error al subir la imagen. Código de estado: ${response.status}`);
+            }
+    
             const data = await response.json();
+            console.log("Respuesta procesada del servidor:", data);
+    
             return data as IImagenArticulo;
         } catch (error) {
             console.error("Error al subir la imagen:", error);
             return null;
         }
     }
+    
 
     // Método para eliminar una imagen
     async deleteImagen(publicId: string, id: number): Promise<string> {
