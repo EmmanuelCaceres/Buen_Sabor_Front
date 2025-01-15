@@ -419,7 +419,8 @@ export default function SaveInsumo() {
                 <div>
                     <label>Sucursales</label>
                     <div>
-                        {sucursales.map(sucursal => (
+                        {/* Solo mostrar los checkboxes si estamos creando (id === 0) */}
+                        {Number(id) === 0 && sucursales.map(sucursal => (
                             <label key={sucursal.id}>
                                 <input 
                                     type="checkbox" 

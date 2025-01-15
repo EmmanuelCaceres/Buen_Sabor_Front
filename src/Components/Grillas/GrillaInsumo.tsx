@@ -20,7 +20,8 @@ export default function GrillaArticulo() {
     const [sucursales, setSucursales] = useState<ISucursalDto[]>([]);
     const [sucursalSeleccionada, setSucursalSeleccionada] = useState<number | null>(null);
     const [articulosInsumos, setArticulosInsumos] = useState<IArticuloInsumo[]>([]);
-    
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
 
     // Función para obtener lista de sucursales
     const obtenerSucursales = () => {
@@ -28,38 +29,34 @@ export default function GrillaArticulo() {
         result.getSucursales()
             .then((data: IPaginatedResponse<ISucursalDto> | null) => {
                 if (data && Array.isArray(data)) {
-                    setSucursales(data); // Asigna el contenido de la respuesta
+                    setSucursales(data);
                 } else {
-                    setSucursales([]); // Si no hay contenido, asigna un arreglo vacío
+                    setSucursales([]);
                     console.log("No se encontraron sucursales.");
                 }
             })
             .catch(error => {
                 console.error("Error al obtener sucursales:", error);
-                setSucursales([]); // Vaciar el estado de sucursales en caso de error
+                setSucursales([]);
             });
     };
-    
-    
-    
-    
 
-    // Función para obtener insumos de la sucursal seleccionada
-    const mostrarDatos = (idSucursal: number) => {
-        const result = new ArticuloInsumoService(`${apiUrl}articulosInsumos/porSucursal/${idSucursal}`);
-        result.getInsumoParaVentas()
-            .then((data) => {
-                if (data && Array.isArray(data.content)) {
-                    //console.log("Datos obtenidos:", data.content);
-                    setArticulosInsumos(data.content); // Accede al contenido paginado
+    // Función para obtener insumos con paginación
+    const mostrarDatosPaginados = (idSucursal: number, page: number) => {
+        const result = new ArticuloInsumoService(`${apiUrl}articulosInsumos/porSucursal/${idSucursal}?page=${page-1}&size=20`);
+        result.getPaginatedInsumos()
+            .then(data => {
+                if (data) {
+                    setArticulosInsumos(data.content);
+                    setTotalPages(data.totalPages);
                 } else {
-                    console.error("No se encontraron datos o content no es un arreglo.");
-                    setArticulosInsumos([]); // Aseguramos que el estado se vacíe correctamente
+                    console.error("No se encontraron datos.");
+                    setArticulosInsumos([]);
                 }
             })
             .catch(error => {
                 console.error("Error al obtener los datos:", error);
-                setArticulosInsumos([]); // Asegura que el estado se vacíe en caso de error
+                setArticulosInsumos([]);
             });
     };
 
@@ -70,7 +67,15 @@ export default function GrillaArticulo() {
     const handleSucursalChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const idSucursal = parseInt(event.target.value);
         setSucursalSeleccionada(idSucursal);
-        mostrarDatos(idSucursal); // Llama a mostrarDatos con el idSucursal seleccionado
+        setCurrentPage(1); // Reinicia la página al cambiar de sucursal
+        mostrarDatosPaginados(idSucursal, 1);
+    };
+
+    const handlePageChange = (newPage: number) => {
+        setCurrentPage(newPage);
+        if (sucursalSeleccionada) {
+            mostrarDatosPaginados(sucursalSeleccionada, newPage);
+        }
     };
 
     const handleDelete = (id: number) => {
@@ -114,7 +119,6 @@ export default function GrillaArticulo() {
                         articulosInsumos.map((insumo: IArticuloInsumo) => (
                             <tr key={insumo.id}>
                                 <td>
-                                    {/* Solo muestra la imagen si existe */}
                                     {insumo.imagenes?.[0]?.url ? (
                                         <img 
                                             width={50} 
@@ -145,6 +149,23 @@ export default function GrillaArticulo() {
                     )}
                 </tbody>
             </Table>
+
+            {/* Controles de paginación */}
+            {totalPages > 1 && (
+                <div className="pagination d-flex justify-content-between align-items-center mt-3">
+                    <Button 
+                        onClick={() => handlePageChange(currentPage - 1)} 
+                        disabled={currentPage === 1}>
+                        Anterior
+                    </Button>
+                    <span>{`Página ${currentPage} de ${totalPages}`}</span>
+                    <Button 
+                        onClick={() => handlePageChange(currentPage + 1)} 
+                        disabled={currentPage === totalPages}>
+                        Siguiente
+                    </Button>
+                </div>
+            )}
         </div>
     );
 }
