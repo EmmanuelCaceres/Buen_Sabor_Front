@@ -43,12 +43,14 @@ export default function GrillaArticulo() {
 
     // Función para obtener insumos con paginación
     const mostrarDatosPaginados = (idSucursal: number, page: number) => {
-        const result = new ArticuloInsumoService(`${apiUrl}articulosInsumos/porSucursal/${idSucursal}?page=${page-1}&size=20`);
+        console.log(`Sucursal ID: ${idSucursal}, Página: ${page}`);
+        const result = new ArticuloInsumoService(`${apiUrl}articulosInsumos/porSucursal/${idSucursal}?page=${page - 1}&size=20`);
         result.getPaginatedInsumos()
             .then(data => {
                 if (data) {
                     setArticulosInsumos(data.content);
                     setTotalPages(data.totalPages);
+                    console.log(`Total de páginas: ${data.totalPages}`);
                 } else {
                     console.error("No se encontraron datos.");
                     setArticulosInsumos([]);
@@ -64,23 +66,33 @@ export default function GrillaArticulo() {
         obtenerSucursales();
     }, []);
 
+    useEffect(() => {
+        if (sucursalSeleccionada) {
+            mostrarDatosPaginados(sucursalSeleccionada, currentPage);
+        }
+    }, [sucursalSeleccionada, currentPage]);
+
     const handleSucursalChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const idSucursal = parseInt(event.target.value);
         setSucursalSeleccionada(idSucursal);
         setCurrentPage(1); // Reinicia la página al cambiar de sucursal
-        mostrarDatosPaginados(idSucursal, 1);
     };
 
     const handlePageChange = (newPage: number) => {
-        setCurrentPage(newPage);
-        if (sucursalSeleccionada) {
-            mostrarDatosPaginados(sucursalSeleccionada, newPage);
+        if (newPage > 0 && newPage <= totalPages) {
+            setCurrentPage(newPage);
         }
     };
 
-    const handleDelete = (id: number) => {
-        new ArticuloInsumoService(`${apiUrl}articulosInsumos`).delete(id);
-        window.location.reload();
+    const handleDelete = async (id: number) => {
+        try {
+            await new ArticuloInsumoService(`${apiUrl}articulosInsumos`).delete(id);
+            if (sucursalSeleccionada) {
+                mostrarDatosPaginados(sucursalSeleccionada, currentPage);
+            }
+        } catch (error) {
+            console.error("Error al eliminar insumo:", error);
+        }
     };
 
     return (

@@ -322,11 +322,12 @@ export default function SaveInsumo() {
 
 
     useEffect(() => {
-        getAllCategories();
-        getAllUnidad();
+        //console.log("ID recibido desde la URL:", id);
         if (Number(id) !== 0) {
             getArticuloInsumo(`${apiUrl}articulosInsumos`, Number(id));
         }
+        getAllCategories();
+        getAllUnidad();
         getAllSucursales();
     }, [id]);
 
@@ -417,9 +418,17 @@ export default function SaveInsumo() {
                 )}
                 <br />
                 <div>
-                    <label>Sucursales</label>
+                    {/* Título dinámico */}
+                    <label>
+                        {Number(id) === 0 
+                            ? "Sucursales" 
+                            : `Sucursal: ${
+                                sucursales.find(sucursal => sucursal.id === articuloInsumo.sucursal.id)?.nombre || 'N/A'
+                            }`
+                        }
+                    </label>
                     <div>
-                        {/* Solo mostrar los checkboxes si estamos creando (id === 0) */}
+                        {/* Mostrar checkboxes solo si id === 0 */}
                         {Number(id) === 0 && sucursales.map(sucursal => (
                             <label key={sucursal.id}>
                                 <input 
@@ -433,6 +442,7 @@ export default function SaveInsumo() {
                         ))}
                     </div>
                 </div>
+
             </form>
 
             <button className="btn btn-primary" onClick={saveArticulo}>Guardar</button>
