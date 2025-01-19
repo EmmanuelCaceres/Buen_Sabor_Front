@@ -22,6 +22,7 @@ export default function GrillaArticulo() {
     const [articulosInsumos, setArticulosInsumos] = useState<IArticuloInsumo[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [ordenDenominacion, setOrdenDenominacion] = useState<'asc' | 'desc'>('asc');
 
     // Función para obtener lista de sucursales
     const obtenerSucursales = () => {
@@ -41,10 +42,13 @@ export default function GrillaArticulo() {
             });
     };
 
-    // Función para obtener insumos con paginación
-    const mostrarDatosPaginados = (idSucursal: number, page: number) => {
-        console.log(`Sucursal ID: ${idSucursal}, Página: ${page}`);
-        const result = new ArticuloInsumoService(`${apiUrl}articulosInsumos/porSucursal/${idSucursal}?page=${page - 1}&size=20`);
+    // Función para obtener insumos con paginación y orden
+    const mostrarDatosPaginados = (idSucursal: number, page: number, orden: 'asc' | 'desc') => {
+        console.log(`Sucursal ID: ${idSucursal}, Página: ${page}, Orden: ${orden}`);
+        
+        const sortParam = `denominacion,${orden}`;  // Ordenar por denominación
+        const result = new ArticuloInsumoService(`${apiUrl}articulosInsumos/porSucursal/${idSucursal}?page=${page - 1}&size=20&sort=${sortParam}`);
+        
         result.getPaginatedInsumos()
             .then(data => {
                 if (data) {
@@ -68,9 +72,9 @@ export default function GrillaArticulo() {
 
     useEffect(() => {
         if (sucursalSeleccionada) {
-            mostrarDatosPaginados(sucursalSeleccionada, currentPage);
+            mostrarDatosPaginados(sucursalSeleccionada, currentPage, ordenDenominacion);
         }
-    }, [sucursalSeleccionada, currentPage]);
+    }, [sucursalSeleccionada, currentPage, ordenDenominacion]);
 
     const handleSucursalChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const idSucursal = parseInt(event.target.value);
@@ -88,10 +92,19 @@ export default function GrillaArticulo() {
         try {
             await new ArticuloInsumoService(`${apiUrl}articulosInsumos`).delete(id);
             if (sucursalSeleccionada) {
-                mostrarDatosPaginados(sucursalSeleccionada, currentPage);
+                mostrarDatosPaginados(sucursalSeleccionada, currentPage, ordenDenominacion);
             }
         } catch (error) {
             console.error("Error al eliminar insumo:", error);
+        }
+    };
+
+    const handleOrdenarDenominacion = () => {
+        const nuevoOrden = ordenDenominacion === 'asc' ? 'desc' : 'asc';
+        setOrdenDenominacion(nuevoOrden);
+
+        if (sucursalSeleccionada) {
+            mostrarDatosPaginados(sucursalSeleccionada, currentPage, nuevoOrden);
         }
     };
 
@@ -120,7 +133,9 @@ export default function GrillaArticulo() {
                 <thead>
                     <tr>
                         <th>Imagen</th>
-                        <th>Denominación</th>
+                        <th onClick={handleOrdenarDenominacion} style={{ cursor: 'pointer' }}>
+                            Denominación {ordenDenominacion === 'asc' ? '↓' : '↑'}
+                        </th>
                         <th>Categoría</th>
                         <th>Unidad de Medida</th>
                         <th>Acciones</th>
