@@ -19,7 +19,8 @@ export default function GrillaArticulo() {
 
     const [sucursales, setSucursales] = useState<ISucursalDto[]>([]);
     const [sucursalSeleccionada, setSucursalSeleccionada] = useState<number | null>(null);
-    const [articulosInsumos, setArticulosInsumos] = useState<IArticuloInsumo[]>([]);
+    const [todosLosInsumos, setTodosLosInsumos] = useState<IArticuloInsumo[]>([]);  // Estado para todos los insumos
+    const [articulosFiltrados, setArticulosFiltrados] = useState<IArticuloInsumo[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [ordenDenominacion, setOrdenDenominacion] = useState<'asc' | 'desc'>('asc');
@@ -52,18 +53,28 @@ export default function GrillaArticulo() {
         result.getPaginatedInsumos()
             .then(data => {
                 if (data) {
-                    setArticulosInsumos(data.content);
-                    setTotalPages(data.totalPages);
-                    console.log(`Total de páginas: ${data.totalPages}`);
+                    setTodosLosInsumos(data.content); // Cargar todos los insumos sin filtrar
+                    const totalPagesCalculated = Math.ceil(data.totalElements / 20); // Total de páginas basadas en todos los insumos
+                    setTotalPages(totalPagesCalculated); // Asegurarse de que `totalPages` se calcule correctamente
+                    console.log(`Total de páginas: ${totalPagesCalculated}`);
+                    // Filtrar después de que se cargan todos los insumos
+                    filtrarInsumos(busqueda, data.content);
                 } else {
                     console.error("No se encontraron datos.");
-                    setArticulosInsumos([]);
                 }
             })
             .catch(error => {
                 console.error("Error al obtener los datos:", error);
-                setArticulosInsumos([]);
             });
+    };
+
+    // Filtrar insumos por búsqueda
+    const filtrarInsumos = (query: string, insumos: IArticuloInsumo[]) => {
+        const filtered = insumos.filter(insumo => 
+            insumo.denominacion.toLowerCase().includes(query.toLowerCase())
+        );
+        setArticulosFiltrados(filtered);
+        setTotalPages(Math.ceil(filtered.length / 20)); // Ajustar el total de páginas según los insumos filtrados
     };
 
     useEffect(() => {
@@ -128,6 +139,17 @@ export default function GrillaArticulo() {
                 ))}
             </Form.Select>
 
+            {/* Mostrar buscador solo cuando se haya seleccionado una sucursal */}
+            {sucursalSeleccionada && (
+                <Form.Control 
+                    type="text" 
+                    placeholder="Buscar insumo..." 
+                    value={busqueda} 
+                    onChange={(e) => setBusqueda(e.target.value)} 
+                    className="mb-3"
+                />
+            )}
+
             {/* Tabla de Insumos */}
             <Table striped bordered hover>
                 <thead>
@@ -142,8 +164,8 @@ export default function GrillaArticulo() {
                     </tr>
                 </thead>
                 <tbody>
-                    {articulosInsumos.length > 0 ? (
-                        articulosInsumos.map((insumo: IArticuloInsumo) => (
+                    {articulosFiltrados.length > 0 ? (
+                        articulosFiltrados.slice((currentPage - 1) * 20, currentPage * 20).map((insumo: IArticuloInsumo) => (
                             <tr key={insumo.id}>
                                 <td>
                                     {insumo.imagenes?.[0]?.url ? (
