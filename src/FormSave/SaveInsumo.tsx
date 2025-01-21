@@ -207,7 +207,7 @@ export default function SaveInsumo() {
 
     const saveArticulo = async () => {
         console.log("Sucursales seleccionadas al guardar:", sucursalesSeleccionadas);  // Log para ver las sucursales seleccionadas al guardar
-        if (sucursalesSeleccionadas.length === 0) {
+        if (Number(id) === 0 && sucursalesSeleccionadas.length === 0) {
             alert("Debe seleccionar al menos una sucursal.");
             return;
         }
@@ -265,23 +265,19 @@ export default function SaveInsumo() {
                 await articuloService.put(Number(id), articuloInsumo);
             } else {
                 console.log("Creando nuevo artículo...");
-                
                 for (const sucursalId of sucursalesSeleccionadas) {
-                    // Aquí obtienes los datos de la sucursal, puede ser una llamada a la API
-                    const sucursal = await obtenerSucursalPorId(sucursalId); // Suponiendo que tienes una función que trae la sucursal completa
-
+                    const sucursal = await obtenerSucursalPorId(sucursalId);
                     const articuloConSucursal = {
                         ...articuloInsumo,
                         sucursal: {
-                            ...sucursal, // Aquí asignas los datos completos de la sucursal
-                            id: sucursalId // Incluyes el id si es necesario
-                        }
+                            ...sucursal,
+                            id: sucursalId,
+                        },
                     };
-
                     console.log("Artículo con sucursal antes de guardar:", articuloConSucursal);
                     await articuloService.post(articuloConSucursal);
                 }
-            }
+            }            
 
             alert("Insumo guardado con éxito!");
             navigate(-1);
@@ -322,9 +318,12 @@ export default function SaveInsumo() {
 
 
     useEffect(() => {
-        //console.log("ID recibido desde la URL:", id);
         if (Number(id) !== 0) {
-            getArticuloInsumo(`${apiUrl}articulosInsumos`, Number(id));
+            getArticuloInsumo(`${apiUrl}articulosInsumos`, Number(id)).then(() => {
+                if (articuloInsumo.sucursal && articuloInsumo.sucursal.id) {
+                    setSucursalesSeleccionadas([articuloInsumo.sucursal.id]); // Marcar la sucursal asociada
+                }
+            });
         }
         getAllCategories();
         getAllUnidad();

@@ -19,11 +19,9 @@ export default function GrillaArticulo() {
 
     const [sucursales, setSucursales] = useState<ISucursalDto[]>([]);
     const [sucursalSeleccionada, setSucursalSeleccionada] = useState<number | null>(null);
-    const [todosLosInsumos, setTodosLosInsumos] = useState<IArticuloInsumo[]>([]);  // Estado para todos los insumos
-    const [articulosFiltrados, setArticulosFiltrados] = useState<IArticuloInsumo[]>([]);
+    const [articulosInsumos, setArticulosInsumos] = useState<IArticuloInsumo[]>([]); // Página actual de insumos
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-    const [ordenDenominacion, setOrdenDenominacion] = useState<'asc' | 'desc'>('asc');
 
     // Función para obtener lista de sucursales
     const obtenerSucursales = () => {
@@ -43,38 +41,25 @@ export default function GrillaArticulo() {
             });
     };
 
-    // Función para obtener insumos con paginación y orden
-    const mostrarDatosPaginados = (idSucursal: number, page: number, orden: 'asc' | 'desc') => {
-        console.log(`Sucursal ID: ${idSucursal}, Página: ${page}, Orden: ${orden}`);
-        
-        const sortParam = `denominacion,${orden}`;  // Ordenar por denominación
-        const result = new ArticuloInsumoService(`${apiUrl}articulosInsumos/porSucursal/${idSucursal}?page=${page - 1}&size=20&sort=${sortParam}`);
+    // Función para obtener insumos paginados
+    const mostrarDatosPaginados = (idSucursal: number, page: number) => {
+        const result = new ArticuloInsumoService(`${apiUrl}articulosInsumos/porSucursal/${idSucursal}?page=${page - 1}&size=20`);
         
         result.getPaginatedInsumos()
             .then(data => {
                 if (data) {
-                    setTodosLosInsumos(data.content); // Cargar todos los insumos sin filtrar
-                    const totalPagesCalculated = Math.ceil(data.totalElements / 20); // Total de páginas basadas en todos los insumos
-                    setTotalPages(totalPagesCalculated); // Asegurarse de que `totalPages` se calcule correctamente
-                    console.log(`Total de páginas: ${totalPagesCalculated}`);
-                    // Filtrar después de que se cargan todos los insumos
-                    filtrarInsumos(busqueda, data.content);
+                    setArticulosInsumos(data.content); // Actualiza la página actual de insumos
+                    setTotalPages(data.totalPages); // Total de páginas basado en los datos de la API
+                    console.log(`Total de páginas: ${data.totalPages}`);
                 } else {
                     console.error("No se encontraron datos.");
+                    setArticulosInsumos([]);
                 }
             })
             .catch(error => {
                 console.error("Error al obtener los datos:", error);
+                setArticulosInsumos([]);
             });
-    };
-
-    // Filtrar insumos por búsqueda
-    const filtrarInsumos = (query: string, insumos: IArticuloInsumo[]) => {
-        const filtered = insumos.filter(insumo => 
-            insumo.denominacion.toLowerCase().includes(query.toLowerCase())
-        );
-        setArticulosFiltrados(filtered);
-        setTotalPages(Math.ceil(filtered.length / 20)); // Ajustar el total de páginas según los insumos filtrados
     };
 
     useEffect(() => {
@@ -83,9 +68,9 @@ export default function GrillaArticulo() {
 
     useEffect(() => {
         if (sucursalSeleccionada) {
-            mostrarDatosPaginados(sucursalSeleccionada, currentPage, ordenDenominacion);
+            mostrarDatosPaginados(sucursalSeleccionada, currentPage);
         }
-    }, [sucursalSeleccionada, currentPage, ordenDenominacion]);
+    }, [sucursalSeleccionada, currentPage]);
 
     const handleSucursalChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const idSucursal = parseInt(event.target.value);
@@ -103,19 +88,10 @@ export default function GrillaArticulo() {
         try {
             await new ArticuloInsumoService(`${apiUrl}articulosInsumos`).delete(id);
             if (sucursalSeleccionada) {
-                mostrarDatosPaginados(sucursalSeleccionada, currentPage, ordenDenominacion);
+                mostrarDatosPaginados(sucursalSeleccionada, currentPage);
             }
         } catch (error) {
             console.error("Error al eliminar insumo:", error);
-        }
-    };
-
-    const handleOrdenarDenominacion = () => {
-        const nuevoOrden = ordenDenominacion === 'asc' ? 'desc' : 'asc';
-        setOrdenDenominacion(nuevoOrden);
-
-        if (sucursalSeleccionada) {
-            mostrarDatosPaginados(sucursalSeleccionada, currentPage, nuevoOrden);
         }
     };
 
@@ -139,33 +115,20 @@ export default function GrillaArticulo() {
                 ))}
             </Form.Select>
 
-            {/* Mostrar buscador solo cuando se haya seleccionado una sucursal */}
-            {sucursalSeleccionada && (
-                <Form.Control 
-                    type="text" 
-                    placeholder="Buscar insumo..." 
-                    value={busqueda} 
-                    onChange={(e) => setBusqueda(e.target.value)} 
-                    className="mb-3"
-                />
-            )}
-
             {/* Tabla de Insumos */}
             <Table striped bordered hover>
                 <thead>
                     <tr>
                         <th>Imagen</th>
-                        <th onClick={handleOrdenarDenominacion} style={{ cursor: 'pointer' }}>
-                            Denominación {ordenDenominacion === 'asc' ? '↓' : '↑'}
-                        </th>
+                        <th>Denominación</th>
                         <th>Categoría</th>
                         <th>Unidad de Medida</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {articulosFiltrados.length > 0 ? (
-                        articulosFiltrados.slice((currentPage - 1) * 20, currentPage * 20).map((insumo: IArticuloInsumo) => (
+                    {articulosInsumos.length > 0 ? (
+                        articulosInsumos.map((insumo: IArticuloInsumo) => (
                             <tr key={insumo.id}>
                                 <td>
                                     {insumo.imagenes?.[0]?.url ? (
