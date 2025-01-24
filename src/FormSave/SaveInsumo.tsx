@@ -82,6 +82,7 @@ export default function SaveInsumo() {
         precioCompra: 0,
         stockActual: 0,
         stockMaximo: 0,
+        stockMinimo:0,
         esParaElaborar: true,
     });
     
@@ -206,6 +207,11 @@ export default function SaveInsumo() {
     };
 
     const saveArticulo = async () => {
+
+        if (!validarFormulario()) {
+            return; // Detiene el proceso si la validación falla
+        }
+        
         console.log("Sucursales seleccionadas al guardar:", sucursalesSeleccionadas);  // Log para ver las sucursales seleccionadas al guardar
         if (Number(id) === 0 && sucursalesSeleccionadas.length === 0) {
             alert("Debe seleccionar al menos una sucursal.");
@@ -330,6 +336,41 @@ export default function SaveInsumo() {
         getAllSucursales();
     }, [id]);
 
+    const validarFormulario = (): boolean => {
+        if (!articuloInsumo.denominacion.trim()) {
+            alert("El nombre del insumo es obligatorio.");
+            return false;
+        }
+    
+        if (articuloInsumo.precioCompra <= 0) {
+            alert("El precio de compra debe ser mayor que 0.");
+            return false;
+        }
+    
+        if (articuloInsumo.stockMinimo < 0 || articuloInsumo.stockMaximo < 0) {
+            alert("El stock mínimo y máximo no pueden ser negativos.");
+            return false;
+        }
+    
+        if (articuloInsumo.stockMinimo >= articuloInsumo.stockMaximo) {
+            alert("El stock mínimo debe ser menor que el stock máximo.");
+            return false;
+        }
+    
+        if (articuloInsumo.esParaElaborar === false && articuloInsumo.precioVenta <= 0) {
+            alert("El precio de venta debe ser mayor que 0 para insumos que no son para elaborar.");
+            return false;
+        }
+    
+        if (Number(id) === 0 && sucursalesSeleccionadas.length === 0) {
+            alert("Debe seleccionar al menos una sucursal.");
+            return false;
+        }
+    
+        return true;
+    };
+    
+
     return (
         <div className="container">
             <Link to="/insumos" className="btnVolver">
@@ -342,9 +383,11 @@ export default function SaveInsumo() {
                 <label htmlFor="precioCompra">Precio de compra </label>
                 <input type="number" id="precioCompra" name="precioCompra" value={articuloInsumo.precioCompra} onChange={(e) => setArticulosInsumo({ ...articuloInsumo, precioCompra: Number(e.target.value) })}></input>
                 <label htmlFor="stockActual">Stock actual</label>
-                <input type="text" id="stockActual" name="stockActual" value={Number(articuloInsumo.stockActual)} onChange={(e) => setArticulosInsumo({ ...articuloInsumo, stockActual: Number(e.target.value) })} />
+                <input type="number" id="stockActual" name="stockActual" value={Number(articuloInsumo.stockActual)} onChange={(e) => setArticulosInsumo({ ...articuloInsumo, stockActual: Number(e.target.value) })} />
                 <label htmlFor="stockMaximo">Stock maximo</label>
                 <input type="number" id="stockMaximo" name="stockMaximo" value={Number(articuloInsumo.stockMaximo)} onChange={(e) => setArticulosInsumo({ ...articuloInsumo, stockMaximo: Number(e.target.value) })} />
+                <label htmlFor="stockMinimo">Stock minimo</label>
+                <input type="number" id="stockMinimo" name="stockMinimo" value={Number(articuloInsumo.stockMinimo)} onChange={(e) => setArticulosInsumo({ ...articuloInsumo, stockMinimo: Number(e.target.value) })} />
                 <input type="file" onChange={onFileChange} />
                 {selectedImage && (
                     <div>
