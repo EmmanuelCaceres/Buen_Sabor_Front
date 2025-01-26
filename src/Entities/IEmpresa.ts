@@ -1,4 +1,4 @@
-export default interface IEmpresa{
+export default interface IEmpresaDto{
     id:number
     baja:boolean
     nombre:string;
