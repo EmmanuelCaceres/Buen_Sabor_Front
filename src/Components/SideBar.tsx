@@ -8,20 +8,20 @@ export default function SideBar() {
 
     return (
         <div className="sidebar-container ">
-            <CSidebar className="border-end d-flex flex-column h-100" style={{ marginTop: "60px" , backgroundColor:"#ffffff"}}>
+            <CSidebar className="border-end d-flex flex-column h-100" style={{ backgroundColor:"#ffffff"}}>
                 <CSidebarNav>
                     <CNavTitle>
                         Dashboard
                     </CNavTitle>
                     <CNavItem>
-                        <Link to="/" className="nav-link" >
+                        <Link to="/panel-usuario" className="nav-link" >
                             <CIcon customClassName="nav-icon" icon={cilHome} />
                             Inicio
                         </Link>
                     </CNavItem>
 
                     <CNavItem>
-                        <Link to="/empresas" className="nav-link">
+                        <Link to="/panel-usuario/empresas" className="nav-link">
                             <CIcon customClassName="nav-icon" icon={cilBuilding} />
                             Empresa
                         </Link>
@@ -35,13 +35,13 @@ export default function SideBar() {
                         }
                     >
                         <CNavItem>
-                            <Link to="/articulos" className="nav-link" >
+                            <Link to="/panel-usuario/articulos" className="nav-link" >
                                 <span className="nav-icon"><span className="nav-icon-bullet"></span></span>
                                 Lista de Productos
                             </Link>
                         </CNavItem>
                         <CNavItem>
-                            <Link to="/categorias" className="nav-link">
+                            <Link to="/panel-usuario/categorias" className="nav-link">
                                 <span className="nav-icon"><span className="nav-icon-bullet"></span></span>
                                 Categorías
                             </Link>
@@ -49,7 +49,7 @@ export default function SideBar() {
                     </CNavGroup>
 
                     <CNavItem>
-                        <Link to="/promociones" className="nav-link">
+                        <Link to="/panel-usuario/promociones" className="nav-link">
                             <CIcon customClassName="nav-icon" icon={cilGift} />
                             Promociones
                         </Link>
@@ -64,26 +64,26 @@ export default function SideBar() {
                         }
                     >
                         <CNavItem>
-                            <Link to="/empleados" className="nav-link" >
+                            <Link to="/panel-usuario/empleados" className="nav-link" >
                                 <span className="nav-icon"><span className="nav-icon-bullet"></span></span>
                                 Lista de Empleados
                             </Link>
                         </CNavItem>
                         <CNavItem>
-                            <Link to="/roles" className="nav-link">
+                            <Link to="/panel-usuario/roles" className="nav-link">
                                 <span className="nav-icon"><span className="nav-icon-bullet"></span></span>
                                 Roles
                             </Link>
                         </CNavItem>
                     </CNavGroup>
                     <CNavItem>
-                        <Link to="/insumos" className="nav-link">
+                        <Link to="/panel-usuario/insumos" className="nav-link">
                             <CIcon customClassName="nav-icon" icon={cilCart} />
                             Insumos
                         </Link>
                     </CNavItem>
                     <CNavItem>
-                        <Link to="/pedidos" className="nav-link">
+                        <Link to="/panel-usuario/pedidos" className="nav-link">
                             <CIcon customClassName="nav-icon" icon={cilCart} />
                             Pedidos
                         </Link>
