@@ -24,15 +24,21 @@ export default class ArticuloInsumoService extends GenericFetch<IArticuloInsumo>
     }
     
 
-    // Método para obtener sucursales
-    async getSucursales(): Promise<IPaginatedResponse<ISucursalDto> | null> {
+    async getSucursales(): Promise<ISucursalDto[]> {
         const response = await fetch(`${this.baseUrl}sucursales`);
         if (!response.ok) {
-            return null;
+            console.error("Error en la respuesta del servidor:", response.status);
+            return [];
         }
+        
         const data = await response.json();
-        return data as IPaginatedResponse<ISucursalDto>;
+        console.log("Datos de sucursales:", data);  // Asegúrate de que `data` tiene la estructura que esperas
+        
+        // Devuelve el campo `content` si existe, o un array vacío si no
+        return data || [];
     }
+    
+
     
     
     async getPaginatedInsumos(): Promise<IPaginatedResponse<IArticuloInsumo> | null> {
