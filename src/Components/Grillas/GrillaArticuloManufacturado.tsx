@@ -61,7 +61,7 @@ export default function GrillaArticulo() {
             <Row className="my-3">
                 <Col className="d-flex justify-content-between align-items-center">
                     <h1>Artículos</h1>
-                    <Link to={'save/0'} className='btn btn-primary'>
+                    <Link to={'/panel-usuario/articulos/save/0'} className='btn btn-primary'>
                         <img src={masObject} alt="Crear Artículo" style={{ marginRight: '8px' }} />
                         Crear Artículo
                     </Link>
@@ -99,7 +99,7 @@ export default function GrillaArticulo() {
                             <td>{articulo.descripcion}</td>
                             <td>{articulo.precioVenta}</td>
                             <td>
-                                <Link to={"save/" + articulo.id} className="btn btn-warning me-2">
+                                <Link to={"/panel-usuario/articulos/save/" + articulo.id} className="btn btn-warning me-2">
                                     Editar
                                 </Link>
                                 <Button variant="danger" onClick={() => handleDelete(articulo.id)}>
