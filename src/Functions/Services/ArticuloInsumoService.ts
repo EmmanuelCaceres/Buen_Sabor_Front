@@ -79,5 +79,16 @@ export default class ArticuloInsumoService extends GenericFetch<IArticuloInsumo>
             return null;
         }
     }
+
+    async deleteInsumo(id: number): Promise<void> {
+        const response = await fetch(`${this.baseUrl}articulosInsumos/${id}`, {
+            method: 'DELETE',
+        });
+    
+        if (!response.ok) {
+            const errorData = await response.json(); // Try to get error details from the server
+            throw new Error(`Error deleting insumo: ${response.status} - ${errorData?.message || response.statusText}`);
+        }
+    }
     
 }

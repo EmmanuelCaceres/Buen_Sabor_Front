@@ -25,6 +25,8 @@ export default function GrillaInsumo() {
     const [categorias, setCategorias] = useState<ICategoria[]>([]);
     const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<number | "">("");
     const [filtrarPorCategoria, setFiltrarPorCategoria] = useState(false);
+    const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+    const [insumoToDelete, setInsumoToDelete] = useState<IArticuloInsumo | null>(null);
 
     const itemsPerPage = 15; // Número de elementos por página
 
@@ -136,6 +138,11 @@ export default function GrillaInsumo() {
         setFiltrarPorCategoria(true);
     };
 
+    const handleDelete = (insumo: IArticuloInsumo) => {
+        setInsumoToDelete(insumo);
+        setShowDeleteConfirmation(true);
+    };
+
     const filteredInsumos = allArticulosInsumos.filter((insumo) => {
         // Buscar la categoría seleccionada
         const categoriaSeleccionadaObj = categorias.find(categoria => categoria.id === categoriaSeleccionada);
@@ -157,6 +164,29 @@ export default function GrillaInsumo() {
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
+
+    const confirmDelete = async () => {
+        if (insumoToDelete) {
+            try {
+                const result = new ArticuloInsumoService(apiUrl);
+                await result.deleteInsumo(insumoToDelete.id); // Assuming you have a deleteInsumo method in your service
+                // After successful deletion, update the state to remove the deleted insumo
+                setAllArticulosInsumos(allArticulosInsumos.filter(insumo => insumo.id !== insumoToDelete.id));
+                alert("Insumo eliminado con éxito."); // Or a better notification system
+            } catch (error) {
+                console.error("Error al eliminar insumo:", error);
+                alert("Error al eliminar el insumo. Inténtelo nuevamente."); // Or a better error handling
+            } finally {
+                setShowDeleteConfirmation(false);
+                setInsumoToDelete(null);
+            }
+        }
+    };
+
+    const cancelDelete = () => {
+        setShowDeleteConfirmation(false);
+        setInsumoToDelete(null);
+    };
 
     return (
         <div className="container">
@@ -182,6 +212,7 @@ export default function GrillaInsumo() {
                 ))}
             </Form.Select>
 
+            {/*filtro de categoria*/}
             <div className="d-flex gap-3 mb-3">
                 <Button variant="info" onClick={handleFiltrarPorCategoria}>Filtrar por Categoría</Button>
                 <Form.Select onChange={handleCategoriaChange} value={categoriaSeleccionada || ""}>
@@ -242,7 +273,7 @@ export default function GrillaInsumo() {
                                     <Link to={"save/" + insumo.id} className="btn btn-warning me-2">
                                         Editar
                                     </Link>
-                                    <Button variant="danger" onClick={() => console.log(`Eliminar: ${insumo.id}`)}>
+                                    <Button variant="danger"onClick={() => handleDelete(insumo)}>
                                         Eliminar
                                     </Button>
                                 </td>
@@ -255,6 +286,27 @@ export default function GrillaInsumo() {
                     )}
                 </tbody>
             </Table>
+
+            {/* Confirmation Modal */}
+            {showDeleteConfirmation && insumoToDelete && (
+                <div className="modal show" style={{ display: 'block', position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title">Confirmar Eliminación</h5>
+                                <button type="button" className="btn-close" onClick={cancelDelete}></button>
+                            </div>
+                            <div className="modal-body">
+                                ¿Está seguro de que desea eliminar el insumo <strong>{insumoToDelete.denominacion}</strong>?
+                            </div>
+                            <div className="modal-footer">
+                                <Button variant="secondary" onClick={cancelDelete}>Cancelar</Button>
+                                <Button variant="danger" onClick={confirmDelete}>Eliminar</Button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Controles de paginación */}
             {filteredInsumos.length > itemsPerPage && (

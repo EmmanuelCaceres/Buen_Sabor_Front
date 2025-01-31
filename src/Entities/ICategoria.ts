@@ -6,5 +6,5 @@ export default interface ICategoria{
     subCategorias: ICategoria[];
     articulos:IArticulo[];
     esInsumo: boolean;
-    categoriaPadre: ICategoria;
+    categoriaPadre: ICategoria | null;
 }

@@ -8,7 +8,7 @@ import ICategoria from "../Entities/ICategoria";
 import IUnidadMedida from "../Entities/IUnidadMedida";
 import UnidadMedidaService from "../Functions/Services/UnidadMedidaService";
 import ImagenArticuloService from "../Functions/Services/ImagenArticuloService";
-import CategoriaService from "../Functions/Services/CategoriaService";
+//import CategoriaService from "../Functions/Services/CategoriaService";
 import SucursalService from "../Functions/Services/SucursalService";
 import ISucursalDto from "../Entities/ISucursalDto";
 
@@ -27,6 +27,7 @@ export default function SaveInsumo() {
     // const handleClose = () => setShow(false);
     const [articuloInsumo, setArticulosInsumo] = useState<IArticuloInsumo>({
         id: Number(id),
+        baja:false,
         denominacion: '',
         sucursal: {
             id: 0,
@@ -78,6 +79,15 @@ export default function SaveInsumo() {
             denominacion: '',
             subCategorias: [],
             articulos: [],
+            esInsumo: false,
+            categoriaPadre: { // Inicialización correcta
+                id: 0,
+                denominacion: '',
+                subCategorias: [],
+                articulos: [],
+                esInsumo: false,
+                categoriaPadre: null // O undefined, dependiendo de tu lógica
+            }
         },
         precioCompra: 0,
         stockActual: 0,
@@ -131,21 +141,15 @@ export default function SaveInsumo() {
     };
 
 
-    const getAllCategories = async () => {
-        const result = new CategoriaService(`${apiUrl}categorias`);
-        const categoriaResult = await result.getAllCategorias(); // Llama al método del servicio
-    
-        if (Array.isArray(categoriaResult)) {
-            // Resultado no paginado: un array de categorías
-            setCategoria(categoriaResult);
-        } else if (categoriaResult && 'data' in categoriaResult) {
-            // Resultado paginado: objeto con la propiedad 'data'
-            setCategoria(categoriaResult.content); // Usa la propiedad 'data' para extraer las categorías
-        } else {
-            console.error("Unexpected response format for categories:", categoriaResult);
-            setCategoria([]); // Fallback a un array vacío en caso de error
-        }
-    };
+    const obtenerCategorias = async () => {
+            try {
+                const result = new ArticuloInsumoService(apiUrl);
+                const data = await result.getCategorias();
+                setCategoria(data.filter((categoria: ICategoria) => categoria.esInsumo) || []);
+            } catch (error) {
+                console.error("Error al obtener categorías:", error);
+            }
+        };
     
     const getAllUnidad = async () => {
         try {
@@ -331,7 +335,7 @@ export default function SaveInsumo() {
                 }
             });
         }
-        getAllCategories();
+        obtenerCategorias();
         getAllUnidad();
         getAllSucursales();
     }, [id]);
@@ -373,7 +377,7 @@ export default function SaveInsumo() {
 
     return (
         <div className="container">
-            <Link to="/insumos" className="btnVolver">
+            <Link to="/panel-usuario/insumos" className="btnVolver">
                 <img width={24} height={24} src={arrow_left} alt="arrow_left" />
                 <p style={{ margin: "0" }}>Volver</p>
             </Link>
