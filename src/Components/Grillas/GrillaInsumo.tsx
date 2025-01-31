@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import ArticuloInsumoService from "../../Functions/Services/ArticuloInsumoService";
 import masObject from "../../assets/circle-plus-svgrepo-com.svg";
 import IArticuloInsumo from "../../Entities/IArticuloInsumo";
-import { Button, Form, Table } from "react-bootstrap";
+import { Button, Form, OverlayTrigger, Table, Tooltip } from "react-bootstrap";
 
 interface ISucursalDto {
     id: number;
@@ -84,6 +84,20 @@ export default function GrillaArticulo() {
         setSucursalSeleccionada(idSucursal);
     };
 
+    const getStockColor = (stock: number, min: number, max: number) => {
+        if (stock <= min) return "#ff4d4d"; // Rojo
+        if (stock >= max) return "#4caf50"; // Verde
+    
+        const range = max - min;
+        const position = (stock - min) / range;
+    
+        const red = position < 0.5 ? 255 : 255 - (position - 0.5) * 510;
+        const green = position < 0.5 ? position * 510 : 255;
+        
+        return `rgb(${red}, ${green}, 50)`;
+    };
+    
+
     const handlePageChange = (newPage: number) => {
         if (newPage > 0 && newPage <= Math.ceil(filteredInsumos.length / itemsPerPage)) {
             setCurrentPage(newPage);
@@ -140,7 +154,8 @@ export default function GrillaArticulo() {
                         <th>Imagen</th>
                         <th>Denominación</th>
                         <th>Categoría</th>
-                        <th>Unidad de Medida</th>
+                        <th>Stock Actual</th>
+                        <th>Unidad de medida</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -151,9 +166,9 @@ export default function GrillaArticulo() {
                                 <td>
                                     {insumo.imagenes?.[0]?.url ? (
                                         <img
-                                            width={50}
-                                            height={50}
-                                            style={{ objectFit: "contain", maxWidth: "50px", maxHeight: "50px" }}
+                                            width={200}
+                                            height={200}
+                                            style={{ objectFit: "contain", maxWidth: "90px", maxHeight: "90px" }}
                                             src={`${insumo.imagenes[0].url}`}
                                             alt="imagenArticulo"
                                         />
@@ -161,6 +176,11 @@ export default function GrillaArticulo() {
                                 </td>
                                 <td>{insumo.denominacion}</td>
                                 <td>{insumo.categoria.denominacion}</td>
+                                <td style={{ backgroundColor: getStockColor(insumo.stockActual, insumo.stockMinimo, insumo.stockMaximo) }}>
+                                    <OverlayTrigger placement="top" overlay={<Tooltip>{`Stock: ${insumo.stockActual}`}</Tooltip>}>
+                                        <span>{insumo.stockActual}</span>
+                                    </OverlayTrigger>
+                                </td>
                                 <td>{insumo.unidadMedida.denominacion}</td>
                                 <td>
                                     <Link to={"save/" + insumo.id} className="btn btn-warning me-2">
