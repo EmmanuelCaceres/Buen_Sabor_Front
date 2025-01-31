@@ -13,6 +13,8 @@ import GrillaRol from "./Components/Grillas/GrillaRol";
 import GrillaPromocion from "./Components/Grillas/GrillaPromocion";
 import SavePromocion from "./FormSave/SavePromocion";
 import Pedidos from "./Components/Pedidos";
+import GrillaInsumo from "./Components/Grillas/GrillaInsumo";
+import GrillaCategoria from "./Components/Grillas/GrillaCategoria";
 
 export const App = () => {
     
@@ -30,12 +32,12 @@ export const App = () => {
                     <Route path="categorias/save/:id" element={<SaveCategoria/>}></Route>
                     <Route path="empresas" element={<GrillaEmpresa/>}></Route>
                     <Route path="empresas/save/:id" element={<SaveEmpresa/>}></Route>
-                    {/* // <Route path="/categorias" element={<GrillaCategoria/>}></Route> */}
+                    <Route path="categorias" element={<GrillaCategoria/>}></Route>
                     <Route path="empleados" element={<GrillaEmpleado/>}></Route>
                     <Route path="roles" element={<GrillaRol/>}></Route>
                     <Route path="promociones" element={<GrillaPromocion/>}></Route>
                     <Route path="promociones/save/:id" element={<SavePromocion/>}></Route>
-                    {/* // <Route path="/insumos" element={<GrillaInsumo/>}></Route> */}
+                    <Route path="insumos" element={<GrillaInsumo/>}></Route>
                     <Route path="pedidos" element={<Pedidos/>}></Route>
 
                 </Route>

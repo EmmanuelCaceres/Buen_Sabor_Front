@@ -4,7 +4,7 @@ import masObject from '../../assets/circle-plus-svgrepo-com.svg';
 import { Container, Row, Col, InputGroup, Table, Button, Form } from 'react-bootstrap';
 import ICategoria from '../../Entities/ICategoria';
 import CategoriaService from '../../Functions/Services/CategoriaService';
-export default function GrillaArticulo() {
+export default function GrillaCategoria() {
 
     const apiUrl = import.meta.env.VITE_URL_API_BACK
 

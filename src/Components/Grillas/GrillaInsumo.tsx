@@ -13,7 +13,7 @@ interface ISucursalDto {
     baja: boolean;
 }
 
-export default function GrillaArticulo() {
+export default function GrillaInsumo() {
     const apiUrl = import.meta.env.VITE_URL_API_BACK;
 
     const [sucursales, setSucursales] = useState<ISucursalDto[]>([]);
