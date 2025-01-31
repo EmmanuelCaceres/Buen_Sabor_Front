@@ -34,7 +34,7 @@ export default function GrillaInsumo() {
             const result = new ArticuloInsumoService(apiUrl);
             const data = await result.getSucursales();
             setSucursales(data || []);
-            console.log(data);
+            //console.log(data);
         } catch (error) {
             console.error("Error al obtener sucursales:", error);
         }
@@ -45,12 +45,16 @@ export default function GrillaInsumo() {
         try {
             const result = new ArticuloInsumoService(apiUrl);
             const data = await result.getCategorias();
-            setCategorias(data || []);
-            console.log(data);
+            setCategorias(data.filter((categoria: ICategoria) => categoria.esInsumo) || []);
         } catch (error) {
             console.error("Error al obtener categorías:", error);
         }
     };
+
+    // const obtenerCategoriasHijas = (idCategoria: number): number[] => {
+    //     const categoriasHijas = categorias.filter(cat => cat.categoriaPadre.id === idCategoria);
+    //     return [idCategoria, ...categoriasHijas.map(cat => cat.id)];
+    // };
 
     // Función para cargar todos los datos en un solo array
     const cargarTodosLosDatos = async (idSucursal: number) => {
@@ -102,7 +106,10 @@ export default function GrillaInsumo() {
     };
 
     const handleCategoriaChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setCategoriaSeleccionada(event.target.value ? parseInt(event.target.value) : "");
+        const categoriaId = event.target.value ? parseInt(event.target.value) : "";
+    
+        // Si la categoría seleccionada es una categoría padre, filtrar por subcategorías
+        setCategoriaSeleccionada(categoriaId);
     };
 
     const getStockColor = (stock: number, min: number, max: number) => {
@@ -129,9 +136,21 @@ export default function GrillaInsumo() {
         setFiltrarPorCategoria(true);
     };
 
-    const filteredInsumos = allArticulosInsumos.filter((insumo) =>
-        insumo.denominacion.toLowerCase().includes(searchTerm.toLowerCase()) && (!filtrarPorCategoria || categoriaSeleccionada === "" || insumo.categoria.id === categoriaSeleccionada)
-    );
+    const filteredInsumos = allArticulosInsumos.filter((insumo) => {
+        // Buscar la categoría seleccionada
+        const categoriaSeleccionadaObj = categorias.find(categoria => categoria.id === categoriaSeleccionada);
+        
+        // Si la categoría seleccionada es una categoría padre, incluimos sus subcategorías
+        const perteneceACategoriaPadre =
+            categoriaSeleccionada === "" ||
+            insumo.categoria.id === categoriaSeleccionada ||
+            (categoriaSeleccionadaObj && categoriaSeleccionadaObj.categoriaPadre === null &&
+                categorias.some(c => c.categoriaPadre?.id === categoriaSeleccionada && insumo.categoria.id === c.id));
+        
+        return insumo.denominacion.toLowerCase().includes(searchTerm.toLowerCase()) &&
+               (!filtrarPorCategoria || perteneceACategoriaPadre);
+    });
+    
 
     // Datos paginados para la página actual
     const paginatedInsumos = filteredInsumos.slice(

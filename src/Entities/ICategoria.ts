@@ -5,4 +5,6 @@ export default interface ICategoria{
     denominacion:string;
     subCategorias: ICategoria[];
     articulos:IArticulo[];
+    esInsumo: boolean;
+    categoriaPadre: ICategoria;
 }

@@ -33,7 +33,7 @@ export default class ArticuloInsumoService extends GenericFetch<IArticuloInsumo>
         }
         
         const data = await response.json();
-        console.log("Datos de sucursales:", data);  // Asegúrate de que `data` tiene la estructura que esperas
+        //console.log("Datos de sucursales:", data);  // Asegúrate de que `data` tiene la estructura que esperas
         
         // Devuelve el campo `content` si existe, o un array vacío si no
         return data || [];
@@ -47,7 +47,7 @@ export default class ArticuloInsumoService extends GenericFetch<IArticuloInsumo>
         }
         
         const data = await response.json();
-        console.log("Datos de categorias:", data);  // Asegúrate de que `data` tiene la estructura que esperas
+        //console.log("Datos de categorias:", data);  // Asegúrate de que `data` tiene la estructura que esperas
         
         // Devuelve el campo `content` si existe, o un array vacío si no
         return data || [];
