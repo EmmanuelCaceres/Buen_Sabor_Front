@@ -1,4 +1,5 @@
 import IArticuloInsumo from "../../Entities/IArticuloInsumo";
+import ICategoria from "../../Entities/ICategoria";
 import { IPaginatedResponse } from "../../Entities/IPaginatedResponse";
 import ISucursalDto from "../../Entities/ISucursalDto"; // Asegúrate de importar la interfaz de sucursal
 import { GenericFetch } from "../GenericFetch";
@@ -33,6 +34,20 @@ export default class ArticuloInsumoService extends GenericFetch<IArticuloInsumo>
         
         const data = await response.json();
         console.log("Datos de sucursales:", data);  // Asegúrate de que `data` tiene la estructura que esperas
+        
+        // Devuelve el campo `content` si existe, o un array vacío si no
+        return data || [];
+    }
+
+    async getCategorias(): Promise<ICategoria[]> {
+        const response = await fetch(`${this.baseUrl}categorias`);
+        if (!response.ok) {
+            console.error("Error en la respuesta del servidor:", response.status);
+            return [];
+        }
+        
+        const data = await response.json();
+        console.log("Datos de categorias:", data);  // Asegúrate de que `data` tiene la estructura que esperas
         
         // Devuelve el campo `content` si existe, o un array vacío si no
         return data || [];

@@ -4,6 +4,7 @@ import ArticuloInsumoService from "../../Functions/Services/ArticuloInsumoServic
 import masObject from "../../assets/circle-plus-svgrepo-com.svg";
 import IArticuloInsumo from "../../Entities/IArticuloInsumo";
 import { Button, Form, OverlayTrigger, Table, Tooltip } from "react-bootstrap";
+import ICategoria from "../../Entities/ICategoria";
 
 interface ISucursalDto {
     id: number;
@@ -21,6 +22,9 @@ export default function GrillaInsumo() {
     const [allArticulosInsumos, setAllArticulosInsumos] = useState<IArticuloInsumo[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState("");
+    const [categorias, setCategorias] = useState<ICategoria[]>([]);
+    const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<number | "">("");
+    const [filtrarPorCategoria, setFiltrarPorCategoria] = useState(false);
 
     const itemsPerPage = 15; // Número de elementos por página
 
@@ -33,6 +37,18 @@ export default function GrillaInsumo() {
             console.log(data);
         } catch (error) {
             console.error("Error al obtener sucursales:", error);
+        }
+    };
+
+    // Función para obtener categorías
+    const obtenerCategorias = async () => {
+        try {
+            const result = new ArticuloInsumoService(apiUrl);
+            const data = await result.getCategorias();
+            setCategorias(data || []);
+            console.log(data);
+        } catch (error) {
+            console.error("Error al obtener categorías:", error);
         }
     };
 
@@ -70,6 +86,7 @@ export default function GrillaInsumo() {
 
     useEffect(() => {
         obtenerSucursales();
+        obtenerCategorias();
     }, []);
 
     useEffect(() => {
@@ -82,6 +99,10 @@ export default function GrillaInsumo() {
     const handleSucursalChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const idSucursal = parseInt(event.target.value);
         setSucursalSeleccionada(idSucursal);
+    };
+
+    const handleCategoriaChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setCategoriaSeleccionada(event.target.value ? parseInt(event.target.value) : "");
     };
 
     const getStockColor = (stock: number, min: number, max: number) => {
@@ -104,8 +125,12 @@ export default function GrillaInsumo() {
         }
     };
 
+    const handleFiltrarPorCategoria = () => {
+        setFiltrarPorCategoria(true);
+    };
+
     const filteredInsumos = allArticulosInsumos.filter((insumo) =>
-        insumo.denominacion.toLowerCase().includes(searchTerm.toLowerCase())
+        insumo.denominacion.toLowerCase().includes(searchTerm.toLowerCase()) && (!filtrarPorCategoria || categoriaSeleccionada === "" || insumo.categoria.id === categoriaSeleccionada)
     );
 
     // Datos paginados para la página actual
@@ -138,6 +163,18 @@ export default function GrillaInsumo() {
                 ))}
             </Form.Select>
 
+            <div className="d-flex gap-3 mb-3">
+                <Button variant="info" onClick={handleFiltrarPorCategoria}>Filtrar por Categoría</Button>
+                <Form.Select onChange={handleCategoriaChange} value={categoriaSeleccionada || ""}>
+                    <option value="">Todas las categorías</option>
+                    {categorias.map((categoria) => (
+                        <option key={categoria.id} value={categoria.id}>
+                            {categoria.denominacion}
+                        </option>
+                    ))}
+                </Form.Select>
+            </div>
+
             {/* Buscador */}
             <Form.Control
                 type="text"
@@ -151,19 +188,19 @@ export default function GrillaInsumo() {
             <Table striped bordered hover>
                 <thead>
                     <tr>
-                        <th>Imagen</th>
-                        <th>Denominación</th>
-                        <th>Categoría</th>
-                        <th>Stock Actual</th>
-                        <th>Unidad de medida</th>
-                        <th>Acciones</th>
+                    <th className="text-center align-middle">Imagen</th>
+                        <th className="text-center align-middle">Denominación</th>
+                        <th className="text-center align-middle">Categoría</th>
+                        <th className="text-center align-middle">Stock Actual</th>
+                        <th className="text-center align-middle">U. Medida</th>
+                        <th className="text-center align-middle">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     {paginatedInsumos.length > 0 ? (
                         paginatedInsumos.map((insumo) => (
                             <tr key={insumo.id}>
-                                <td>
+                                <td className="text-center align-middle">
                                     {insumo.imagenes?.[0]?.url ? (
                                         <img
                                             width={200}
@@ -174,15 +211,15 @@ export default function GrillaInsumo() {
                                         />
                                     ) : null}
                                 </td>
-                                <td>{insumo.denominacion}</td>
-                                <td>{insumo.categoria.denominacion}</td>
-                                <td style={{ backgroundColor: getStockColor(insumo.stockActual, insumo.stockMinimo, insumo.stockMaximo) }}>
+                                <td className="text-center align-middle">{insumo.denominacion}</td>
+                                <td className="text-center align-middle">{insumo.categoria.denominacion}</td>
+                                <td className="text-center align-middle" style={{ backgroundColor: getStockColor(insumo.stockActual, insumo.stockMinimo, insumo.stockMaximo) }}>
                                     <OverlayTrigger placement="top" overlay={<Tooltip>{`Stock: ${insumo.stockActual}`}</Tooltip>}>
                                         <span>{insumo.stockActual}</span>
                                     </OverlayTrigger>
                                 </td>
-                                <td>{insumo.unidadMedida.denominacion}</td>
-                                <td>
+                                <td className="text-center align-middle">{insumo.unidadMedida.denominacion}</td>
+                                <td className="text-center align-middle">
                                     <Link to={"save/" + insumo.id} className="btn btn-warning me-2">
                                         Editar
                                     </Link>
