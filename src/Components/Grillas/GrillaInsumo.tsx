@@ -3,7 +3,9 @@ import { Link } from "react-router-dom";
 import ArticuloInsumoService from "../../Functions/Services/ArticuloInsumoService";
 import masObject from "../../assets/circle-plus-svgrepo-com.svg";
 import IArticuloInsumo from "../../Entities/IArticuloInsumo";
-import { Button, Form, Table } from "react-bootstrap";
+import { Button, Form, OverlayTrigger, Table, Tooltip } from "react-bootstrap";
+// import ICategoria from "../../Entities/ICategoria";
+// import GrillaGenerica from "./GrillaGenerica";
 
 interface ISucursalDto {
     id: number;

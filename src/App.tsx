@@ -1,6 +1,5 @@
 import { Route, Routes } from "react-router-dom"
 import { AuthenticationGuard, Profile, CallBack, Header,Home } from "./Components"
-import { useAuth0 } from "@auth0/auth0-react"
 import Root from "./Components/Root";
 import GrillaArticulo from "./Components/Grillas/GrillaArticuloManufacturado";
 import SaveArticulo from "./FormSave/SaveArticuloManufacturado";

@@ -3,24 +3,38 @@ import { Link } from 'react-router-dom';
 import ArticuloManufacturadoService from '../../Functions/Services/ArticuloManufacturadoService';
 import IArticuloManufacturado from '../../Entities/IArticuloManufacturado';
 import masObject from '../../assets/circle-plus-svgrepo-com.svg';
-import { Container, Row, Col, InputGroup, Table, Button, Form } from 'react-bootstrap';
+import { Container, Row, Col, InputGroup, Form } from 'react-bootstrap';
+import { Loader } from '../Loader/Loader';
+import GrillaGenerica from './GrillaGenerica';
+import { IPaginatedResponse } from '../../Entities/IPaginatedResponse';
+
 export default function GrillaArticulo() {
 
     const apiUrl = import.meta.env.VITE_URL_API_BACK
 
     const [inputValue, setInputValue] = useState('');
 
+    const [loading, setLoading] = useState(false);
+
     const [articulosManufacturados, setArticulosManufacturados] = useState<IArticuloManufacturado[]>([]);
 
-    const mostrarDatos =(url:string)=>{
-        const result = new ArticuloManufacturadoService(url);
-        result.getAll()
+    const mostrarDatos = (url:string)=>{
+        try {
+            console.log("entre");
+            setLoading(true)
+            const result = new ArticuloManufacturadoService(url);
+            result.getAll()
             .then(data =>{
                 setArticulosManufacturados(data);
             })
-            .catch(error =>{
-                console.log(error)
+            .catch(err =>{
+                console.error(err)
             })
+        } catch (error) {
+            console.error(error)
+        }finally{
+            setLoading(false);
+        }
     }
     const searchItem = (value: string) => {
         const result = new ArticuloManufacturadoService(`${apiUrl}articulosManufacturados/name?nombre=`);
@@ -52,9 +66,15 @@ export default function GrillaArticulo() {
         setInputValue(event.target.value);
     };
 
-    useEffect(() => {
-        mostrarDatos(`${apiUrl}articulosManufacturados`)
-    }, ([]))
+    if(loading){
+        return <Loader/>;
+    }
+
+    useEffect(()=>{
+         mostrarDatos(`${apiUrl}articulosManufacturados`)
+        console.log(articulosManufacturados);
+        
+    },([apiUrl]))
 
     return (
         <Container>
@@ -78,8 +98,9 @@ export default function GrillaArticulo() {
                         />
                     </InputGroup>
                 </Col>
-            </Row>
-            <Table striped bordered hover>
+            </Row>    
+                <GrillaGenerica data={articulosManufacturados} propertiesToShow={["id","denominacion","descripcion","precioVenta"]} editItem={`/panel-usuario/articulos/save/`} deleteFunction={handleDelete}></GrillaGenerica>
+            {/* <Table striped bordered hover>
                 <thead>
                     <tr>
                         <th>Imagen</th>
@@ -109,40 +130,8 @@ export default function GrillaArticulo() {
                         </tr>
                     ))}
                 </tbody>
-            </Table>
+            </Table> */}
         </Container>
     );
     
 }
-
-{/* <div id="country_code" class="w-1/4">
-                                <select id="select_country_code"  name="country_code" class="hidden" value="+54">
-                                    <option value="+54">{{__('forms.area_code.Argentina') }} </option>
-                                    <option value="+591">{{__('forms.area_code.Bolivia') }} </option>
-                                    <option value="+55">{{__('forms.area_code.Brasil') }} </option>
-                                    <option value="+56">{{__('forms.area_code.Chile') }}  </option>
-                                    <option value="+57">{{__('forms.area_code.Colombia') }} </option>
-                                    <option value="+506">{{__('forms.area_code.Costa_Rica') }} </option>
-                                    <option value="+53">{{__('forms.area_code.Cuba') }} </option>
-                                    <option value="+593">{{__('forms.area_code.Ecuador') }} </option>
-                                    <option value="+503">{{__('forms.area_code.El_Salvador') }} </option>
-                                    <option value="+502">{{__('forms.area_code.Guatemala') }} </option>
-                                    <option value="+504">{{__('forms.area_code.Honduras') }} </option>
-                                    <option value="+52">{{__('forms.area_code.Mexico') }} </option>
-                                    <option value="+505">{{__('forms.area_code.Nicaragua') }} </option>
-                                    <option value="+507">{{__('forms.area_code.Panama') }} </option>
-                                    <option value="+595">{{__('forms.area_code.Paraguay') }} </option>
-                                    <option value="+51">{{__('forms.area_code.Peru') }} </option>
-                                    <option value="+1">{{__('forms.area_code.Puerto_Rico') }} </option>
-                                    <option value="+1">{{__('forms.area_code.Republica_Dominicana') }} </option>
-                                    <option value="+598">{{__('forms.area_code.Uruguay') }} </option>
-                                    <option value="+58">{{__('forms.area_code.Venezuela') }}</option>
-                                </select>
-                                <div class=" relative select-form form-input-select">
-                                    +54
-                                </div>
-                                <div class="find_country h-fit bg-white px-2 pt-4 absolute rounded-[10px] list-shadow" style="width: 217px">
-                                    <ul class="select-options-country w-full pr-4 pl-2 relative border-0">
-                                    </ul>
-                                </div>
-                                </div> */}
