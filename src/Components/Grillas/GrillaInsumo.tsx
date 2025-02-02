@@ -3,44 +3,46 @@ import { Link } from "react-router-dom";
 import ArticuloInsumoService from "../../Functions/Services/ArticuloInsumoService";
 import masObject from "../../assets/circle-plus-svgrepo-com.svg";
 import IArticuloInsumo from "../../Entities/IArticuloInsumo";
-import { Button, Form, OverlayTrigger, Table, Tooltip } from "react-bootstrap";
+import { Badge, Button, Form, Modal, OverlayTrigger, Table, Tooltip } from "react-bootstrap";
 import ICategoria from "../../Entities/ICategoria";
 
-interface ISucursalDto {
-    id: number;
-    nombre: string;
-    horarioApertura: string;
-    horarioCierre: string;
-    baja: boolean;
-}
+// interface ISucursalDto {
+//     id: number;
+//     nombre: string;
+//     horarioApertura: string;
+//     horarioCierre: string;
+//     baja: boolean;
+// }
 
 export default function GrillaInsumo() {
     const apiUrl = import.meta.env.VITE_URL_API_BACK;
 
-    const [sucursales, setSucursales] = useState<ISucursalDto[]>([]);
-    const [sucursalSeleccionada, setSucursalSeleccionada] = useState<number | null>(null);
+    // const [sucursales, setSucursales] = useState<ISucursalDto[]>([]);
+    const [sucursalSeleccionada] = useState<number | null>(2);
     const [allArticulosInsumos, setAllArticulosInsumos] = useState<IArticuloInsumo[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState("");
     const [categorias, setCategorias] = useState<ICategoria[]>([]);
-    const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<number | "">("");
+    const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<ICategoria | null>(null);
     const [filtrarPorCategoria, setFiltrarPorCategoria] = useState(false);
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     const [insumoToDelete, setInsumoToDelete] = useState<IArticuloInsumo | null>(null);
+    const [showFilterModal, setShowFilterModal] = useState(false);
 
     const itemsPerPage = 15; // Número de elementos por página
 
+
     // Función para obtener lista de sucursales
-    const obtenerSucursales = async () => {
-        try {
-            const result = new ArticuloInsumoService(apiUrl);
-            const data = await result.getSucursales();
-            setSucursales(data || []);
-            //console.log(data);
-        } catch (error) {
-            console.error("Error al obtener sucursales:", error);
-        }
-    };
+    // const obtenerSucursales = async () => {
+    //     try {
+    //         const result = new ArticuloInsumoService(apiUrl);
+    //         const data = await result.getSucursales();
+    //         setSucursales(data || []);
+    //         //console.log(data);
+    //     } catch (error) {
+    //         console.error("Error al obtener sucursales:", error);
+    //     }
+    // };
 
     // Función para obtener categorías
     const obtenerCategorias = async () => {
@@ -91,9 +93,15 @@ export default function GrillaInsumo() {
     };
 
     useEffect(() => {
-        obtenerSucursales();
+        // obtenerSucursales();
         obtenerCategorias();
     }, []);
+
+    useEffect(() => {
+        if (categoriaSeleccionada !== null) {
+            setFiltrarPorCategoria(true);
+        }
+    }, [categoriaSeleccionada]);
 
     useEffect(() => {
         if (sucursalSeleccionada) {
@@ -102,17 +110,17 @@ export default function GrillaInsumo() {
         }
     }, [sucursalSeleccionada]);
 
-    const handleSucursalChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const idSucursal = parseInt(event.target.value);
-        setSucursalSeleccionada(idSucursal);
-    };
+    // const handleSucursalChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    //     const idSucursal = parseInt(event.target.value);
+    //     setSucursalSeleccionada(idSucursal);
+    // };
 
-    const handleCategoriaChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const categoriaId = event.target.value ? parseInt(event.target.value) : "";
+    // const handleCategoriaChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    //     const categoriaId = event.target.value ? parseInt(event.target.value) : "";
     
-        // Si la categoría seleccionada es una categoría padre, filtrar por subcategorías
-        setCategoriaSeleccionada(categoriaId);
-    };
+    //     // Si la categoría seleccionada es una categoría padre, filtrar por subcategorías
+    //     setCategoriaSeleccionada(categoriaId);
+    // };
 
     const getStockColor = (stock: number, min: number, max: number) => {
         if (stock <= min) return "#ff4d4d"; // Rojo
@@ -143,20 +151,27 @@ export default function GrillaInsumo() {
         setShowDeleteConfirmation(true);
     };
 
+    const handleCloseFilterModal = () => setShowFilterModal(false);
+    const handleShowFilterModal = () => setShowFilterModal(true);
+
     const filteredInsumos = allArticulosInsumos.filter((insumo) => {
-        // Buscar la categoría seleccionada
-        const categoriaSeleccionadaObj = categorias.find(categoria => categoria.id === categoriaSeleccionada);
+        // Verificar si la categoría seleccionada es válida
+        const categoriaSeleccionadaObj = categorias.find(categoria => categoria.id === categoriaSeleccionada?.id);
         
-        // Si la categoría seleccionada es una categoría padre, incluimos sus subcategorías
-        const perteneceACategoriaPadre =
-            categoriaSeleccionada === "" ||
-            insumo.categoria.id === categoriaSeleccionada ||
-            (categoriaSeleccionadaObj && categoriaSeleccionadaObj.categoriaPadre === null &&
-                categorias.some(c => c.categoriaPadre?.id === categoriaSeleccionada && insumo.categoria.id === c.id));
-        
-        return insumo.denominacion.toLowerCase().includes(searchTerm.toLowerCase()) &&
-               (!filtrarPorCategoria || perteneceACategoriaPadre);
+        // Si la categoría seleccionada es nula, mostramos todos los insumos
+        if (!categoriaSeleccionada) {
+            return insumo.denominacion.toLowerCase().includes(searchTerm.toLowerCase());
+        }
+    
+        // Si la categoría seleccionada es una categoría padre, incluir sus subcategorías
+        const perteneceACategoria = categoriaSeleccionadaObj?.categoriaPadre === null
+            ? insumo.categoria.id === categoriaSeleccionadaObj.id || categorias.some(c => c.categoriaPadre?.id === categoriaSeleccionadaObj.id && insumo.categoria.id === c.id)
+            : insumo.categoria.id === categoriaSeleccionadaObj?.id;
+    
+        // Filtrar insumos por denominación y por categoría
+        return insumo.denominacion.toLowerCase().includes(searchTerm.toLowerCase()) && perteneceACategoria;
     });
+    
     
 
     // Datos paginados para la página actual
@@ -188,9 +203,31 @@ export default function GrillaInsumo() {
         setInsumoToDelete(null);
     };
 
+    const renderCategorias = (categoriaPadreId: number | null = null, nivel = 0) => {
+        return categorias
+            .filter(cat => (cat.categoriaPadre ? cat.categoriaPadre.id : null) === categoriaPadreId)
+            .map(cat => (
+                <div key={cat.id} style={{ marginLeft: `${nivel * 20}px`, cursor: "pointer" }}>
+                    <Button variant="link" onClick={() => handleCategoriaClick(cat)}>
+                        {nivel === 0 ? <strong>{cat.denominacion}</strong> : `↳ ${cat.denominacion}`}
+                    </Button>
+                    {renderCategorias(cat.id, nivel + 1)} {/* Ahora acepta `number` sin error */}
+                </div>
+            ));
+    };
+
+    const handleCategoriaClick = (categoria : ICategoria) => {
+        setCategoriaSeleccionada(categoria);
+        setShowFilterModal(false);
+    };
+
+    const limpiarFiltro = () => {
+        setCategoriaSeleccionada(null);
+    };
+
     return (
         <div className="container">
-            <div className="d-flex justify-content-between align-items-center my-3">
+            <div className="d-flex justify-content-between align-items-center">
                 <h1>Insumos</h1>
                 <Link to={"save/0"} className="btn btn-primary">
                     <img src={masObject} alt="Crear Insumo" style={{ marginRight: "8px" }} />
@@ -199,7 +236,7 @@ export default function GrillaInsumo() {
             </div>
 
             {/* Selector de sucursales */}
-            <Form.Select
+            {/* <Form.Select
                 onChange={handleSucursalChange}
                 value={sucursalSeleccionada || ""}
                 className="mb-3"
@@ -210,29 +247,66 @@ export default function GrillaInsumo() {
                         {sucursal.nombre}
                     </option>
                 ))}
-            </Form.Select>
+            </Form.Select> */}
 
             {/*filtro de categoria*/}
             <div className="d-flex gap-3 mb-3">
-                <Button variant="info" onClick={handleFiltrarPorCategoria}>Filtrar por Categoría</Button>
-                <Form.Select onChange={handleCategoriaChange} value={categoriaSeleccionada || ""}>
-                    <option value="">Todas las categorías</option>
-                    {categorias.map((categoria) => (
-                        <option key={categoria.id} value={categoria.id}>
-                            {categoria.denominacion}
-                        </option>
-                    ))}
-                </Form.Select>
+                <Modal show={showFilterModal} onHide={handleCloseFilterModal}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Filtrar por Categoría</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <div>{renderCategorias()}</div>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={handleCloseFilterModal}>
+                            Cancelar
+                        </Button>
+                        <Button variant="primary" onClick={handleFiltrarPorCategoria}>
+                            Filtrar
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
             </div>
 
             {/* Buscador */}
-            <Form.Control
-                type="text"
-                placeholder="Buscar insumo..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="mb-3"
-            />
+            <div className="d-flex gap-3 mb-3">
+                <Form.Control
+                    type="text"
+                    placeholder="Buscar insumo..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="mb-3"
+                />
+                <Button variant="info" style={{ width: 40, height: 40, display: 'flex', justifyContent: 'center', alignItems: 'center' }} onClick={handleShowFilterModal}>
+                    <img src="/src/assets/filter.svg" alt="Filtrar" style={{ width: 20, height: 20 }} />
+                </Button>
+
+            </div>
+            {categoriaSeleccionada && (
+                <div
+                    style={{
+                        marginLeft: "10px",
+                        marginRight: "0",
+                        cursor: "pointer",
+                        display: 'flex',
+                        backgroundColor: '#6c757d',
+                        color: 'white',
+                        borderRadius: '50px',
+                        padding: '0.25rem 0.5rem',
+                        whiteSpace: 'nowrap',
+                        maxWidth: 'fit-content',
+                    }}
+                    onClick={limpiarFiltro}
+                >
+                    {categoriaSeleccionada.denominacion} ✖
+                </div>
+            )}
+
+
+
+
+
 
             {/* Tabla de Insumos */}
             <Table striped bordered hover>
