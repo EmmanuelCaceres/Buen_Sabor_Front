@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import ArticuloInsumoService from "../../Functions/Services/ArticuloInsumoService";
 import masObject from "../../assets/circle-plus-svgrepo-com.svg";
 import IArticuloInsumo from "../../Entities/IArticuloInsumo";
-import { Badge, Button, Form, Modal, OverlayTrigger, Table, Tooltip } from "react-bootstrap";
+import { Button, Form, Modal, OverlayTrigger, Table, Tooltip } from "react-bootstrap";
 import ICategoria from "../../Entities/ICategoria";
 
 // interface ISucursalDto {
@@ -24,7 +24,7 @@ export default function GrillaInsumo() {
     const [searchTerm, setSearchTerm] = useState("");
     const [categorias, setCategorias] = useState<ICategoria[]>([]);
     const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<ICategoria | null>(null);
-    const [filtrarPorCategoria, setFiltrarPorCategoria] = useState(false);
+    const [, setFiltrarPorCategoria] = useState(false);
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     const [insumoToDelete, setInsumoToDelete] = useState<IArticuloInsumo | null>(null);
     const [showFilterModal, setShowFilterModal] = useState(false);
