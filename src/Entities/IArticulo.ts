@@ -11,4 +11,5 @@ export default interface IArticulo{
     imagenes: IImagenArticulo[];
     categoria: ICategoria;
     sucursal: ISucursalDto;
+    baja:boolean;
 }
