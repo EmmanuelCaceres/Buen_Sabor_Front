@@ -5,3 +5,5 @@ export * from "./ButtonPrimary/ButtonPrimary.tsx"
 export * from "./Auth0/CallBack/CallBack.tsx";
 export * from "./header/Header.tsx";
 export * from "./Home/Home.tsx";
+export * from "./Loader/Loader.tsx";
+export * from "./ButtonEdit/ButtonEdit.tsx";

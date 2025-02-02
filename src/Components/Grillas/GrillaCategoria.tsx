@@ -4,6 +4,8 @@ import masObject from '../../assets/circle-plus-svgrepo-com.svg';
 import { Container, Row, Col, InputGroup, Table, Button, Form } from 'react-bootstrap';
 import ICategoria from '../../Entities/ICategoria';
 import CategoriaService from '../../Functions/Services/CategoriaService';
+import GrillaGenerica from './GrillaGenerica';
+
 export default function GrillaCategoria() {
 
     const apiUrl = import.meta.env.VITE_URL_API_BACK
@@ -53,6 +55,7 @@ export default function GrillaCategoria() {
     };
 
     useEffect(() => {
+        console.log("Entre a categorías");
         mostrarDatos(`${apiUrl}categorias`)
     }, ([]))
 
@@ -79,30 +82,7 @@ export default function GrillaCategoria() {
                     </InputGroup>
                 </Col>
             </Row>
-            <Table striped bordered hover>
-                <thead>
-                    <tr>
-                        <th>Denominación</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {categorias.map((categoria: ICategoria) => (
-                        <tr key={categoria.id}>
-                            <td>{categoria.denominacion}</td>
-                            <td>
-                                <Link to={"save/" + categoria.id} className="btn btn-warning me-2">
-                                    Editar
-                                </Link>
-                                <Button variant="danger" onClick={() => handleDelete(categoria.id)}>
-                                    Eliminar
-                                </Button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </Table>
+            <GrillaGenerica data={categorias} propertiesToShow={["denominacion"]} editItem={`/panel-usuario/categorias/save/`} deleteFunction={handleDelete}/>
         </Container>
     );
-    
 }
