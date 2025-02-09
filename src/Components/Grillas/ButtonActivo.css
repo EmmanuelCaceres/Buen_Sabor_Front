@@ -1,0 +1,27 @@
+/* ButtonActivo.css */
+
+.btn-naranja {
+    background-color: #FFA500;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 30px; /* Bordes más redondeados */
+    border: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  .btn-naranja:hover {
+    background-color: #FF8C00 ;
+    cursor: pointer;
+  }
+  
+  .btn-naranja.active {
+    background-color: #FF8C00;
+    transform: scale(0.85); /* Efecto de pulsación */
+  }
+
+  .btn-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px; /* Aquí puedes ajustar el espacio entre los botones */
+}

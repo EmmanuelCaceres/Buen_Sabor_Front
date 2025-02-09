@@ -1,34 +1,41 @@
-import GrillaRow from "./GrillaRow"
-import { Table } from 'react-bootstrap';
+import GrillaRow from "./GrillaRow";
+import { Table } from "react-bootstrap";
 
-interface GrillaProps<T> {
-    data: T[]
-    propertiesToShow: (keyof T)[]
-    editItem?: string
-    deleteFunction?: (id:number)=>void
+interface GrillaProps<T extends { id: number }> {
+    data: T[];
+    propertiesToShow: (keyof T)[];
+    editItem?: string;
+    deleteFunction?: (id: number) => void;
 }
 
-export default function GrillaGenerica<T>({ data, propertiesToShow,editItem,deleteFunction }: GrillaProps<T>) {
+export default function GrillaGenerica<T extends { id: number }>({
+    data,
+    propertiesToShow,
+    editItem,
+    deleteFunction,
+}: GrillaProps<T>) {
     return (
         <Table striped bordered hover>
             <thead>
                 <tr>
-                    {propertiesToShow.map((property, index) => (
-                        <th key={index}>{String(property)}</th>
+                    {propertiesToShow.map((property) => (
+                        <th key={String(property)}>{String(property)}</th>
                     ))}
+                    {(editItem || deleteFunction) && <th>Acciones</th>}
                 </tr>
             </thead>
             <tbody>
-                {data.map((item, index) => (
-                    <GrillaRow key={index}
+                {data.map((item) => (
+                    <GrillaRow
+                        key={item.id}
                         data={item}
                         propertiesToShow={propertiesToShow}
-                        isActions={true}
+                        isActions={!!editItem || !!deleteFunction}
                         urlParent={editItem}
                         onDelete={deleteFunction}
                     />
                 ))}
             </tbody>
         </Table>
-    )
+    );
 }

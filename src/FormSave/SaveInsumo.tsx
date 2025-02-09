@@ -76,17 +76,21 @@ export default function SaveInsumo() {
         imagenes: [],
         categoria: {
             id: 0,
+            baja:false,
             denominacion: '',
             subCategorias: [],
             articulos: [],
             esInsumo: false,
+            sucursales: [],
             categoriaPadre: { // Inicialización correcta
                 id: 0,
+                baja:false,
                 denominacion: '',
                 subCategorias: [],
                 articulos: [],
                 esInsumo: false,
-                categoriaPadre: null // O undefined, dependiendo de tu lógica
+                categoriaPadre: null, // O undefined, dependiendo de tu lógica
+                sucursales: []
             }
         },
         precioCompra: 0,
