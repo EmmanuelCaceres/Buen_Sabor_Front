@@ -3,11 +3,12 @@ import CIcon from "@coreui/icons-react";
 import { Link } from "react-router-dom";
 import '@coreui/coreui/dist/css/coreui.min.css';
 import { CNavGroup, CNavItem, CNavTitle, CSidebar, CSidebarNav } from "@coreui/react";
+import "../index.css"
 
 export default function SideBar() {
 
     return (
-        <div className="sidebar-container ">
+        <div className="sidebar-container sidebar">
             <CSidebar className="border-end d-flex flex-column h-100" style={{ backgroundColor:"#ffffff"}}>
                 <CSidebarNav>
                     <CNavTitle>

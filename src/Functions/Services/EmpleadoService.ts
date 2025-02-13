@@ -14,6 +14,14 @@ export default class EmpleadoService extends GenericFetch<IEmpleado> {
         return data as IPaginatedResponse<IEmpleado>;
     }
     
+    async getEmpleadoByNombre(nombre:string):Promise<IPaginatedResponse<IEmpleado> | null> {
+        const response = await fetch(`${this.baseUrl}${nombre}`);
+        if (!response.ok) {
+            return null;
+        }
+        const data = await response.json();
+        return data as IPaginatedResponse<IEmpleado>;
+    }
 
     async getSucursales(): Promise<ISucursalDto[]> {
         const response = await fetch(`${this.baseUrl}sucursales`);

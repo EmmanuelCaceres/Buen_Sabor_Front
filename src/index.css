@@ -9,15 +9,49 @@ html {
   box-sizing: border-box;
   margin: 0;
 }
-#root{
-  background: #EAF4F5 !important;
-  height: 100vh;
+
+.rootContainer{
+  min-height: 100vh;
+  display: grid;
+  grid-template-areas: 
+  "header  header"
+  "sidebar content";
+  grid-template-columns: auto 1fr;
+  grid-template-rows: .5fr 4fr;
+  column-gap: 36px;
+}
+
+.rootContainer .header{
+  grid-area: header;
+}
+
+.rootContainer .sidebar{
+  grid-area: sidebar;
+}
+
+.rootContainer .content{
+  grid-area: content;
+  padding-top: 36px;
+  padding-right: 24px;
+  padding-bottom: 24px;
 }
 
 p{
   margin: 0;
 }
+
 .container{
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%; 
+  min-height: 100%;
+  padding: 3rem;
+  box-shadow: 0px 0px 6px 1px rgba(0, 0, 0, 0.15); 
+  border-radius: 24px;
+}
+
+/* .container{
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -29,7 +63,7 @@ p{
   box-shadow: 0px 0px 6px 1px rgba(0, 0, 0, 0.15); 
   border-radius: 24px;
   margin-top: 5rem; 
-}
+} */
 
 .itemGrilla{
   width: 100%;

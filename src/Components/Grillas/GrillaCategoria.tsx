@@ -7,10 +7,10 @@ import CategoriaService from '../../Functions/Services/CategoriaService';
 import GrillaGenerica from './GrillaGenerica';
 import './ButtonActivo.css';
 
+import { InputSearch } from '../../Components';
+
 export default function GrillaCategoria() {
     const apiUrl = import.meta.env.VITE_URL_API_BACK;
-
-    const [inputValue, setInputValue] = useState('');
     const [categorias, setCategorias] = useState<ICategoria[]>([]);
     const [activeButton, setActiveButton] = useState<'insumos' | 'manufacturados' | 'todas' | null>(null); // Estado para el botón activo
 
@@ -31,43 +31,29 @@ export default function GrillaCategoria() {
                 console.log(error);
             });
     };
-
     // Función de búsqueda por denominación
     const searchItem = (value: string) => {
-        const result = new CategoriaService(`${apiUrl}categorias/name?nombre=`);
-        result.getCategoryByDenominacion(value)
+        const result = new CategoriaService(`${apiUrl}categorias/filter?keyword=`);
+        result.filterByKeyword(true,value)
             .then(data => {
-                setCategorias(data ?? []);
+                if (Array.isArray(data)) {
+                    setCategorias(data);
+                } else if ('content' in data && Array.isArray(data.content)) {
+                    setCategorias(data.content);
+                } else {
+                    setCategorias([]);
+                }
             })
             .catch(error => {
                 console.log(error);
             });
     };
-
-    // Función para manejar la tecla "Enter" en el campo de búsqueda
-    const handleKeyPress = (event: { key: string; }) => {
-        if (event.key === 'Enter') {
-            searchItem(inputValue);
-        }
-    };
-
     // Función para eliminar una categoría
     const handleDelete = (id: number) => {
         new CategoriaService(`${apiUrl}categorias`).delete(id);
         alert("Categoria removido con éxito!");
         window.location.reload();
     };
-
-    // Manejo de cambios en el campo de búsqueda
-    const handleInputChange = (event: { target: { value: SetStateAction<string>; }; }) => {
-        setInputValue(event.target.value);
-    };
-
-    // Cargar las categorías por defecto al iniciar
-    useEffect(() => {
-        mostrarDatos(`${apiUrl}categorias`); // Por defecto, cargar todas las categorías
-    }, []);
-
     // Función para manejar el clic en los botones
     const handleButtonClick = (buttonType: 'insumos' | 'manufacturados' | 'todas') => {
         setActiveButton(buttonType); // Cambiar el botón activo
@@ -79,6 +65,12 @@ export default function GrillaCategoria() {
             mostrarDatos(`${apiUrl}categorias/paged/categoriasManufacturados`);
         }
     };
+
+    // Cargar las categorías por defecto al iniciar
+    useEffect(() => {
+        mostrarDatos(`${apiUrl}categorias/paged`); // Por defecto, cargar todas las categorías
+    }, [apiUrl]);
+
 
     return (
         <Container>
@@ -121,18 +113,11 @@ export default function GrillaCategoria() {
 
             <Row className="mb-3">
                 <Col>
-                    <InputGroup>
-                        <Form.Control
-                            type="text"
-                            onChange={handleInputChange}
-                            onKeyPress={handleKeyPress}
-                            placeholder="Busca una categoria"
-                        />
-                    </InputGroup>
+                    <InputSearch label={"Buscar categoría"} customMethod={searchItem}/>
                 </Col>
             </Row>
 
-            <GrillaGenerica data={categorias} propertiesToShow={["Denominación"]} editItem={`/panel-usuario/categorias/save/`} deleteFunction={handleDelete} />
+            <GrillaGenerica data={categorias} propertiesToShow={["denominacion"]} editItem={`/panel-usuario/categorias/save/`} deleteFunction={handleDelete} />
         </Container>
     );
 }
