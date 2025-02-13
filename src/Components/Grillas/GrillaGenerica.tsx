@@ -4,6 +4,7 @@ import { Table } from "react-bootstrap";
 interface GrillaProps<T extends { id: number }> {
     data: T[];
     propertiesToShow: (keyof T)[];
+    columnAliases?: Partial<Record<keyof T, string>>; // Más seguro, restringido a claves de T
     editItem?: string;
     deleteFunction?: (id: number) => void;
 }
@@ -11,17 +12,22 @@ interface GrillaProps<T extends { id: number }> {
 export default function GrillaGenerica<T extends { id: number }>({
     data,
     propertiesToShow,
+    columnAliases = {},
     editItem,
     deleteFunction,
 }: GrillaProps<T>) {
+    const hasActions = !!editItem || !!deleteFunction;
+
     return (
-        <Table striped bordered hover>
+        <Table striped bordered hover responsive>
             <thead>
                 <tr>
                     {propertiesToShow.map((property) => (
-                        <th key={String(property)}>{String(property)}</th>
+                        <th key={String(property)} scope="col">
+                            {columnAliases?.[property] ?? String(property)}
+                        </th>
                     ))}
-                    {(editItem || deleteFunction) && <th>Acciones</th>}
+                    {hasActions && <th scope="col">Acciones</th>}
                 </tr>
             </thead>
             <tbody>
@@ -30,7 +36,7 @@ export default function GrillaGenerica<T extends { id: number }>({
                         key={item.id}
                         data={item}
                         propertiesToShow={propertiesToShow}
-                        isActions={!!editItem || !!deleteFunction}
+                        isActions={hasActions}
                         urlParent={editItem}
                         onDelete={deleteFunction}
                     />

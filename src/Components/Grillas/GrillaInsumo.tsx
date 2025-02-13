@@ -3,16 +3,10 @@ import { Link } from "react-router-dom";
 import ArticuloInsumoService from "../../Functions/Services/ArticuloInsumoService";
 import masObject from "../../assets/circle-plus-svgrepo-com.svg";
 import IArticuloInsumo from "../../Entities/IArticuloInsumo";
-import { Button, Form, Modal, OverlayTrigger, Table, Tooltip } from "react-bootstrap";
+import { Button, Form, Modal} from "react-bootstrap";
 import ICategoria from "../../Entities/ICategoria";
+import GrillaGenerica from "./GrillaGenerica";
 
-// interface ISucursalDto {
-//     id: number;
-//     nombre: string;
-//     horarioApertura: string;
-//     horarioCierre: string;
-//     baja: boolean;
-// }
 
 export default function GrillaInsumo() {
     const apiUrl = import.meta.env.VITE_URL_API_BACK;
@@ -31,34 +25,31 @@ export default function GrillaInsumo() {
 
     const itemsPerPage = 15; // Número de elementos por página
 
-
-    // Función para obtener lista de sucursales
-    // const obtenerSucursales = async () => {
-    //     try {
-    //         const result = new ArticuloInsumoService(apiUrl);
-    //         const data = await result.getSucursales();
-    //         setSucursales(data || []);
-    //         //console.log(data);
-    //     } catch (error) {
-    //         console.error("Error al obtener sucursales:", error);
-    //     }
-    // };
+    
 
     // Función para obtener categorías
     const obtenerCategorias = async () => {
         try {
             const result = new ArticuloInsumoService(apiUrl);
             const data = await result.getCategorias();
-            setCategorias(data.filter((categoria: ICategoria) => categoria.esInsumo) || []);
+            
+            // Transformar los datos para que las claves coincidan con la interfaz ICategoria
+            const categoriasTransformadas = data.map((categoria: any) => ({
+                ...categoria,
+                esInsumo: categoria['Es un insumo?'], // Renombramos la propiedad
+                denominacion: categoria.Denominación, // Asegúrate que el nombre sea correcto
+                subCategorias: categoria.Subcategorias || [],
+                sucursales: categoria.Sucursales || [],
+                // Realiza cualquier otra transformación que necesites
+            }));
+    
+            // Filtrar las categorías que son insumos
+            setCategorias(categoriasTransformadas.filter((categoria: ICategoria) => categoria.esInsumo));
         } catch (error) {
             console.error("Error al obtener categorías:", error);
         }
     };
-
-    // const obtenerCategoriasHijas = (idCategoria: number): number[] => {
-    //     const categoriasHijas = categorias.filter(cat => cat.categoriaPadre.id === idCategoria);
-    //     return [idCategoria, ...categoriasHijas.map(cat => cat.id)];
-    // };
+    
 
     // Función para cargar todos los datos en un solo array
     const cargarTodosLosDatos = async (idSucursal: number) => {
@@ -95,6 +86,7 @@ export default function GrillaInsumo() {
     useEffect(() => {
         // obtenerSucursales();
         obtenerCategorias();
+        //console.log(categorias)
     }, []);
 
     useEffect(() => {
@@ -110,30 +102,18 @@ export default function GrillaInsumo() {
         }
     }, [sucursalSeleccionada]);
 
-    // const handleSucursalChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    //     const idSucursal = parseInt(event.target.value);
-    //     setSucursalSeleccionada(idSucursal);
-    // };
-
-    // const handleCategoriaChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    //     const categoriaId = event.target.value ? parseInt(event.target.value) : "";
+    // const getStockColor = (stock: number, min: number, max: number) => {
+    //     if (stock <= min) return "#ff4d4d"; // Rojo
+    //     if (stock >= max) return "#4caf50"; // Verde
     
-    //     // Si la categoría seleccionada es una categoría padre, filtrar por subcategorías
-    //     setCategoriaSeleccionada(categoriaId);
-    // };
-
-    const getStockColor = (stock: number, min: number, max: number) => {
-        if (stock <= min) return "#ff4d4d"; // Rojo
-        if (stock >= max) return "#4caf50"; // Verde
+    //     const range = max - min;
+    //     const position = (stock - min) / range;
     
-        const range = max - min;
-        const position = (stock - min) / range;
-    
-        const red = position < 0.5 ? 255 : 255 - (position - 0.5) * 510;
-        const green = position < 0.5 ? position * 510 : 255;
+    //     const red = position < 0.5 ? 255 : 255 - (position - 0.5) * 510;
+    //     const green = position < 0.5 ? position * 510 : 255;
         
-        return `rgb(${red}, ${green}, 50)`;
-    };
+    //     return `rgb(${red}, ${green}, 50)`;
+    // };
     
 
     const handlePageChange = (newPage: number) => {
@@ -146,31 +126,44 @@ export default function GrillaInsumo() {
         setFiltrarPorCategoria(true);
     };
 
-    const handleDelete = (insumo: IArticuloInsumo) => {
-        setInsumoToDelete(insumo);
-        setShowDeleteConfirmation(true);
+    const handleDelete = (id: number) => {
+        const insumo = allArticulosInsumos.find(insumo => insumo.id === id);
+        if (insumo) {
+            setInsumoToDelete(insumo);
+            setShowDeleteConfirmation(true);
+        }
     };
-
+    
     const handleCloseFilterModal = () => setShowFilterModal(false);
     const handleShowFilterModal = () => setShowFilterModal(true);
 
     const filteredInsumos = allArticulosInsumos.filter((insumo) => {
         // Verificar si la categoría seleccionada es válida
         const categoriaSeleccionadaObj = categorias.find(categoria => categoria.id === categoriaSeleccionada?.id);
-        
+    
+        // Verificar el valor de categoriaSeleccionadaObj
+        console.log("categoriaSeleccionadaObj:", categoriaSeleccionadaObj);
+    
         // Si la categoría seleccionada es nula, mostramos todos los insumos
         if (!categoriaSeleccionada) {
-            return insumo.denominacion.toLowerCase().includes(searchTerm.toLowerCase());
+            console.log("Categoría no seleccionada, mostrando todos los insumos");
+            return insumo.Denominación.toLowerCase().includes(searchTerm.toLowerCase());
         }
     
         // Si la categoría seleccionada es una categoría padre, incluir sus subcategorías
+        console.log("insumo.categoria:", insumo.categoria);
         const perteneceACategoria = categoriaSeleccionadaObj?.categoriaPadre === null
             ? insumo.categoria.id === categoriaSeleccionadaObj.id || categorias.some(c => c.categoriaPadre?.id === categoriaSeleccionadaObj.id && insumo.categoria.id === c.id)
             : insumo.categoria.id === categoriaSeleccionadaObj?.id;
     
+        // Verificar si se está filtrando correctamente por denominación y categoría
+        console.log("Filtrando insumo:", insumo.Denominación);
+        console.log("perteneceACategoria:", perteneceACategoria);
+    
         // Filtrar insumos por denominación y por categoría
-        return insumo.denominacion.toLowerCase().includes(searchTerm.toLowerCase()) && perteneceACategoria;
+        return insumo.Denominación.toLowerCase().includes(searchTerm.toLowerCase()) && perteneceACategoria;
     });
+    
     
     
 
@@ -209,7 +202,7 @@ export default function GrillaInsumo() {
             .map(cat => (
                 <div key={cat.id} style={{ marginLeft: `${nivel * 20}px`, cursor: "pointer" }}>
                     <Button variant="link" onClick={() => handleCategoriaClick(cat)}>
-                        {nivel === 0 ? <strong>{cat.denominacion}</strong> : `↳ ${cat.denominacion}`}
+                        {nivel === 0 ? <strong>{cat.Denominación}</strong> : `↳ ${cat.Denominación}`}
                     </Button>
                     {renderCategorias(cat.id, nivel + 1)} {/* Ahora acepta `number` sin error */}
                 </div>
@@ -224,6 +217,7 @@ export default function GrillaInsumo() {
     const limpiarFiltro = () => {
         setCategoriaSeleccionada(null);
     };
+    
 
     return (
         <div className="container">
@@ -235,19 +229,6 @@ export default function GrillaInsumo() {
                 </Link>
             </div>
 
-            {/* Selector de sucursales */}
-            {/* <Form.Select
-                onChange={handleSucursalChange}
-                value={sucursalSeleccionada || ""}
-                className="mb-3"
-            >
-                <option value="">Selecciona una sucursal</option>
-                {sucursales.map((sucursal) => (
-                    <option key={sucursal.id} value={sucursal.id}>
-                        {sucursal.nombre}
-                    </option>
-                ))}
-            </Form.Select> */}
 
             {/*filtro de categoria*/}
             <div className="d-flex gap-3 mb-3">
@@ -299,17 +280,12 @@ export default function GrillaInsumo() {
                     }}
                     onClick={limpiarFiltro}
                 >
-                    {categoriaSeleccionada.denominacion} ✖
+                    {categoriaSeleccionada.Denominación} ✖
                 </div>
             )}
 
-
-
-
-
-
             {/* Tabla de Insumos */}
-            <Table striped bordered hover>
+            {/* <Table striped bordered hover>
                 <thead>
                     <tr>
                     <th className="text-center align-middle">Imagen</th>
@@ -325,18 +301,18 @@ export default function GrillaInsumo() {
                         paginatedInsumos.map((insumo) => (
                             <tr key={insumo.id}>
                                 <td className="text-center align-middle">
-                                    {insumo.imagenes?.[0]?.url ? (
+                                    {insumo.Imagen?.[0]?.url ? (
                                         <img
                                             width={200}
                                             height={200}
                                             style={{ objectFit: "contain", maxWidth: "90px", maxHeight: "90px" }}
-                                            src={`${insumo.imagenes[0].url}`}
+                                            src={`${insumo.Imagen[0].url}`}
                                             alt="imagenArticulo"
                                         />
                                     ) : null}
                                 </td>
-                                <td className="text-center align-middle">{insumo.denominacion}</td>
-                                <td className="text-center align-middle">{insumo.categoria.denominacion}</td>
+                                <td className="text-center align-middle">{insumo.Denominación}</td>
+                                <td className="text-center align-middle">{insumo.categoria.Denominación}</td>
                                 <td className="text-center align-middle" style={{ backgroundColor: getStockColor(insumo.stockActual, insumo.stockMinimo, insumo.stockMaximo) }}>
                                     <OverlayTrigger placement="top" overlay={<Tooltip>{`Stock: ${insumo.stockActual}`}</Tooltip>}>
                                         <span>{insumo.stockActual}</span>
@@ -359,7 +335,15 @@ export default function GrillaInsumo() {
                         </tr>
                     )}
                 </tbody>
-            </Table>
+            </Table> */}
+
+            <GrillaGenerica
+                data={paginatedInsumos}
+                propertiesToShow={["Imagen", "Denominación", "Categoria", "Stock actual", "Unidad de medida"]}
+                editItem={`/panel-usuario/insumos/save/`}
+                deleteFunction={(id: number) => handleDelete(id)}
+            />
+            
 
             {/* Confirmation Modal */}
             {showDeleteConfirmation && insumoToDelete && (
@@ -371,7 +355,7 @@ export default function GrillaInsumo() {
                                 <button type="button" className="btn-close" onClick={cancelDelete}></button>
                             </div>
                             <div className="modal-body">
-                                ¿Está seguro de que desea eliminar el insumo <strong>{insumoToDelete.denominacion}</strong>?
+                                ¿Está seguro de que desea eliminar el insumo <strong>{insumoToDelete.Denominación}</strong>?
                             </div>
                             <div className="modal-footer">
                                 <Button variant="secondary" onClick={cancelDelete}>Cancelar</Button>

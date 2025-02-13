@@ -11,54 +11,56 @@ interface InfoRow<T extends { id: number }> {
     onDelete?: (id: number) => void;
 }
 
-// Tipado del Modal con el mismo tipo de datos que la fila
-interface ModalProps<T> {
-    isOpen: boolean;
-    data: T; // Ahora 'data' tiene el tipo genérico
-    onClose: () => void;
+interface ComplexValue {
+    Denominación?: string;
+    nombre?: string;
+    denominacion?: string;
+    url?: string;
+    [key: string]: any; // Esto permite que tenga otras propiedades que no hemos especificado
 }
+
+// Función para formatear valores de propiedades complejas
+const formatValue = (value: unknown): string => {
+    if (Array.isArray(value)) {
+        if (value.length === 0) return "No tiene";
+        return value.map((item) => {
+            if (typeof item === "object" && item !== null) {
+                return formatComplexValue(item); // Reutiliza lógica para objetos
+            }
+            return String(item);
+        }).join(", ");
+    } else if (typeof value === "boolean") {
+        return value ? "Sí" : "No";
+    } else if (value === null || value === undefined) {
+        return "No tiene";
+    } else if (typeof value === "object" && value !== null) {
+        return formatComplexValue(value); // Formatear objetos complejos
+    }
+    return String(value);
+};
+
+// Función para formatear objetos complejos de forma inteligente
+const formatComplexValue = (value: ComplexValue): string => {
+    if ('Denominación' in value) return value.Denominación || "No tiene denominación";
+    if ('nombre' in value) return value.nombre || "No tiene nombre";
+    if ('denominacion' in value) return value.denominacion || "No tiene denominación";
+    if ('url' in value) return value.url || "No tiene imagen";
+    return JSON.stringify(value, null, 2); // Si no se reconoce la propiedad, lo formateamos como JSON
+};
 
 const Modal = <T extends { id: number }>({ isOpen, data, onClose }: ModalProps<T>) => {
     if (!isOpen) return null;
-
-    const formatValue = (value: unknown): string => {
-    
-        if (Array.isArray(value)) {
-
-            if (value.length === 0) {
-                return "No tiene"; // Si el array está vacío, mostrar "No tiene"
-            }
-            
-            return value.map((item) => {
-                if (typeof item === "object" && item !== null) {
-                    console.log("Objeto dentro del array:", item); // Vemos qué propiedades tiene
-    
-                    return (item as { nombre?: string; denominacion?: string }).nombre 
-                        || (item as { nombre?: string; denominacion?: string }).denominacion 
-                        || JSON.stringify(item);
-                }
-                return String(item);
-            }).join(", ");
-        } else if (typeof value === "boolean") {
-            return value ? "Sí" : "No";
-        } else if (value === null || value === undefined) {
-            return "No tiene";
-        } else if (typeof value === "object" && value !== null) {
-            return JSON.stringify(value, null, 2);
-        }
-        return String(value);
-    };
-
-    
 
     return (
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <h3>Detalles del Elemento</h3>
                 <ul>
-                    {Object.entries(data).map(([key, value]) => (
-                        <li key={key}><strong>{key}:</strong> {formatValue(value)}</li>
-                    ))}
+                    {Object.entries(data)
+                        .filter(([key]) => key !== "Imagen") // Filtramos la propiedad Imagen
+                        .map(([key, value]) => (
+                            <li key={key}><strong>{key}:</strong> {formatValue(value)}</li>
+                        ))}
                 </ul>
                 <button onClick={onClose}>Cerrar</button>
             </div>
@@ -81,9 +83,19 @@ export default function GrillaRow<T extends { id: number }>({
     return (
         <>
             <tr>
-                {propertiesToShow.map((property, index) => (
-                    <td key={index}>{String(data[property])}</td>
-                ))}
+                {propertiesToShow.map((property, index) => {
+                    const value = data[property];
+                    return (
+                        <td key={index}>
+                            {property === "Imagen" && Array.isArray(value) && value.length > 0 ? (
+                                <img src={value[0].url} alt="Imagen" width="50" height="50" />
+                            ) : (
+                                // Muestra un valor formateado para objetos o arrays
+                                formatValue(value)
+                            )}
+                        </td>
+                    );
+                })}
                 {isActions && (
                     <td>
                         <button className="ver" onClick={handleModalOpen}>Ver</button>

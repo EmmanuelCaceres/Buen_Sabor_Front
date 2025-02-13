@@ -13,7 +13,7 @@ export default function SaveCategoria() {
     const [categoria, setCategoria] = useState<ICategoria>({
         id: 0,
         baja: false,
-        denominacion: '',
+        Denominación: '',
         subCategorias: [],
         articulos: [],
         esInsumo: false,
@@ -21,7 +21,7 @@ export default function SaveCategoria() {
         categoriaPadre: {
             id: 0,
             baja: false,
-            denominacion: '',
+            Denominación: '',
             subCategorias: [],
             articulos: [],
             esInsumo: false,
@@ -74,8 +74,8 @@ export default function SaveCategoria() {
                     type="text"
                     id="denominacion"
                     name="denominacion"
-                    value={categoria.denominacion}
-                    onChange={(e) => setCategoria({ ...categoria, denominacion: e.target.value })}
+                    value={categoria.Denominación}
+                    onChange={(e) => setCategoria({ ...categoria, Denominación: e.target.value })}
                 />
 
                 <div className="form-check-inline" style={{ display: 'flex', gap: '10px' }}>

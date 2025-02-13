@@ -5,10 +5,10 @@ import ISucursalDto from "./ISucursalDto";
 
 export default interface IArticulo{
     id:number;
-    denominacion:string;
+    Denominación:string;
     precioVenta:number;
     unidadMedida:IUnidadMedida;
-    imagenes: IImagenArticulo[];
+    Imagen: IImagenArticulo[];
     categoria: ICategoria;
     sucursal: ISucursalDto;
     baja:boolean;
