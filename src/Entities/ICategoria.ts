@@ -4,7 +4,7 @@ import ISucursalDto from "./ISucursalDto";
 export default interface ICategoria{
     id:number;
     baja:boolean;
-    Denominación:string;
+    denominacion:string;
     subCategorias: ICategoria[];
     articulos:IArticulo[];
     esInsumo: boolean;

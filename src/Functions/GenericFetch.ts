@@ -1,7 +1,7 @@
 import { IPaginatedResponse } from "../Entities/IPaginatedResponse";
 
 // GenericFetch.ts
-export class GenericFetch<T> {
+export class GenericFetch<T>{
     protected baseUrl: string;
 
     constructor(baseUrl: string) {
@@ -58,5 +58,15 @@ export class GenericFetch<T> {
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
+    }
+
+    public async filterByKeyword(isPaginated: boolean = false,keyword:string): Promise<T[] | IPaginatedResponse<T>> {
+        const response = await fetch(this.baseUrl+keyword);
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+    
+        const data = await response.json();
+        return isPaginated ? (data as IPaginatedResponse<T>) : (data as T[]);
     }
 }

@@ -14,12 +14,13 @@ import SavePromocion from "./FormSave/SavePromocion";
 import Pedidos from "./Components/Pedidos";
 import GrillaInsumo from "./Components/Grillas/GrillaInsumo";
 import GrillaCategoria from "./Components/Grillas/GrillaCategoria";
+import SaveEmpleado from "./FormSave/SaveEmpleado";
 
 export const App = () => {
     
     return (
         <>
-            <Header/>
+            {/* <Header/> */}
             <Routes>
                 <Route path="/" element={<Home/>} />
                 <Route path="/profile" element={<AuthenticationGuard component={Profile} />} />
@@ -33,6 +34,7 @@ export const App = () => {
                     <Route path="empresas/save/:id" element={<SaveEmpresa/>}></Route>
                     <Route path="categorias" element={<GrillaCategoria/>}></Route>
                     <Route path="empleados" element={<GrillaEmpleado/>}></Route>
+                    <Route path="empleados/save/:id" element={<SaveEmpleado/>}></Route>
                     <Route path="roles" element={<GrillaRol/>}></Route>
                     <Route path="promociones" element={<GrillaPromocion/>}></Route>
                     <Route path="promociones/save/:id" element={<SavePromocion/>}></Route>

@@ -1,6 +1,7 @@
 import { CContainer, CNavbar, CNavbarBrand, CNavbarToggler } from "@coreui/react"
 import { useState } from "react"
 import logoImage from "../assets/imagenes/hamburguesa.svg";
+import "../index.css"
 
 
 export default function NavBar() {
@@ -11,7 +12,7 @@ export default function NavBar() {
     };
 
     return (
-        <CNavbar className="bg-dark fixed-top">
+        <CNavbar className="bg-dark header">
             <CContainer fluid className="d-flex justify-content-between align-items-center">
                 <div className="d-flex align-items-center">
                     <img src={logoImage} alt="Logo" style={{ height: "auto", width: "45px", marginLeft: "15px", color: "white" }} />
