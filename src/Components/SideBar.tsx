@@ -70,12 +70,6 @@ export default function SideBar() {
                                 Lista de Empleados
                             </Link>
                         </CNavItem>
-                        <CNavItem>
-                            <Link to="/panel-usuario/roles" className="nav-link">
-                                <span className="nav-icon"><span className="nav-icon-bullet"></span></span>
-                                Roles
-                            </Link>
-                        </CNavItem>
                     </CNavGroup>
                     <CNavItem>
                         <Link to="/panel-usuario/insumos" className="nav-link">

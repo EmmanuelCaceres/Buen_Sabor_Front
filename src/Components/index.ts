@@ -8,3 +8,4 @@ export * from "./Home/Home.tsx";
 export * from "./Loader/Loader.tsx";
 export * from "./ButtonEdit/ButtonEdit.tsx";
 export * from "./InputSearch/InputSearch.tsx";
+export * from "./Modal/Modal.tsx";
