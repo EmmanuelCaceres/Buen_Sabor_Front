@@ -1,6 +1,8 @@
-import { useState } from "react";
 import { ButtonEdit } from "../../Components";
 import './GrillaRow.css'
+import useModal from "../../Hooks/useModal";
+import { Modal } from "../../Components";
+import { ModalContext, useModalContext } from "../Modal/context/ModalContext";
 
 // Tipado de la fila con un tipo genérico
 interface InfoRow<T extends { id: number }> {
@@ -48,26 +50,6 @@ const formatComplexValue = (value: ComplexValue): string => {
     return JSON.stringify(value, null, 2); // Si no se reconoce la propiedad, lo formateamos como JSON
 };
 
-const Modal = <T extends { id: number }>({ isOpen, data, onClose }: ModalProps<T>) => {
-    if (!isOpen) return null;
-
-    return (
-        <div className="modal-overlay" onClick={onClose}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                <h3>Detalles del Elemento</h3>
-                <ul>
-                    {Object.entries(data)
-                        .filter(([key]) => key !== "Imagen") // Filtramos la propiedad Imagen
-                        .map(([key, value]) => (
-                            <li key={key}><strong>{key}:</strong> {formatValue(value)}</li>
-                        ))}
-                </ul>
-                <button onClick={onClose}>Cerrar</button>
-            </div>
-        </div>
-    );
-};
-
 export default function GrillaRow<T extends { id: number }>({
     data,
     propertiesToShow,
@@ -75,10 +57,12 @@ export default function GrillaRow<T extends { id: number }>({
     onDelete,
     urlParent,
 }: InfoRow<T>) {
-    const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const handleModalOpen = () => setIsModalOpen(true);
-    const handleModalClose = () => setIsModalOpen(false);
+    // const [isOpen,openModal,closeModal] = useModal(false)
+    const {setState} = useModalContext();
+    const openModal = () =>{
+        setState(true)
+    }
 
     return (
         <>
@@ -98,7 +82,7 @@ export default function GrillaRow<T extends { id: number }>({
                 })}
                 {isActions && (
                     <td>
-                        <button className="ver" onClick={handleModalOpen}>Ver</button>
+                        <button className="ver" onClick={openModal}>Ver</button>
                         <ButtonEdit label="Editar" url={urlParent ? `${urlParent}${data.id}` : "#"} />
                         <button
                             className="btn btn-danger"
@@ -111,7 +95,21 @@ export default function GrillaRow<T extends { id: number }>({
             </tr>
 
             {/* Modal fuera de la tabla */}
-            <Modal isOpen={isModalOpen} data={data} onClose={handleModalClose} />
+            <Modal children={
+                <>
+                    <h3>Detalles</h3>
+                    <ul style={{listStyle:"none",padding:"0"}}>
+
+                        {Object.entries(data)
+                            .filter(([key]) => key !== "Imagen") // Filtramos la propiedad Imagen
+                            .map(([key, value]) => (
+                                <li key={key}>{formatValue(value)}</li>
+                            ))}
+                    </ul>
+                </>
+                    
+            }/>
+
         </>
     );
 }

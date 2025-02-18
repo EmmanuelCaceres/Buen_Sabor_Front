@@ -10,6 +10,7 @@ import {createBrowserRouter,RouterProvider,BrowserRouter} from "react-router-dom
 // import GrillaArticulo from './Components/Grillas/GrillaArticuloManufacturado.tsx';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
+import { ModalProvider } from './Components/Modal/context/ModalContext';
 // import GrillaEmpresa from './Components/Grillas/GrillaEmpresa.tsx';
 // import GrillaCategoria from './Components/Grillas/GrillaCategoria.tsx';
 // import GrillaEmpleado from './Components/Grillas/GrillaEmpleado.tsx';
@@ -119,9 +120,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   // Controla el correcto funcionamiento de los componentes, crea y destruye los componentes 2 veces, en producción se quita
   <StrictMode>
       <BrowserRouter>
+      <ModalProvider>
         <Auth0ProviderWithNavigate>
           <App/>
         </Auth0ProviderWithNavigate>
+        </ModalProvider>
       </BrowserRouter>
   </StrictMode>,
 )
