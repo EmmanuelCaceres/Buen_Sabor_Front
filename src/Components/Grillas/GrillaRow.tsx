@@ -1,8 +1,8 @@
 import { ButtonEdit } from "../../Components";
 import './GrillaRow.css'
-import useModal from "../../Hooks/useModal";
+// import useModal from "../../Hooks/useModal";
 import { Modal } from "../../Components";
-import { ModalContext, useModalContext } from "../Modal/context/ModalContext";
+import { useModalContext } from "../Modal/context/ModalContext";
 
 // Tipado de la fila con un tipo genérico
 interface InfoRow<T extends { id: number }> {
@@ -17,8 +17,7 @@ interface ComplexValue {
     Denominación?: string;
     nombre?: string;
     denominacion?: string;
-    url?: string;
-    [key: string]: any; // Esto permite que tenga otras propiedades que no hemos especificado
+    url?: string; // Esto permite que tenga otras propiedades que no hemos especificado
 }
 
 // Función para formatear valores de propiedades complejas
@@ -69,9 +68,11 @@ export default function GrillaRow<T extends { id: number }>({
             <tr>
                 {propertiesToShow.map((property, index) => {
                     const value = data[property];
+                    console.log('Property:', property); // Esto mostrará el nombre de la propiedad.
+                    console.log('Value:', value); // Esto mostrará el valor de la propiedad.
                     return (
                         <td key={index}>
-                            {property === "Imagen" && Array.isArray(value) && value.length > 0 ? (
+                            {property === "imagenes" && Array.isArray(value) && value.length > 0 ? (
                                 <img src={value[0].url} alt="Imagen" width="50" height="50" />
                             ) : (
                                 // Muestra un valor formateado para objetos o arrays
