@@ -1,8 +1,9 @@
 import { ButtonEdit } from "../../Components";
 import './GrillaRow.css'
-import useModal from "../../Hooks/useModal";
 import { Modal } from "../../Components";
 import { ModalContext, useModalContext } from "../Modal/context/ModalContext";
+import { useDiccionario } from "../../Hooks/useDiccionario";
+// import { formatValue } from "../../Hooks/useFormatData";
 
 // Tipado de la fila con un tipo genérico
 interface InfoRow<T extends { id: number }> {
@@ -57,7 +58,6 @@ export default function GrillaRow<T extends { id: number }>({
     onDelete,
     urlParent,
 }: InfoRow<T>) {
-
     // const [isOpen,openModal,closeModal] = useModal(false)
     const {setState} = useModalContext();
     const openModal = () =>{
@@ -103,7 +103,7 @@ export default function GrillaRow<T extends { id: number }>({
                         {Object.entries(data)
                             .filter(([key]) => key !== "Imagen") // Filtramos la propiedad Imagen
                             .map(([key, value]) => (
-                                <li key={key}>{formatValue(value)}</li>
+                                <li key={key}>{useDiccionario(key)} : {formatValue(value)}</li>
                             ))}
                     </ul>
                 </>
