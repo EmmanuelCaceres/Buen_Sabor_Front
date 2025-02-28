@@ -1,5 +1,6 @@
 import GrillaRow from "./GrillaRow";
 import { Table } from "react-bootstrap";
+import { useDiccionario } from "../../Hooks/useDiccionario";
 
 interface GrillaProps<T extends { id: number }> {
     data: T[];
@@ -24,7 +25,7 @@ export default function GrillaGenerica<T extends { id: number }>({
                 <tr>
                     {propertiesToShow.map((property) => (
                         <th key={String(property)} scope="col">
-                            {columnAliases?.[property] ?? String(property)}
+                            {columnAliases?.[property] ?? useDiccionario(String(property))}
                         </th>
                     ))}
                     {hasActions && <th scope="col">Acciones</th>}
