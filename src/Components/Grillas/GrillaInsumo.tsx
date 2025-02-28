@@ -32,19 +32,9 @@ export default function GrillaInsumo() {
         try {
             const result = new ArticuloInsumoService(apiUrl);
             const data = await result.getCategorias();
-            
-            // Transformar los datos para que las claves coincidan con la interfaz ICategoria
-            const categoriasTransformadas = data.map((categoria: any) => ({
-                ...categoria,
-                esInsumo: categoria['Es un insumo?'], // Renombramos la propiedad
-                denominacion: categoria.Denominación, // Asegúrate que el nombre sea correcto
-                subCategorias: categoria.Subcategorias || [],
-                sucursales: categoria.Sucursales || [],
-                // Realiza cualquier otra transformación que necesites
-            }));
     
             // Filtrar las categorías que son insumos
-            setCategorias(categoriasTransformadas.filter((categoria: ICategoria) => categoria.esInsumo));
+            setCategorias(data.filter((categoria: ICategoria) => categoria.esInsumo));
         } catch (error) {
             console.error("Error al obtener categorías:", error);
         }
@@ -86,7 +76,6 @@ export default function GrillaInsumo() {
     useEffect(() => {
         // obtenerSucursales();
         obtenerCategorias();
-        //console.log(categorias)
     }, []);
 
     useEffect(() => {
@@ -99,6 +88,7 @@ export default function GrillaInsumo() {
         if (sucursalSeleccionada) {
             cargarTodosLosDatos(sucursalSeleccionada);
             setCurrentPage(1); // Reinicia la página al cambiar de sucursal
+            
         }
     }, [sucursalSeleccionada]);
 
@@ -138,30 +128,31 @@ export default function GrillaInsumo() {
     const handleShowFilterModal = () => setShowFilterModal(true);
 
     const filteredInsumos = allArticulosInsumos.filter((insumo) => {
+        console.log(`insumo:`, JSON.stringify(insumo, null, 2));
         // Verificar si la categoría seleccionada es válida
         const categoriaSeleccionadaObj = categorias.find(categoria => categoria.id === categoriaSeleccionada?.id);
     
         // Verificar el valor de categoriaSeleccionadaObj
-        console.log("categoriaSeleccionadaObj:", categoriaSeleccionadaObj);
     
         // Si la categoría seleccionada es nula, mostramos todos los insumos
         if (!categoriaSeleccionada) {
-            console.log("Categoría no seleccionada, mostrando todos los insumos");
-            return insumo.Denominación.toLowerCase().includes(searchTerm.toLowerCase());
+            return insumo.denominacion.toLowerCase().includes(searchTerm.toLowerCase());
         }
     
         // Si la categoría seleccionada es una categoría padre, incluir sus subcategorías
-        console.log("insumo.categoria:", insumo.categoria);
+        //console.log("insumo.categoria:", insumo);
         const perteneceACategoria = categoriaSeleccionadaObj?.categoriaPadre === null
-            ? insumo.categoria.id === categoriaSeleccionadaObj.id || categorias.some(c => c.categoriaPadre?.id === categoriaSeleccionadaObj.id && insumo.categoria.id === c.id)
-            : insumo.categoria.id === categoriaSeleccionadaObj?.id;
+    ? insumo.categoria?.id === categoriaSeleccionadaObj.id || 
+      categorias.some(c => c.categoriaPadre?.id === categoriaSeleccionadaObj.id && insumo.categoria?.id === c.id)
+    : insumo.categoria?.id === categoriaSeleccionadaObj?.id;
+
     
         // Verificar si se está filtrando correctamente por denominación y categoría
-        console.log("Filtrando insumo:", insumo.Denominación);
-        console.log("perteneceACategoria:", perteneceACategoria);
+        // console.log("Filtrando insumo:", insumo.denominacion);
+        // console.log("perteneceACategoria:", perteneceACategoria);
     
         // Filtrar insumos por denominación y por categoría
-        return insumo.Denominación.toLowerCase().includes(searchTerm.toLowerCase()) && perteneceACategoria;
+        return insumo.denominacion.toLowerCase().includes(searchTerm.toLowerCase()) && perteneceACategoria;
     });
     
     
@@ -202,7 +193,7 @@ export default function GrillaInsumo() {
             .map(cat => (
                 <div key={cat.id} style={{ marginLeft: `${nivel * 20}px`, cursor: "pointer" }}>
                     <Button variant="link" onClick={() => handleCategoriaClick(cat)}>
-                        {nivel === 0 ? <strong>{cat.Denominación}</strong> : `↳ ${cat.Denominación}`}
+                        {nivel === 0 ? <strong>{cat.denominacion}</strong> : `↳ ${cat.denominacion}`}
                     </Button>
                     {renderCategorias(cat.id, nivel + 1)} {/* Ahora acepta `number` sin error */}
                 </div>
@@ -280,7 +271,7 @@ export default function GrillaInsumo() {
                     }}
                     onClick={limpiarFiltro}
                 >
-                    {categoriaSeleccionada.Denominación} ✖
+                    {categoriaSeleccionada.denominacion} ✖
                 </div>
             )}
 
@@ -339,7 +330,7 @@ export default function GrillaInsumo() {
 
             <GrillaGenerica
                 data={paginatedInsumos}
-                propertiesToShow={["Imagen", "Denominación", "Categoria", "Stock actual", "Unidad de medida"]}
+                propertiesToShow={["imagenes", "denominacion", "categoria", "stockActual", "unidadMedida"]}
                 editItem={`/panel-usuario/insumos/save/`}
                 deleteFunction={(id: number) => handleDelete(id)}
             />
@@ -355,7 +346,7 @@ export default function GrillaInsumo() {
                                 <button type="button" className="btn-close" onClick={cancelDelete}></button>
                             </div>
                             <div className="modal-body">
-                                ¿Está seguro de que desea eliminar el insumo <strong>{insumoToDelete.Denominación}</strong>?
+                                ¿Está seguro de que desea eliminar el insumo <strong>{insumoToDelete.denominacion}</strong>?
                             </div>
                             <div className="modal-footer">
                                 <Button variant="secondary" onClick={cancelDelete}>Cancelar</Button>

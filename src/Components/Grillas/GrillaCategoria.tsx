@@ -1,7 +1,7 @@
-import { SetStateAction, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import masObject from '../../assets/circle-plus-svgrepo-com.svg';
-import { Container, Row, Col, InputGroup, Form, Button } from 'react-bootstrap';
+import { Container, Row, Col, Button } from 'react-bootstrap';
 import ICategoria from '../../Entities/ICategoria';
 import CategoriaService from '../../Functions/Services/CategoriaService';
 import GrillaGenerica from './GrillaGenerica';
