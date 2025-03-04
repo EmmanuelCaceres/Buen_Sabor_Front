@@ -14,6 +14,12 @@ export default class ArticuloInsumoService extends GenericFetch<IArticuloInsumo>
         const data = await response.json();
         return data as IPaginatedResponse<IArticuloInsumo>;
     }
+
+    async buscarInsumoXDenominacion(codigo: string): Promise<IArticuloInsumo[]> {
+        const response = await this.getInsumoByDenominacion(codigo);
+        return response?.content || [];
+    }
+    
     
     async getInsumoParaVentas(): Promise<IPaginatedResponse<IArticuloInsumo> | null> {
         const response = await fetch(`${this.baseUrl}`);

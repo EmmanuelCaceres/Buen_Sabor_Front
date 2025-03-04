@@ -15,6 +15,12 @@ const translates:Translates={
     denominacion: "Denominación",
     acciones: "Acciones",
     descripcion: "Descripción",
+    id: "ID",
+    stockActual: "Stock actual",
+    stockMaximo: "Stock maximo",
+    unidadMedida: "Unidad de medida",
+    categoria: "Categoria",
+    imagenes: "Imagen"
 }
 
 const useDiccionario = (clave:string)=>{

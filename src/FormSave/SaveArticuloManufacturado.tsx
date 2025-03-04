@@ -9,12 +9,12 @@ import arrow_left from "../assets/arrow-circle-left-svgrepo-com.svg";
 import ArticuloManufacturadoService from "../Functions/Services/ArticuloManufacturadoService";
 import ArticuloInsumoService from "../Functions/Services/ArticuloInsumoService";
 import IArticuloManufacturadoDetalles from "../Entities/IArticuloManufacturadoDetalle";
-// import IImagenArticulo from "../Entities/IImagenArticulo";
 import ICategoria from "../Entities/ICategoria";
-import CatetgoriaService from "../Functions/Services/CategoriaService";
 import IUnidadMedida from "../Entities/IUnidadMedida";
 import UnidadMedidaService from "../Functions/Services/UnidadMedidaService";
 import ImagenArticuloService from "../Functions/Services/ImagenArticuloService";
+import ISucursalDto from "../Entities/ISucursalDto";
+import SucursalService from "../Functions/Services/SucursalService";
 
 export default function SaveArticulo() {
     const apiUrl = import.meta.env.VITE_URL_API_BACK
@@ -23,21 +23,15 @@ export default function SaveArticulo() {
     const navigate = useNavigate();
     const [inputValue, setInputValue] = useState('');
     const [insumos, setInsumos] = useState<IArticuloInsumo[]>([]);
-    // const [imgUrl, setImgUrl] = useState<IImagenArticulo>(
-    //     {
-    //         id: 0,
-    //         url: ''
-    //     }
-    // );
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [categoria, setCategoria] = useState<ICategoria[]>([])
     const [unidadMedida, setUnidadMedida] = useState<IUnidadMedida[]>([]);
-
+    const [sucursalesSeleccionadas, setSucursalesSeleccionadas] = useState<number[]>([]);
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
     const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const formData = new FormData();
         const file = event.target.files?.[0];
     
         if (!file) {
@@ -45,36 +39,16 @@ export default function SaveArticulo() {
             return;
         }
     
-        formData.append("file", file);
-        console.log(formData);
-    
-        const result = new ImagenArticuloService(`${apiUrl}imagenArticulos`);
-        result.postImagen(formData)
-            .then(data => {
-                if (data) {
-                    //console.log(data);
-                    setArticulosManufacturado(prevState => ({
-                        ...prevState,
-                        imagenes: [
-                            ...prevState.imagenes,
-                            {
-                                id: data.id,
-                                url: data.url
-                            }
-                        ]
-                    }));
-                } else {
-                    console.log("No data received");
-                }
-            })
-            .catch(error => {
-                console.log(error);
-            });
+        // Mostrar la nueva imagen en una etiqueta img
+        const imageUrl = URL.createObjectURL(file);
+        setSelectedImage(imageUrl);  // Establece la imagen seleccionada
+        console.log("File uploaded: ", imageUrl);
     };
 
     const [articuloManufacturado, setArticulosManufacturado] = useState<IArticuloManufacturado>(
         {
-            id: Number(id),
+            id: 0,
+            baja: false,
             denominacion: '',
             precioVenta: 0,
             unidadMedida: {
@@ -84,9 +58,61 @@ export default function SaveArticulo() {
             imagenes: [],
             categoria: {
                 id: 0,
+                baja:false,
                 denominacion: '',
                 subCategorias: [],
-                articulos: []
+                articulos: [],
+                esInsumo: false,
+                sucursales: [],
+                categoriaPadre: { // Inicialización correcta
+                    id: 0,
+                    baja:false,
+                    denominacion: '',
+                    subCategorias: [],
+                    articulos: [],
+                    esInsumo: false,
+                    categoriaPadre: null, // O undefined, dependiendo de tu lógica
+                    sucursales: []
+                }
+            },
+            sucursal: {
+                id: 0,
+                nombre: '',
+                horarioApertura: '',
+                horarioCierre: '',
+                baja: false,
+                casaMatriz: false,
+                domicilio:{
+                    id: 0,
+                    baja: false,
+                    calle: '',
+                    numero: 0,
+                    cp: 0,
+                    piso: 0,
+                    nroDpto: 0,
+                    localidad: {
+                        id: 0,
+                        baja: false,
+                        nombre: '',
+                        provincia: {
+                            id: 0,
+                            baja: false,
+                            nombre: '',
+                            pais: {
+                                id: 0,
+                                baja: false,
+                                nombre: '',
+                            },
+                        },
+                    },
+                },
+                empresa: {
+                    id: 0,
+                    baja: false,
+                    nombre: '',
+                    razonSocial: '',
+                    cuil: '',
+                },
             },
             descripcion: '',
             tiempoEstimadoMinutos: 0,
@@ -95,13 +121,27 @@ export default function SaveArticulo() {
         }
     );
 
+    useEffect(() => {
+        if (Number(id) !== 0) {
+            getArticuloManufacturado(`${apiUrl}articulosManufacturados`, Number(id)).then(() => {
+                if (articuloManufacturado.sucursal && articuloManufacturado.sucursal.id) {
+                    setSucursalesSeleccionadas([articuloManufacturado.sucursal.id]); // Marcar la sucursal asociada
+                }
+            });
+        }
+        if (articuloManufacturado.imagenes.length > 0) {
+            const firstImageUrl = articuloManufacturado.imagenes[0].url;
+            setSelectedImage(firstImageUrl); // Establece la imagen inicial desde los datos
+        }
+    }, [articuloManufacturado.imagenes]);
+
     const getArticuloManufacturado = async (baseUrl: string, id: number) => {
         const result = new ArticuloManufacturadoService(baseUrl);
-        await result.getById(id)
+        await result.get(id)
             .then(data => {
                 if (data !== null) {
                     setArticulosManufacturado(data);
-                    console.log("DATAA"+ JSON.stringify(data))
+                    //console.log("DATAA"+ JSON.stringify(data))
                 } else {
                     console.log("El artículo manufacturado no se encontró.");
                 }
@@ -113,7 +153,7 @@ export default function SaveArticulo() {
 
     const buscarInsumoXDenominacion = async () => {
         const result = new ArticuloInsumoService(`${apiUrl}articulosInsumos/search?denominacion=`);
-        const insumosResult = await result.getInsumoByDenominacion(inputValue);
+        const insumosResult = await result.buscarInsumoXDenominacion(inputValue);
         if (insumosResult) {
             setInsumos(insumosResult);
         } else {
@@ -121,17 +161,36 @@ export default function SaveArticulo() {
         }
 
     }
-    const getAllCategories = async () => {
-        const result = new CatetgoriaService(`${apiUrl}categorias`)
-        const categoriaResult = await result.getAll();
-        setCategoria(categoriaResult);
-    }
+    const obtenerCategorias = async () => {
+            try {
+                const result = new ArticuloManufacturadoService(apiUrl);
+                const data = await result.getCategorias();
+                setCategoria(data.filter((categoria: ICategoria) => categoria.esInsumo) || []);
+            } catch (error) {
+                console.error("Error al obtener categorías:", error);
+            }
+    };
 
     const getAllUnidad = async () => {
-        const result = new UnidadMedidaService(`${apiUrl}unidadMedidas`)
-        const unidadMedidaResult = await result.getAll();
-        setUnidadMedida(unidadMedidaResult)
-    }
+            try {
+                const result = new UnidadMedidaService(`${apiUrl}unidadesMedidas`);
+                const unidadMedidaResult = await result.getAll(); // Llama al método genérico
+        
+                if (Array.isArray(unidadMedidaResult)) {
+                    // Si es un array de unidades de medida
+                    setUnidadMedida(unidadMedidaResult);
+                } else if (unidadMedidaResult && 'data' in unidadMedidaResult) {
+                    // Si es un objeto paginado con una propiedad 'data'
+                    setUnidadMedida(unidadMedidaResult.content);
+                } else {
+                    console.error("Unexpected response format for unidadMedida:", unidadMedidaResult);
+                    setUnidadMedida([]); // Fallback a un array vacío en caso de error
+                }
+            } catch (error) {
+                console.error("Error fetching unidad de medida:", error);
+                setUnidadMedida([]); // Maneja errores y asegura un estado consistente
+            }
+    };
 
     const agregarInsumo = (insumo: IArticuloInsumo) => {
         const existeInsumo = articuloManufacturado.articuloManufacturadoDetalles.find((insumoDetalle) => insumoDetalle.articuloInsumo.id === insumo.id)
@@ -181,39 +240,138 @@ export default function SaveArticulo() {
         }
     }
 
-    const saveArticulo = async () => {
-        //console.log(articuloManufacturado);
-        if (Number(id) !== 0) {
-            await new ArticuloManufacturadoService(`${apiUrl}articulosManufacturados`).put(Number(id), articuloManufacturado);
-        } else {
-            await new ArticuloManufacturadoService(`${apiUrl}articulosManufacturados`).post(articuloManufacturado);
+    const validarFormulario = (): boolean => {
+        if (!articuloManufacturado.denominacion.trim()) {
+            alert("El nombre del articulo es obligatorio.");
+            return false;
         }
-        alert("Articulo guardado con exito!");
-        handleClose();
-        navigate(-1);
+    
+        if (articuloManufacturado.precioVenta <= 0) {
+            alert("El precio de venta debe ser mayor que 0.");
+            return false;
+        }
+    
+        if (Number(id) === 0 && sucursalesSeleccionadas.length === 0) {
+            alert("Debe seleccionar al menos una sucursal.");
+            return false;
+        }
+    
+        return true;
     };
-    // const handleFileChange = (e)=>{
-    //     const selectedFile = e.target.files[0];
-    //     const imageUrl = selectedFile.name; // Suponiendo que aquí guardas la URL de la imagen
 
-    //     setImgUrl({
-    //     id: Number(id) !== 0 ? articuloManufacturado.imagenes[0].id : 0,
-    //     url: imageUrl
-    //     });
-    // }
+    async function obtenerSucursalPorId(id: number): Promise<ISucursalDto> {
+            const sucursalService = new SucursalService(`${apiUrl}sucursales`);
+            const sucursal = await sucursalService.get(id);
+            return sucursal; // Retorna el objeto completo de la sucursal
+        }
 
+    const saveArticulo = async () => {
+    
+            if (!validarFormulario()) {
+                return; // Detiene el proceso si la validación falla
+            }
+            
+            //console.log("Sucursales seleccionadas al guardar:", sucursalesSeleccionadas);  // Log para ver las sucursales seleccionadas al guardar
+            if (Number(id) === 0 && sucursalesSeleccionadas.length === 0) {
+                alert("Debe seleccionar al menos una sucursal.");
+                return;
+            }
+        
+            // Eliminar imagen anterior si existe
+            if (articuloManufacturado.imagenes.length > 0) {
+                const imageUrl = articuloManufacturado.imagenes[0].url;
+                const publicIdToDelete = imageUrl.split('/')[6].split('.')[0];
+                try {
+                    const resultDelete = new ImagenArticuloService(`${apiUrl}images`);
+                    await resultDelete.deleteImagen(publicIdToDelete, articuloManufacturado.imagenes[0].id);
+                    console.log("Imagen anterior eliminada correctamente");
+                } catch (error) {
+                    console.error("Error al eliminar la imagen anterior:", error);
+                    alert("Error al eliminar la imagen anterior. El artículo no será guardado.");
+                    return;
+                }
+            }
+        
+            // Subir nueva imagen si está seleccionada
+            if (selectedImage) {
+                try {
+                    const blob = await fetch(selectedImage).then((res) => res.blob());
+                    const file = new File([blob], "imagen.jpg", { type: "image/jpeg" });
+                    const formData = new FormData();
+                    formData.append("upload", file);
+                    const result = new ImagenArticuloService(`${apiUrl}images/uploads`);
+                    const uploadedImage = await result.postImagen(formData);
+                    if (uploadedImage && uploadedImage.id) {
+                        articuloManufacturado.imagenes = [{
+                            id: uploadedImage.id,
+                            url: uploadedImage.url,
+                        }];
+                        console.log("Imagen subida correctamente:", uploadedImage);
+                    } else {
+                        console.error("Error en la subida de imagen: No se recibió ID válido.");
+                        return;
+                    }
+                } catch (error) {
+                    console.error("Error al subir la imagen:", error);
+                    alert("Error al subir la nueva imagen. El artículo no será guardado.");
+                    return;
+                }
+            }
+        
+            // Verificar datos del artículo con sucursales asociadas
+            console.log("Datos finales del artículo a guardar:", JSON.stringify(articuloManufacturado, null, 2));
+        
+            // Guardar el artículo en el backend
+            try {
+                const articuloService = new ArticuloManufacturadoService(`${apiUrl}articulosInsumos`);
+    
+                if (Number(id) !== 0) {
+                    console.log("Actualizando artículo existente...");
+                    await articuloService.put(Number(id), articuloManufacturado);
+                } else {
+                    console.log("Creando nuevo artículo...");
+                    for (const sucursalId of sucursalesSeleccionadas) {
+                        const sucursal = await obtenerSucursalPorId(sucursalId);
+                        const articuloConSucursal = {
+                            ...articuloManufacturado,
+                            sucursal: {
+                                ...sucursal,
+                                id: sucursalId,
+                            },
+                        };
+                        console.log("Artículo con sucursal antes de guardar:", articuloConSucursal);
+                        await articuloService.post(articuloConSucursal);
+                    }
+                }            
+    
+                alert("Insumo guardado con éxito!");
+                navigate(-1);
+            } catch (error) {
+                console.error("Error al guardar el artículo:", error);
+                alert("Error al guardar el artículo.");
+            }
+        };
 
     useEffect(() => {
-        //console.log(id)
-        getAllCategories()
+        obtenerCategorias()
         getAllUnidad()
-        if (Number(id) != 0) {
-            getArticuloManufacturado(`${apiUrl}articulosManufacturados`, Number(id))
-
-        }
-        // console.log(articuloManufacturado.articuloManufacturadoDetalles)
-        //console.log(categoria)
     }, ([]))
+
+    useEffect(() => {
+        if (articuloManufacturado.imagenes.length > 0) {
+            const firstImageUrl = articuloManufacturado.imagenes[0].url;
+            setSelectedImage(firstImageUrl);
+        }
+    }, [articuloManufacturado]); 
+
+    const handleCantidadChange = (id: number, nuevaCantidad: number) => {
+        setArticulosManufacturado(prevState => ({
+            ...prevState,
+            articuloManufacturadoDetalles: prevState.articuloManufacturadoDetalles.map(detalle =>
+                detalle.id === id ? { ...detalle, cantidad: nuevaCantidad } : detalle
+            )
+        }));
+    };
 
     return (
         <div className="container">
@@ -231,6 +389,12 @@ export default function SaveArticulo() {
                 <label htmlFor="tiempoEstimadoMinutos">Tiempo Estimado(minutos)</label>
                 <input type="number" id="tiempoEstimadoMinutos" name="tiempoEstimadoMinutos" value={Number(articuloManufacturado.tiempoEstimadoMinutos)} onChange={(e) => setArticulosManufacturado({ ...articuloManufacturado, tiempoEstimadoMinutos: Number(e.target.value) })} />
                 <input type="file" onChange={onFileChange} />
+                {selectedImage && (
+                    <div>
+                        <h3>Vista previa de la imagen seleccionada:</h3>
+                        <img src={selectedImage} alt="Vista previa" style={{ width: '100px', height: 'auto', marginTop: '10px' }} />
+                    </div>
+                )}
                 <div style={{ display: "flex", justifyContent: "start",gap:"3rem",margin:"1rem 0" }}>
                     <div>
                         <label htmlFor="categoria" style={{marginRight:"1rem"}}>Categorias</label>
@@ -258,8 +422,6 @@ export default function SaveArticulo() {
                         </select>
                     </div>
                 </div>
-                {/* <label htmlFor="imagen">Imagen</label>
-                <input type="file" name="imagen" id="imagen" onChange={handleFileChange}/> */}
                 <label htmlFor="preparacion">Preparación</label>
                 <textarea id="preparacion" name="preparacion" defaultValue={articuloManufacturado.preparacion} onChange={(e) => setArticulosManufacturado({ ...articuloManufacturado, preparacion: e.target.value })}></textarea>
                 <div style={{ display: "flex", justifyContent: "space-between", margin:"1rem 0" }}>
@@ -285,7 +447,11 @@ export default function SaveArticulo() {
                                         <p>{detalle.articuloInsumo?.denominacion}</p>
                                     </td>
                                     <td>
-                                        <input type='number' defaultValue={detalle.cantidad} onChange={e => detalle.cantidad = Number(e.target.value)} />
+                                        <input 
+                                            type='number' 
+                                            value={detalle.cantidad} 
+                                            onChange={e => handleCantidadChange(detalle.id, Number(e.target.value))} 
+                                        />
                                     </td>
                                     <td>
                                         <p>{detalle.articuloInsumo?.precioVenta}</p>
@@ -320,17 +486,6 @@ export default function SaveArticulo() {
                         </ul>
                     <div>
                         <h3>Ingredientes seleccionados:</h3>
-                        <ul className="listaInsumo" style={{}}>
-                            {articuloManufacturado.articuloManufacturadoDetalles && articuloManufacturado.articuloManufacturadoDetalles.map((detalle) => (
-                                <li key={detalle.articuloInsumo.id}>
-                                    {detalle.articuloInsumo?.denominacion}
-                                    <svg onClick={() => deleteInsumo(detalle.articuloInsumo)} style={{ position: "absolute", top: "3px", right: "1px" }} width="14px" height="14px" viewBox="0 0 24.00 24.00" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M7 17L16.8995 7.10051" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"></path>
-                                        <path d="M7 7.00001L16.8995 16.8995" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"></path>
-                                    </svg>
-                                </li>
-                            ))}
-                        </ul>
                     </div>
                 </Modal.Body>
                 <Modal.Footer>

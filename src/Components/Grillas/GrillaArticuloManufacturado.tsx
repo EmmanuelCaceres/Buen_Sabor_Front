@@ -71,7 +71,7 @@ export default function GrillaArticulo() {
     }
 
     useEffect(()=>{
-         mostrarDatos(`${apiUrl}articulosManufacturados`)
+        mostrarDatos(`${apiUrl}articulosManufacturados`)
         console.log(articulosManufacturados);
         
     },([apiUrl]))
@@ -99,7 +99,7 @@ export default function GrillaArticulo() {
                     </InputGroup>
                 </Col>
             </Row>    
-                <GrillaGenerica data={articulosManufacturados} propertiesToShow={["id","denominacion","descripcion","precioVenta"]} editItem={`/panel-usuario/articulos/save/`} deleteFunction={handleDelete}></GrillaGenerica>
+                <GrillaGenerica data={articulosManufacturados} propertiesToShow={["imagenes","denominacion","descripcion","precioVenta"]} editItem={`/panel-usuario/articulos/save/`} deleteFunction={handleDelete}></GrillaGenerica>
             {/* <Table striped bordered hover>
                 <thead>
                     <tr>

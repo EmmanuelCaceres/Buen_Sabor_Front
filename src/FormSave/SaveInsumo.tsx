@@ -28,7 +28,7 @@ export default function SaveInsumo() {
     const [articuloInsumo, setArticulosInsumo] = useState<IArticuloInsumo>({
         id: Number(id),
         baja:false,
-        Denominación: '',
+        denominacion: '',
         sucursal: {
             id: 0,
             nombre: '',
@@ -73,11 +73,11 @@ export default function SaveInsumo() {
             id: 0,
             denominacion: '',
         },
-        Imagen: [],
+        imagenes: [],
         categoria: {
             id: 0,
             baja:false,
-            Denominación: '',
+            denominacion: '',
             subCategorias: [],
             articulos: [],
             esInsumo: false,
@@ -85,7 +85,7 @@ export default function SaveInsumo() {
             categoriaPadre: { // Inicialización correcta
                 id: 0,
                 baja:false,
-                Denominación: '',
+                denominacion: '',
                 subCategorias: [],
                 articulos: [],
                 esInsumo: false,
@@ -119,11 +119,11 @@ export default function SaveInsumo() {
     
 
     useEffect(() => {
-        if (articuloInsumo.Imagen.length > 0) {
-            const firstImageUrl = articuloInsumo.Imagen[0].url;
+        if (articuloInsumo.imagenes.length > 0) {
+            const firstImageUrl = articuloInsumo.imagenes[0].url;
             setSelectedImage(firstImageUrl); // Establece la imagen inicial desde los datos
         }
-    }, [articuloInsumo.Imagen]);
+    }, [articuloInsumo.imagenes]);
 
     
     
@@ -227,12 +227,12 @@ export default function SaveInsumo() {
         }
     
         // Eliminar imagen anterior si existe
-        if (articuloInsumo.Imagen.length > 0) {
-            const imageUrl = articuloInsumo.Imagen[0].url;
+        if (articuloInsumo.imagenes.length > 0) {
+            const imageUrl = articuloInsumo.imagenes[0].url;
             const publicIdToDelete = imageUrl.split('/')[6].split('.')[0];
             try {
                 const resultDelete = new ImagenArticuloService(`${apiUrl}images`);
-                await resultDelete.deleteImagen(publicIdToDelete, articuloInsumo.Imagen[0].id);
+                await resultDelete.deleteImagen(publicIdToDelete, articuloInsumo.imagenes[0].id);
                 console.log("Imagen anterior eliminada correctamente");
             } catch (error) {
                 console.error("Error al eliminar la imagen anterior:", error);
@@ -251,7 +251,7 @@ export default function SaveInsumo() {
                 const result = new ImagenArticuloService(`${apiUrl}images/uploads`);
                 const uploadedImage = await result.postImagen(formData);
                 if (uploadedImage && uploadedImage.id) {
-                    articuloInsumo.Imagen = [{
+                    articuloInsumo.imagenes = [{
                         id: uploadedImage.id,
                         url: uploadedImage.url,
                     }];
@@ -345,7 +345,7 @@ export default function SaveInsumo() {
     }, [id]);
 
     const validarFormulario = (): boolean => {
-        if (!articuloInsumo.Denominación.trim()) {
+        if (!articuloInsumo.denominacion.trim()) {
             alert("El nombre del insumo es obligatorio.");
             return false;
         }
@@ -387,7 +387,7 @@ export default function SaveInsumo() {
             </Link>
             <form action="" className="formContainer">
                 <label htmlFor="denominacion">Nombre del insumo</label>
-                <input type="text" id="denominacion" name="denominacion" value={articuloInsumo.Denominación} onChange={(e) => setArticulosInsumo({ ...articuloInsumo, Denominación: e.target.value })} />
+                <input type="text" id="denominacion" name="denominacion" value={articuloInsumo.denominacion} onChange={(e) => setArticulosInsumo({ ...articuloInsumo, denominacion: e.target.value })} />
                 <label htmlFor="precioCompra">Precio de compra </label>
                 <input type="number" id="precioCompra" name="precioCompra" value={articuloInsumo.precioCompra} onChange={(e) => setArticulosInsumo({ ...articuloInsumo, precioCompra: Number(e.target.value) })}></input>
                 <label htmlFor="stockActual">Stock actual</label>
@@ -410,7 +410,7 @@ export default function SaveInsumo() {
                             {
                                 categoria.map((categoria: ICategoria) => {
                                     return (
-                                        <option key={categoria.id} value={categoria.id}>{categoria.Denominación}</option>
+                                        <option key={categoria.id} value={categoria.id}>{categoria.denominacion}</option>
                                     )
                                 })
                             }
