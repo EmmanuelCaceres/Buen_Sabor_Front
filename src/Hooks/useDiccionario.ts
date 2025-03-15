@@ -20,7 +20,12 @@ const translates:Translates={
     stockMaximo: "Stock maximo",
     unidadMedida: "Unidad de medida",
     categoria: "Categoria",
-    imagenes: "Imagen"
+    imagenes: "Imagen",
+    baja: "Dado de baja", 
+    precioCompra: "Precio de compra",
+    esParaElaborar: "¿Es para elaborar?",
+    tiempoEstimadoMinutos: "Tiempo estimado en minutos",
+    articuloManufacturadoDetalles:"Ingredientes"
 }
 
 const useDiccionario = (clave:string)=>{

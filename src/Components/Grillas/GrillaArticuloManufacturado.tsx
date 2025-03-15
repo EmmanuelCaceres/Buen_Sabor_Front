@@ -1,80 +1,187 @@
-import { SetStateAction, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
 import ArticuloManufacturadoService from '../../Functions/Services/ArticuloManufacturadoService';
 import IArticuloManufacturado from '../../Entities/IArticuloManufacturado';
 import masObject from '../../assets/circle-plus-svgrepo-com.svg';
-import { Container, Row, Col, InputGroup, Form } from 'react-bootstrap';
-import { Loader } from '../Loader/Loader';
+import { Container, Row, Col, Form, Button, Modal } from 'react-bootstrap';
 import GrillaGenerica from './GrillaGenerica';
-import { IPaginatedResponse } from '../../Entities/IPaginatedResponse';
+import ICategoria from '../../Entities/ICategoria';
 
 export default function GrillaArticulo() {
 
     const apiUrl = import.meta.env.VITE_URL_API_BACK
 
-    const [inputValue, setInputValue] = useState('');
-
-    const [loading, setLoading] = useState(false);
-
+    const [sucursalSeleccionada] = useState<number | null>(2);
+    const [searchTerm, setSearchTerm] = useState("");
     const [articulosManufacturados, setArticulosManufacturados] = useState<IArticuloManufacturado[]>([]);
+    const [categorias, setCategorias] = useState<ICategoria[]>([]);
+    const [, setFiltrarPorCategoria] = useState(false);
+    const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<ICategoria | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [showFilterModal, setShowFilterModal] = useState(false);
+    const [manufacturadoToDelete, setInsumoToDelete] = useState<IArticuloManufacturado | null>(null);
+    const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+    const itemsPerPage = 10 // Número de elementos por página
 
-    const mostrarDatos = (url:string)=>{
+    const cargarTodosLosDatos = async (idSucursal: number) => {
+        const allData: IArticuloManufacturado[] = [];
+        let page = 0;
+
         try {
-            console.log("entre");
-            setLoading(true)
-            const result = new ArticuloManufacturadoService(url);
-            result.getAll()
-            .then(data =>{
-                setArticulosManufacturados(data);
-            })
-            .catch(err =>{
-                console.error(err)
-            })
-        } catch (error) {
-            console.error(error)
-        }finally{
-            setLoading(false);
-        }
-    }
-    const searchItem = (value: string) => {
-        const result = new ArticuloManufacturadoService(`${apiUrl}articulosManufacturados/name?nombre=`);
-        result.getArticuloByName(value)
-            .then(data => {
-                // Verifica si 'data' es 'null' y proporciona un array vacío en su lugar
-                setArticulosManufacturados(data ?? []);
-            })
-            .catch(error => {
-                console.log(error);
-            });
-    }
+            let hasMoreData = true;
+            while (hasMoreData) {
+                const result = new ArticuloManufacturadoService(
+                    `${apiUrl}articulosManufacturados/porSucursal/${idSucursal}?page=${page}&size=20`
+                );
+                const data = await result.getPaginatedManufacturados();
 
-    const handleKeyPress = (event: { key: string; }) => {
-        if (event.key === 'Enter') {
-            console.log(inputValue)
-            searchItem(inputValue);
+                if (data && data.content) {
+                    allData.push(...data.content);
+
+                    if (data.last) {
+                        hasMoreData = false;
+                    } else {
+                        page++;
+                    }
+                } else {
+                    hasMoreData = false;
+                }
+            }
+    
+            setArticulosManufacturados(allData);
+        } catch (error) {
+            console.error("Error al cargar todos los datos:", error);
         }
+    };
+
+    // Función para obtener categorías
+    const obtenerCategorias = async () => {
+        try {
+            const result = new ArticuloManufacturadoService(apiUrl);
+            const data = await result.getCategorias();
+        
+            // Filtrar las categorías que son no insumos
+            setCategorias(data.filter((categoria: ICategoria) => !categoria.esInsumo));
+        } catch (error) {
+            console.error("Error al obtener categorías:", error);
+        }
+    };
+
+    const limpiarFiltro = () => {
+        setCategoriaSeleccionada(null);
+    };
+
+    const filteredManufacturados = articulosManufacturados.filter((manufacturado) => {
+        console.log(`insumo:`, JSON.stringify(manufacturado, null, 2));
+        // Verificar si la categoría seleccionada es válida
+        const categoriaSeleccionadaObj = categorias.find(categoria => categoria.id === categoriaSeleccionada?.id);
+    
+        // Verificar el valor de categoriaSeleccionadaObj
+    
+        // Si la categoría seleccionada es nula, mostramos todos los manufacturados
+        if (!categoriaSeleccionada) {
+            return manufacturado.denominacion.toLowerCase().includes(searchTerm.toLowerCase());
+        }
+    
+        // Si la categoría seleccionada es una categoría padre, incluir sus subcategorías
+        const perteneceACategoria = categoriaSeleccionadaObj?.categoriaPadre === null
+    ? manufacturado.categoria?.id === categoriaSeleccionadaObj.id || 
+      categorias.some(c => c.categoriaPadre?.id === categoriaSeleccionadaObj.id && manufacturado.categoria?.id === c.id)
+    : manufacturado.categoria?.id === categoriaSeleccionadaObj?.id;
+    
+        // Filtrar manufacturados por denominación y por categoría
+        return manufacturado.denominacion.toLowerCase().includes(searchTerm.toLowerCase()) && perteneceACategoria;
+    });
+
+    const paginatedManufacturados = filteredManufacturados.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
+
+    const confirmDelete = async () => {
+        if (manufacturadoToDelete) {
+            try {
+                const result = new ArticuloManufacturadoService(apiUrl);
+                await result.deleteInsumo(manufacturadoToDelete.id); // Assuming you have a deleteInsumo method in your service
+                // After successful deletion, update the state to remove the deleted insumo
+                setArticulosManufacturados(articulosManufacturados.filter(manufacturado => manufacturado.id !== manufacturadoToDelete.id));
+                alert("Insumo eliminado con éxito."); // Or a better notification system
+            } catch (error) {
+                console.error("Error al eliminar articulo:", error);
+                alert("Error al eliminar el articulo. Inténtelo nuevamente."); // Or a better error handling
+            } finally {
+                setShowDeleteConfirmation(false);
+                setInsumoToDelete(null);
+            }
+        }
+    };
+    
+    const cancelDelete = () => {
+        setShowDeleteConfirmation(false);
+        setInsumoToDelete(null);
+    };
+
+    const handleFiltrarPorCategoria = () => {
+        setFiltrarPorCategoria(true);
     };
 
     const handleDelete = (id:number) => {
-        //console.log(event);
-        new ArticuloManufacturadoService(`${apiUrl}articulosManufacturados`).delete(id);
-        alert("Articulo removido con éxito!")
-        window.location.reload;
+        const manufacturado = articulosManufacturados.find(manufacturado => manufacturado.id === id);
+        if (manufacturado) {
+            setInsumoToDelete(manufacturado);
+            setShowDeleteConfirmation(true);
+        }
     }
 
-    const handleInputChange = (event: { target: { value: SetStateAction<string>; }; }) => {
-        setInputValue(event.target.value);
+    const renderCategorias = (categoriaPadreId: number | null = null, nivel = 0) => {
+        return categorias
+            .filter(cat => (cat.categoriaPadre ? cat.categoriaPadre.id : null) === categoriaPadreId)
+            .map(cat => (
+                <div key={cat.id} style={{ marginLeft: `${nivel * 20}px`, cursor: "pointer" }}>
+                    <Button variant="link" onClick={() => handleCategoriaClick(cat)}>
+                        {nivel === 0 ? <strong>{cat.denominacion}</strong> : `↳ ${cat.denominacion}`}
+                    </Button>
+                    {renderCategorias(cat.id, nivel + 1)} {/* Ahora acepta `number` sin error */}
+                </div>
+            ));
     };
 
-    if(loading){
-        return <Loader/>;
-    }
+    const handleCategoriaClick = (categoria : ICategoria) => {
+        setCategoriaSeleccionada(categoria);
+        setShowFilterModal(false);
+    };
 
-    useEffect(()=>{
-        mostrarDatos(`${apiUrl}articulosManufacturados`)
-        console.log(articulosManufacturados);
-        
-    },([apiUrl]))
+    const handleCloseFilterModal = () => setShowFilterModal(false);
+    const handleShowFilterModal = () => setShowFilterModal(true);
+
+    // const handleInputChange = (event: { target: { value: SetStateAction<string>; }; }) => {
+    //     setInputValue(event.target.value);
+    // };
+
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useEffect(() => {
+        if (sucursalSeleccionada) {
+            cargarTodosLosDatos(sucursalSeleccionada);
+            setCurrentPage(1); // Reinicia la página al cambiar de sucursal
+        }
+    }, [sucursalSeleccionada]);
+
+    useEffect(() => {
+        if (categoriaSeleccionada !== null) {
+            setFiltrarPorCategoria(true);
+        }
+    }, [categoriaSeleccionada]);
+
+    useEffect(() => {
+        // obtenerSucursales();
+        obtenerCategorias();
+    }, []);
+
+    const handlePageChange = (newPage: number) => {
+        if (newPage > 0 && newPage <= Math.ceil(filteredManufacturados.length / itemsPerPage)) {
+            setCurrentPage(newPage);
+        }
+    };
 
     return (
         <Container>
@@ -87,51 +194,97 @@ export default function GrillaArticulo() {
                     </Link>
                 </Col>
             </Row>
-            <Row className="mb-3">
-                <Col>
-                    <InputGroup>
-                        <Form.Control
-                            type="text"
-                            onChange={handleInputChange}
-                            onKeyPress={handleKeyPress}
-                            placeholder="Busca un artículo"
-                        />
-                    </InputGroup>
-                </Col>
-            </Row>    
-                <GrillaGenerica data={articulosManufacturados} propertiesToShow={["imagenes","denominacion","descripcion","precioVenta"]} editItem={`/panel-usuario/articulos/save/`} deleteFunction={handleDelete}></GrillaGenerica>
-            {/* <Table striped bordered hover>
-                <thead>
-                    <tr>
-                        <th>Imagen</th>
-                        <th>Denominación</th>
-                        <th>Descripción</th>
-                        <th>Precio Venta</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {articulosManufacturados.map((articulo: IArticuloManufacturado) => (
-                        <tr key={articulo.id}>
-                            <td>
-                                <img width={64} height={64} src={`${apiUrl}imagenArticulos/uploads/${articulo.imagenes[0].url}`} alt="imagenArticulo" />
-                            </td>
-                            <td>{articulo.denominacion}</td>
-                            <td>{articulo.descripcion}</td>
-                            <td>{articulo.precioVenta}</td>
-                            <td>
-                                <Link to={"/panel-usuario/articulos/save/" + articulo.id} className="btn btn-warning me-2">
-                                    Editar
-                                </Link>
-                                <Button variant="danger" onClick={() => handleDelete(articulo.id)}>
-                                    Eliminar
-                                </Button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </Table> */}
+
+            {/*filtro de categoria*/}
+                <div className="d-flex gap-3 mb-3">
+                    <Modal show={showFilterModal} onHide={handleCloseFilterModal}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>Filtrar por Categoría</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <div>{renderCategorias()}</div>
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={handleCloseFilterModal}>
+                                Cancelar
+                            </Button>
+                            <Button variant="primary" onClick={handleFiltrarPorCategoria}>
+                                Filtrar
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
+                </div>
+            {/* Buscador */}
+                <div className="d-flex gap-3 mb-3">
+                    <Form.Control
+                        type="text"
+                        placeholder="Buscar articulo..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="mb-3"
+                    />
+                    <Button variant="info" style={{ width: 40, height: 40, display: 'flex', justifyContent: 'center', alignItems: 'center' }} onClick={handleShowFilterModal}>
+                        <img src="/src/assets/filter.svg" alt="Filtrar" style={{ width: 20, height: 20 }} />
+                    </Button>
+
+                </div>
+                    {categoriaSeleccionada && (
+                    <div
+                        style={{
+                            marginLeft: "10px",
+                            marginRight: "0",
+                            cursor: "pointer",
+                            display: 'flex',
+                            backgroundColor: '#6c757d',
+                            color: 'white',
+                            borderRadius: '50px',
+                            padding: '0.25rem 0.5rem',
+                            whiteSpace: 'nowrap',
+                            maxWidth: 'fit-content',
+                        }}
+                        onClick={limpiarFiltro}
+                    >
+                        {categoriaSeleccionada.denominacion} ✖
+                    </div>
+                )}
+
+            <GrillaGenerica data={paginatedManufacturados} propertiesToShow={["imagenes","denominacion","descripcion","precioVenta"]} editItem={`/panel-usuario/articulos/save/`} deleteFunction={handleDelete}></GrillaGenerica>
+
+            {/* Confirmation Modal */}
+                {showDeleteConfirmation && manufacturadoToDelete && (
+                    <div className="modal show" style={{ display: 'block', position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+                        <div className="modal-dialog">
+                            <div className="modal-content">
+                                <div className="modal-header">                                                             <h5 className="modal-title">Confirmar Eliminación</h5>
+                                    <button type="button" className="btn-close" onClick={cancelDelete}></button>
+                                </div>
+                                <div className="modal-body">
+                                    ¿Está seguro de que desea eliminar el insumo <strong>{manufacturadoToDelete.denominacion}</strong>?
+                                </div>
+                                <div className="modal-footer">
+                                    <Button variant="secondary" onClick={cancelDelete}>Cancelar</Button>
+                                    <Button variant="danger" onClick={confirmDelete}>Eliminar</Button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+            {/* Controles de paginación */}
+                {filteredManufacturados.length > itemsPerPage && (
+                    <div className="pagination d-flex justify-content-between align-items-center mt-3">
+                        <Button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+                            Anterior
+                        </Button>
+                            <span>{`Página ${currentPage} de ${Math.ceil(filteredManufacturados.length / itemsPerPage)}`}</span>
+                        <Button
+                            onClick={() => handlePageChange(currentPage + 1)}
+                            disabled={currentPage === Math.ceil(filteredManufacturados.length / itemsPerPage)}
+                            >
+                                Siguiente
+                            </Button>
+                    </div>
+                )}
         </Container>
     );
-    
 }

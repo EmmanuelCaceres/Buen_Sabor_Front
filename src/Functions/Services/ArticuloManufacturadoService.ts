@@ -27,12 +27,12 @@ export default class ArticuloManufacturadoService extends GenericFetch<IArticulo
             return data || [];
     }
 
-    async getPaginatedInsumos(): Promise<IPaginatedResponse<IArticuloManufacturado> | null> {
+    async getPaginatedManufacturados(): Promise<IPaginatedResponse<IArticuloManufacturado> | null> {
         try {
             const result = await this.getAll(true) as IPaginatedResponse<IArticuloManufacturado>;
             return result;
         } catch (error) {
-            console.error("Error fetching paginated insumos:", error);
+            console.error("Error fetching paginated manufacturados:", error);
             return null;
         }
     }
