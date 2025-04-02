@@ -29,6 +29,9 @@ export default function SaveArticulo() {
     const [sucursalesSeleccionadas, setSucursalesSeleccionadas] = useState<number[]>([]);
     const [sucursales, setSucursales] = useState<{ id: number, nombre: string }[]>([]);
     const [show, setShow] = useState(false);
+    const [, setCantidades] = useState<{ [key: number]: number }>({});
+
+
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
     
@@ -203,14 +206,14 @@ export default function SaveArticulo() {
         if (existeInsumo) {
             alert("El insumo ya existe en el arreglo");
         } else {
-            const nuevoDetalle: IArticuloManufacturadoDetalles = {
-                id: 0,
-                cantidad: 0,
-                articulo: insumo
-            };
+            // const nuevoDetalle: IArticuloManufacturadoDetalles = {
+            //     id: 0,
+            //     cantidad: 0,
+            //     articulo: insumo
+            // };
             setArticulosManufacturado(prevState => ({
                 ...prevState,
-                articuloManufacturadoDetalles: [...prevState.articuloManufacturadoDetalles, nuevoDetalle]
+                articuloManufacturadoDetalles: [...prevState.articuloManufacturadoDetalles, { id: Date.now(), articulo: insumo, cantidad: 1 }]
             }));
         }
     };
@@ -400,15 +403,10 @@ export default function SaveArticulo() {
 
     const handleCantidadChange = (id: number, nuevaCantidad: number) => {
         setArticulosManufacturado(prevState => {
-            // Crear una copia nueva solo si hay cambios
-            const nuevosDetalles = prevState.articuloManufacturadoDetalles.map(detalle =>
-                detalle.id === id && detalle.cantidad !== nuevaCantidad
-                    ? { ...detalle, cantidad: nuevaCantidad }
-                    : detalle
+            // Clonar el array para asegurarnos de no mutar el estado anterior
+            const nuevosDetalles = prevState.articuloManufacturadoDetalles.map(detalle => 
+                detalle.id === id ? { ...detalle, cantidad: nuevaCantidad } : detalle
             );
-    
-            // Si los detalles no cambiaron, devolver el mismo estado para evitar renders innecesarios
-            if (nuevosDetalles === prevState.articuloManufacturadoDetalles) return prevState;
     
             return {
                 ...prevState,
@@ -416,6 +414,34 @@ export default function SaveArticulo() {
             };
         });
     };
+    
+
+    // const handleInputChange = (id: number, nuevaCantidad: number) => {
+    //     setCantidades(prev => ({
+    //         ...prev,
+    //         [id]: nuevaCantidad // Solo cambia la cantidad del detalle específico
+    //     }));
+    // };
+    
+
+    // const handleBlur = (id: number) => {
+    //     setArticulosManufacturado(prevState => ({
+    //         ...prevState,
+    //         articuloManufacturadoDetalles: prevState.articuloManufacturadoDetalles.map(detalle =>
+    //             detalle.id === id ? { ...detalle, cantidad: cantidades[id] } : detalle
+    //         )
+    //     }));
+    // };
+    
+    
+    useEffect(() => {
+        const cantidadesIniciales: { [key: number]: number } = {};
+        articuloManufacturado.articuloManufacturadoDetalles.forEach(detalle => {
+            cantidadesIniciales[detalle.id] = detalle.cantidad;
+        });
+        setCantidades(cantidadesIniciales);
+    }, [articuloManufacturado.articuloManufacturadoDetalles]);
+    
     
 
     return (
@@ -507,6 +533,7 @@ export default function SaveArticulo() {
                         <tr>
                             <th>Denominación</th>
                             <th>Cantidad</th>
+                            <th>Unidad de medida</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -526,6 +553,10 @@ export default function SaveArticulo() {
                                             value={detalle.cantidad} 
                                             onChange={e => handleCantidadChange(detalle.id, Number(e.target.value))} 
                                         />
+
+                                    </td>
+                                    <td>
+                                        <p>{articuloInsumo ? articuloInsumo.unidadMedida.denominacion : 'N/A'}</p>
                                     </td>
                                     <td>
                                         <button style={{ marginBottom: 10 }} className="btn btn-danger" onClick={() => deleteInsumo(articuloInsumo)}>Eliminar</button>
@@ -549,13 +580,6 @@ export default function SaveArticulo() {
                 </Modal.Header>
                 <Modal.Body style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                     <div className="d-flex justify-content-between">
-                    {/* <Form.Control
-                            type="text"
-                            placeholder="Buscar insumo..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="mb-3"
-                        /> */}
                         <input className="ms-1" type="text" value={inputValue} onChange={(e) => setInputValue(e.target.value)} />
                         <Button variant="primary" onClick={buscarInsumoXDenominacion}>Mostrar ingredientes</Button>
                     </div>
