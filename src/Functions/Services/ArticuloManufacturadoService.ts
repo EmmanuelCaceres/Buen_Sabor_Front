@@ -46,20 +46,19 @@ export default class ArticuloManufacturadoService extends GenericFetch<IArticulo
                 const data: IArticuloManufacturado = await response.json();
                 return data;
             } catch (error) {
-                console.error(`Error fetching insumo by ID ${id}:`, error);
+                console.error(`Error fetching articulo by ID ${id}:`, error);
                 return null;
             }
         }
     
-        async deleteInsumo(id: number): Promise<void> {
-            const response = await fetch(`${this.baseUrl}articulosInsumos/${id}`, {
-                method: 'DELETE',
-            });
+    async deleteInsumo(id: number): Promise<void> {
+        const response = await fetch(`${this.baseUrl}articulosManufacturados/${id}`, {
+            method: 'DELETE',
+        });
         
-            if (!response.ok) {
-                const errorData = await response.json(); // Try to get error details from the server
-                throw new Error(`Error deleting insumo: ${response.status} - ${errorData?.message || response.statusText}`);
-            }
+        if (!response.ok) {
+            const errorData = await response.json(); // Try to get error details from the server
+            throw new Error(`Error deleting articulo: ${response.status} - ${errorData?.message || response.statusText}`);
         }
-
+    }
 }

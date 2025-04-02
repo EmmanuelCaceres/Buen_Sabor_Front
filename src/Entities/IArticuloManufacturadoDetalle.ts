@@ -4,5 +4,5 @@ import IArticuloInsumo from "./IArticuloInsumo"
 export default interface IArticuloManufacturadoDetalles{
     id:number;
     cantidad:number;
-    articuloInsumo:IArticuloInsumo;
+    articulo:IArticuloInsumo;
 }

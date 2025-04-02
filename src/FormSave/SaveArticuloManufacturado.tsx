@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams,useNavigate } from "react-router-dom"
 import { Link } from "react-router-dom";
 import Button from 'react-bootstrap/Button';
@@ -27,9 +27,11 @@ export default function SaveArticulo() {
     const [categoria, setCategoria] = useState<ICategoria[]>([])
     const [unidadMedida, setUnidadMedida] = useState<IUnidadMedida[]>([]);
     const [sucursalesSeleccionadas, setSucursalesSeleccionadas] = useState<number[]>([]);
+    const [sucursales, setSucursales] = useState<{ id: number, nombre: string }[]>([]);
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
+    
 
     const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -37,8 +39,7 @@ export default function SaveArticulo() {
         if (!file) {
             console.log("No file selected");
             return;
-        }
-    
+        } 
         // Mostrar la nueva imagen en una etiqueta img
         const imageUrl = URL.createObjectURL(file);
         setSelectedImage(imageUrl);  // Establece la imagen seleccionada
@@ -123,17 +124,17 @@ export default function SaveArticulo() {
 
     useEffect(() => {
         if (Number(id) !== 0) {
-            getArticuloManufacturado(`${apiUrl}articulosManufacturados`, Number(id)).then(() => {
-                if (articuloManufacturado.sucursal && articuloManufacturado.sucursal.id) {
-                    setSucursalesSeleccionadas([articuloManufacturado.sucursal.id]); // Marcar la sucursal asociada
-                }
-            });
+            getArticuloManufacturado(`${apiUrl}articulosManufacturados`, Number(id));
         }
+    }, [id, apiUrl]);  // Solo depende de 'id' y 'apiUrl', no de 'articuloManufacturado'
+    
+    useEffect(() => {
         if (articuloManufacturado.imagenes.length > 0) {
             const firstImageUrl = articuloManufacturado.imagenes[0].url;
-            setSelectedImage(firstImageUrl); // Establece la imagen inicial desde los datos
+            setSelectedImage(firstImageUrl);
         }
-    }, [articuloManufacturado.imagenes]);
+    }, [articuloManufacturado.imagenes]);  // Solo actualiza cuando cambia 'imagenes'
+    
 
     const getArticuloManufacturado = async (baseUrl: string, id: number) => {
         const result = new ArticuloManufacturadoService(baseUrl);
@@ -152,8 +153,13 @@ export default function SaveArticulo() {
     }
 
     const buscarInsumoXDenominacion = async () => {
-        const result = new ArticuloInsumoService(`${apiUrl}articulosInsumos/search?denominacion=`);
+        const result = new  ArticuloInsumoService(`${apiUrl}articulosInsumos/filtrar/2?nombre=`);
+        
+
         const insumosResult = await result.buscarInsumoXDenominacion(inputValue);
+        console.log("Valor de inputValue:", inputValue);
+
+        console.log(`DATAA: ${JSON.stringify(insumosResult, null, 2)}`);
         if (insumosResult) {
             setInsumos(insumosResult);
         } else {
@@ -161,17 +167,17 @@ export default function SaveArticulo() {
         }
 
     }
-    const obtenerCategorias = async () => {
+    const obtenerCategorias = useCallback(async () => {
             try {
                 const result = new ArticuloManufacturadoService(apiUrl);
                 const data = await result.getCategorias();
-                setCategoria(data.filter((categoria: ICategoria) => categoria.esInsumo) || []);
+                setCategoria(data.filter((categoria: ICategoria) => !categoria.esInsumo) || []);
             } catch (error) {
                 console.error("Error al obtener categorías:", error);
             }
-    };
+    },[apiUrl]);
 
-    const getAllUnidad = async () => {
+    const getAllUnidad = useCallback(async () => {
             try {
                 const result = new UnidadMedidaService(`${apiUrl}unidadesMedidas`);
                 const unidadMedidaResult = await result.getAll(); // Llama al método genérico
@@ -190,17 +196,17 @@ export default function SaveArticulo() {
                 console.error("Error fetching unidad de medida:", error);
                 setUnidadMedida([]); // Maneja errores y asegura un estado consistente
             }
-    };
+    },[apiUrl]);
 
     const agregarInsumo = (insumo: IArticuloInsumo) => {
-        const existeInsumo = articuloManufacturado.articuloManufacturadoDetalles.find((insumoDetalle) => insumoDetalle.articuloInsumo.id === insumo.id)
+        const existeInsumo = articuloManufacturado.articuloManufacturadoDetalles.find((insumoDetalle) => insumoDetalle.articulo.id === insumo.id)
         if (existeInsumo) {
             alert("El insumo ya existe en el arreglo");
         } else {
             const nuevoDetalle: IArticuloManufacturadoDetalles = {
                 id: 0,
                 cantidad: 0,
-                articuloInsumo: insumo
+                articulo: insumo
             };
             setArticulosManufacturado(prevState => ({
                 ...prevState,
@@ -214,7 +220,7 @@ export default function SaveArticulo() {
     const deleteInsumo = async (articuloInsumo: IArticuloInsumo) => {
         let articuloInsumoFilter: IArticuloManufacturadoDetalles[] = [];
         if (articuloManufacturado.articuloManufacturadoDetalles) {
-            articuloInsumoFilter = articuloManufacturado.articuloManufacturadoDetalles.filter(detalle => detalle.articuloInsumo.id !== articuloInsumo.id);
+            articuloInsumoFilter = articuloManufacturado.articuloManufacturadoDetalles.filter(detalle => detalle.articulo.id !== articuloInsumo.id);
         }
         setArticulosManufacturado(prevState => ({ ...prevState, articuloManufacturadoDetalles: articuloInsumoFilter }));
     }
@@ -239,6 +245,16 @@ export default function SaveArticulo() {
             }));
         }
     }
+
+    const handleSucursalChange = (sucursalId: number) => {
+        setSucursalesSeleccionadas(prevState => {
+            if (prevState.includes(sucursalId)) {
+                return prevState.filter(id => id !== sucursalId); // Desmarcar
+            } else {
+                return [...prevState, sucursalId]; // Marcar
+            }
+        });
+    };
 
     const validarFormulario = (): boolean => {
         if (!articuloManufacturado.denominacion.trim()) {
@@ -266,98 +282,116 @@ export default function SaveArticulo() {
         }
 
     const saveArticulo = async () => {
-    
-            if (!validarFormulario()) {
-                return; // Detiene el proceso si la validación falla
-            }
-            
-            //console.log("Sucursales seleccionadas al guardar:", sucursalesSeleccionadas);  // Log para ver las sucursales seleccionadas al guardar
-            if (Number(id) === 0 && sucursalesSeleccionadas.length === 0) {
-                alert("Debe seleccionar al menos una sucursal.");
+        if (!validarFormulario()) {
+            return; // Detiene el proceso si la validación falla
+        }
+
+        console.log("Sucursales seleccionadas al guardar:", sucursalesSeleccionadas);
+        if (Number(id) === 0 && sucursalesSeleccionadas.length === 0) {
+            alert("Debe seleccionar al menos una sucursal.");
+            return;
+        }
+
+        // Verificar si hay una nueva imagen diferente
+        const currentImageUrl = articuloManufacturado.imagenes.length > 0 ? articuloManufacturado.imagenes[0].url : null;
+        const isNewImage = selectedImage && selectedImage !== currentImageUrl;
+
+        // Eliminar imagen anterior solo si hay una nueva diferente
+        if (isNewImage && currentImageUrl) {
+            const publicIdToDelete = currentImageUrl.split('/')[6].split('.')[0];
+            try {
+                const resultDelete = new ImagenArticuloService(`${apiUrl}images`);
+                await resultDelete.deleteImagen(publicIdToDelete, articuloManufacturado.imagenes[0].id);
+                console.log("Imagen anterior eliminada correctamente");
+            } catch (error) {
+                console.error("Error al eliminar la imagen anterior:", error);
+                alert("Error al eliminar la imagen anterior. El artículo no será guardado.");
                 return;
             }
-        
-            // Eliminar imagen anterior si existe
-            if (articuloManufacturado.imagenes.length > 0) {
-                const imageUrl = articuloManufacturado.imagenes[0].url;
-                const publicIdToDelete = imageUrl.split('/')[6].split('.')[0];
-                try {
-                    const resultDelete = new ImagenArticuloService(`${apiUrl}images`);
-                    await resultDelete.deleteImagen(publicIdToDelete, articuloManufacturado.imagenes[0].id);
-                    console.log("Imagen anterior eliminada correctamente");
-                } catch (error) {
-                    console.error("Error al eliminar la imagen anterior:", error);
-                    alert("Error al eliminar la imagen anterior. El artículo no será guardado.");
-                    return;
-                }
-            }
-        
-            // Subir nueva imagen si está seleccionada
-            if (selectedImage) {
-                try {
-                    const blob = await fetch(selectedImage).then((res) => res.blob());
-                    const file = new File([blob], "imagen.jpg", { type: "image/jpeg" });
-                    const formData = new FormData();
-                    formData.append("upload", file);
-                    const result = new ImagenArticuloService(`${apiUrl}images/uploads`);
-                    const uploadedImage = await result.postImagen(formData);
-                    if (uploadedImage && uploadedImage.id) {
-                        articuloManufacturado.imagenes = [{
-                            id: uploadedImage.id,
-                            url: uploadedImage.url,
-                        }];
-                        console.log("Imagen subida correctamente:", uploadedImage);
-                    } else {
-                        console.error("Error en la subida de imagen: No se recibió ID válido.");
-                        return;
-                    }
-                } catch (error) {
-                    console.error("Error al subir la imagen:", error);
-                    alert("Error al subir la nueva imagen. El artículo no será guardado.");
-                    return;
-                }
-            }
-        
-            // Verificar datos del artículo con sucursales asociadas
-            console.log("Datos finales del artículo a guardar:", JSON.stringify(articuloManufacturado, null, 2));
-        
-            // Guardar el artículo en el backend
+        }
+
+        // Subir nueva imagen si está seleccionada y es diferente de la actual
+        if (isNewImage) {
             try {
-                const articuloService = new ArticuloManufacturadoService(`${apiUrl}articulosInsumos`);
-    
-                if (Number(id) !== 0) {
-                    console.log("Actualizando artículo existente...");
-                    await articuloService.put(Number(id), articuloManufacturado);
+                const blob = await fetch(selectedImage).then((res) => res.blob());
+                const file = new File([blob], "imagen.jpg", { type: "image/jpeg" });
+                const formData = new FormData();
+                formData.append("upload", file);
+                const result = new ImagenArticuloService(`${apiUrl}images/uploads`);
+                const uploadedImage = await result.postImagen(formData);
+                if (uploadedImage && uploadedImage.id) {
+                    articuloManufacturado.imagenes = [{
+                        id: uploadedImage.id,
+                        url: uploadedImage.url,
+                    }];
+                    console.log("Imagen subida correctamente:", uploadedImage);
                 } else {
-                    console.log("Creando nuevo artículo...");
-                    for (const sucursalId of sucursalesSeleccionadas) {
-                        const sucursal = await obtenerSucursalPorId(sucursalId);
-                        const articuloConSucursal = {
-                            ...articuloManufacturado,
-                            sucursal: {
-                                ...sucursal,
-                                id: sucursalId,
-                            },
-                        };
-                        console.log("Artículo con sucursal antes de guardar:", articuloConSucursal);
-                        await articuloService.post(articuloConSucursal);
-                    }
-                }            
-    
-                alert("Insumo guardado con éxito!");
-                navigate(-1);
+                    console.error("Error en la subida de imagen: No se recibió ID válido.");
+                    return;
+                }
             } catch (error) {
-                console.error("Error al guardar el artículo:", error);
-                alert("Error al guardar el artículo.");
+                console.error("Error al subir la imagen:", error);
+                alert("Error al subir la nueva imagen. El artículo no será guardado.");
+                return;
             }
-        };
+        } else {
+            console.log("La imagen no ha cambiado, no se subirá nuevamente.");
+        }
+
+        // Verificar datos del artículo con sucursales asociadas
+        console.log("Datos finales del artículo a guardar:", JSON.stringify(articuloManufacturado, null, 2));
+
+        // Guardar el artículo en el backend
+        try {
+            const articuloService = new ArticuloManufacturadoService(`${apiUrl}articulosManufacturados`);
+
+            if (Number(id) !== 0) {
+                console.log("Actualizando artículo existente...");
+                await articuloService.put(Number(id), articuloManufacturado);
+            } else {
+                console.log("Creando nuevo artículo...");
+                for (const sucursalId of sucursalesSeleccionadas) {
+                    const sucursal = await obtenerSucursalPorId(sucursalId);
+                    const articuloConSucursal = {
+                        ...articuloManufacturado,
+                        sucursal: {
+                            ...sucursal,
+                            id: sucursalId,
+                        },
+                    };
+                    console.log("Artículo con sucursal antes de guardar:", articuloConSucursal);
+                    await articuloService.post(articuloConSucursal);
+                }
+            }            
+
+            alert("Articulo guardado con éxito!");
+            navigate(-1);
+        } catch (error) {
+            console.error("Error al guardar el artículo:", error);
+            alert("Error al guardar el artículo.");
+        }
+    };
+
+    const getAllSucursales = useCallback(async () => {
+            try {
+                const result = await fetch(`${apiUrl}sucursales`);
+            
+                const text = await result.text(); // Obtén el contenido como texto primero            
+                const data = JSON.parse(text); // Intenta convertirlo en JSON
+                setSucursales(data);
+            } catch (error) {
+                console.error("Error al obtener las sucursales:", error);
+            }
+    }, [apiUrl]);
 
     useEffect(() => {
         obtenerCategorias()
         getAllUnidad()
-    }, ([]))
+        getAllSucursales();
+    }, ([obtenerCategorias, getAllUnidad,getAllSucursales]))
 
     useEffect(() => {
+        //console.log('useEffect ejecutado para articuloManufacturado:', articuloManufacturado);
         if (articuloManufacturado.imagenes.length > 0) {
             const firstImageUrl = articuloManufacturado.imagenes[0].url;
             setSelectedImage(firstImageUrl);
@@ -365,13 +399,24 @@ export default function SaveArticulo() {
     }, [articuloManufacturado]); 
 
     const handleCantidadChange = (id: number, nuevaCantidad: number) => {
-        setArticulosManufacturado(prevState => ({
-            ...prevState,
-            articuloManufacturadoDetalles: prevState.articuloManufacturadoDetalles.map(detalle =>
-                detalle.id === id ? { ...detalle, cantidad: nuevaCantidad } : detalle
-            )
-        }));
+        setArticulosManufacturado(prevState => {
+            // Crear una copia nueva solo si hay cambios
+            const nuevosDetalles = prevState.articuloManufacturadoDetalles.map(detalle =>
+                detalle.id === id && detalle.cantidad !== nuevaCantidad
+                    ? { ...detalle, cantidad: nuevaCantidad }
+                    : detalle
+            );
+    
+            // Si los detalles no cambiaron, devolver el mismo estado para evitar renders innecesarios
+            if (nuevosDetalles === prevState.articuloManufacturadoDetalles) return prevState;
+    
+            return {
+                ...prevState,
+                articuloManufacturadoDetalles: nuevosDetalles
+            };
+        });
     };
+    
 
     return (
         <div className="container">
@@ -430,21 +475,50 @@ export default function SaveArticulo() {
                         Añadir Ingrediente
                     </Button>
                 </div>
+                <div>
+                    {/* Título dinámico */}
+                    <label>
+                        {Number(id) === 0 
+                            ? "Sucursales" 
+                            : `Sucursal: ${
+                                sucursales.find(sucursal => sucursal.id === articuloManufacturado.sucursal.id)?.nombre || 'N/A'
+                            }`
+                        }
+                    </label>
+                    <div>
+                        {/* Mostrar checkboxes solo si id === 0 */}
+                        {Number(id) === 0 && sucursales.map(sucursal => (
+                            <label key={sucursal.id}>
+                                <input 
+                                    type="checkbox" 
+                                    value={sucursal.id}
+                                    checked={sucursalesSeleccionadas.includes(sucursal.id)} 
+                                    onChange={() => handleSucursalChange(sucursal.id)}
+                                />
+                                {sucursal.nombre}
+                            </label>
+                        ))}
+                    </div>
+                </div>
+
                 {articuloManufacturado.articuloManufacturadoDetalles && articuloManufacturado.articuloManufacturadoDetalles.length > 0 && (
                     <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                        <thead>
-                            <tr>
-                                <th>Denominación</th>
-                                <th>Cantidad</th>
-                                <th>Precio de Venta</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {articuloManufacturado.articuloManufacturadoDetalles.map((detalle) => (
+                    <thead>
+                        <tr>
+                            <th>Denominación</th>
+                            <th>Cantidad</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {articuloManufacturado.articuloManufacturadoDetalles.map((detalle) => {
+                            // Asegúrate de que 'articuloInsumo' tiene datos
+                            const articuloInsumo = detalle.articulo;
+                
+                            return (
                                 <tr key={detalle.id}>
                                     <td>
-                                        <p>{detalle.articuloInsumo?.denominacion}</p>
+                                        <p>{articuloInsumo ? articuloInsumo.denominacion : 'N/A'}</p>
                                     </td>
                                     <td>
                                         <input 
@@ -454,15 +528,16 @@ export default function SaveArticulo() {
                                         />
                                     </td>
                                     <td>
-                                        <p>{detalle.articuloInsumo?.precioVenta}</p>
-                                    </td>
-                                    <td>
-                                        <button style={{ marginBottom: 10 }} className="btn btn-danger" onClick={() => deleteInsumo(detalle.articuloInsumo)}>Eliminar</button>
+                                        <button style={{ marginBottom: 10 }} className="btn btn-danger" onClick={() => deleteInsumo(articuloInsumo)}>Eliminar</button>
                                     </td>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            );
+                        })}
+                    </tbody>
+                </table>
+                
+                
+                                
                 )}
             </form>
 
@@ -474,6 +549,13 @@ export default function SaveArticulo() {
                 </Modal.Header>
                 <Modal.Body style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                     <div className="d-flex justify-content-between">
+                    {/* <Form.Control
+                            type="text"
+                            placeholder="Buscar insumo..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="mb-3"
+                        /> */}
                         <input className="ms-1" type="text" value={inputValue} onChange={(e) => setInputValue(e.target.value)} />
                         <Button variant="primary" onClick={buscarInsumoXDenominacion}>Mostrar ingredientes</Button>
                     </div>

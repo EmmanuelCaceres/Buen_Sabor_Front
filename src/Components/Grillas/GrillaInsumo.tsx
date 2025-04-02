@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import ArticuloInsumoService from "../../Functions/Services/ArticuloInsumoService";
 import masObject from "../../assets/circle-plus-svgrepo-com.svg";
@@ -22,7 +22,7 @@ export default function GrillaInsumo() {
     const itemsPerPage = 15; // Número de elementos por página
 
     // Función para obtener categorías
-    const obtenerCategorias = async () => {
+    const obtenerCategorias = useCallback(async () => {
         try {
             const result = new ArticuloInsumoService(apiUrl);
             const data = await result.getCategorias();
@@ -32,11 +32,11 @@ export default function GrillaInsumo() {
         } catch (error) {
             console.error("Error al obtener categorías:", error);
         }
-    };
+    },[apiUrl]);
     
 
     // Función para cargar todos los datos en un solo array
-    const cargarTodosLosDatos = async (idSucursal: number) => {
+    const cargarTodosLosDatos = useCallback(async (idSucursal: number) => {
         const allData: IArticuloInsumo[] = [];
         let page = 0;
 
@@ -65,12 +65,12 @@ export default function GrillaInsumo() {
         } catch (error) {
             console.error("Error al cargar todos los datos:", error);
         }
-    };
+    },[apiUrl]);
 
     useEffect(() => {
         // obtenerSucursales();
         obtenerCategorias();
-    }, []);
+    }, [obtenerCategorias]);
 
     useEffect(() => {
         if (categoriaSeleccionada !== null) {
@@ -84,7 +84,7 @@ export default function GrillaInsumo() {
             setCurrentPage(1); // Reinicia la página al cambiar de sucursal
             
         }
-    }, [sucursalSeleccionada]);
+    }, [sucursalSeleccionada, cargarTodosLosDatos]);
 
     // const getStockColor = (stock: number, min: number, max: number) => {
     //     if (stock <= min) return "#ff4d4d"; // Rojo
@@ -121,7 +121,6 @@ export default function GrillaInsumo() {
     const handleShowFilterModal = () => setShowFilterModal(true);
 
     const filteredInsumos = allArticulosInsumos.filter((insumo) => {
-        console.log(`insumo:`, JSON.stringify(insumo, null, 2));
         // Verificar si la categoría seleccionada es válida
         const categoriaSeleccionadaObj = categorias.find(categoria => categoria.id === categoriaSeleccionada?.id);
     

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
 import ArticuloManufacturadoService from '../../Functions/Services/ArticuloManufacturadoService';
 import IArticuloManufacturado from '../../Entities/IArticuloManufacturado';
@@ -23,10 +23,10 @@ export default function GrillaArticulo() {
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     const itemsPerPage = 10 // Número de elementos por página
 
-    const cargarTodosLosDatos = async (idSucursal: number) => {
+    const cargarTodosLosDatos = useCallback(async (idSucursal: number) => {
         const allData: IArticuloManufacturado[] = [];
         let page = 0;
-
+    
         try {
             let hasMoreData = true;
             while (hasMoreData) {
@@ -34,10 +34,10 @@ export default function GrillaArticulo() {
                     `${apiUrl}articulosManufacturados/porSucursal/${idSucursal}?page=${page}&size=20`
                 );
                 const data = await result.getPaginatedManufacturados();
-
+    
                 if (data && data.content) {
                     allData.push(...data.content);
-
+    
                     if (data.last) {
                         hasMoreData = false;
                     } else {
@@ -52,27 +52,35 @@ export default function GrillaArticulo() {
         } catch (error) {
             console.error("Error al cargar todos los datos:", error);
         }
-    };
+    }, [apiUrl]); // `apiUrl` es una dependencia que puede cambiar
+    
+    useEffect(() => {
+        if (sucursalSeleccionada) {
+            cargarTodosLosDatos(sucursalSeleccionada);
+            setCurrentPage(1);
+        }
+    }, [sucursalSeleccionada, cargarTodosLosDatos]);
+    
 
     // Función para obtener categorías
-    const obtenerCategorias = async () => {
+    const obtenerCategorias = useCallback(async () => {
         try {
             const result = new ArticuloManufacturadoService(apiUrl);
             const data = await result.getCategorias();
-        
-            // Filtrar las categorías que son no insumos
+    
+            // Filtrar las categorías que no son insumos
             setCategorias(data.filter((categoria: ICategoria) => !categoria.esInsumo));
         } catch (error) {
             console.error("Error al obtener categorías:", error);
         }
-    };
+    }, [apiUrl]);
 
     const limpiarFiltro = () => {
         setCategoriaSeleccionada(null);
     };
 
     const filteredManufacturados = articulosManufacturados.filter((manufacturado) => {
-        console.log(`insumo:`, JSON.stringify(manufacturado, null, 2));
+        //console.log(`insumo:`, JSON.stringify(manufacturado, null, 2));
         // Verificar si la categoría seleccionada es válida
         const categoriaSeleccionadaObj = categorias.find(categoria => categoria.id === categoriaSeleccionada?.id);
     
@@ -164,7 +172,7 @@ export default function GrillaArticulo() {
             cargarTodosLosDatos(sucursalSeleccionada);
             setCurrentPage(1); // Reinicia la página al cambiar de sucursal
         }
-    }, [sucursalSeleccionada]);
+    }, [sucursalSeleccionada, cargarTodosLosDatos]);
 
     useEffect(() => {
         if (categoriaSeleccionada !== null) {
@@ -175,7 +183,7 @@ export default function GrillaArticulo() {
     useEffect(() => {
         // obtenerSucursales();
         obtenerCategorias();
-    }, []);
+    }, [obtenerCategorias]);
 
     const handlePageChange = (newPage: number) => {
         if (newPage > 0 && newPage <= Math.ceil(filteredManufacturados.length / itemsPerPage)) {

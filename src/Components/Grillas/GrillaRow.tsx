@@ -1,7 +1,8 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { ButtonEdit } from "../../Components";
 import './GrillaRow.css'
 import { Modal } from "../../Components";
-import { ModalContext, useModalContext } from "../Modal/context/ModalContext";
+import { useModalContext } from "../Modal/context/ModalContext";
 import { useDiccionario } from "../../Hooks/useDiccionario";
 // import { formatValue } from "../../Hooks/useFormatData";
 
@@ -68,12 +69,18 @@ export default function GrillaRow<T extends { id: number }>({
             <tr>
                 {propertiesToShow.map((property, index) => {
                     const value = data[property];
-                    console.log('Property:', property); // Esto mostrará el nombre de la propiedad.
-                    console.log('Value:', value); // Esto mostrará el valor de la propiedad.
+                    //console.log('Property:', property); // Esto mostrará el nombre de la propiedad.
+                    //console.log('Value:', value); // Esto mostrará el valor de la propiedad.
                     return (
                         <td key={index}>
                             {property === "imagenes" && Array.isArray(value) && value.length > 0 ? (
-                                <img src={value[0].url} alt="Imagen" width="50" height="50" />
+                                <img 
+                                src={value[0].url} 
+                                alt="Imagen" 
+                                width="50" 
+                                height="50" 
+                                style={{ objectFit: "contain", display: "block" }} 
+                            />
                             ) : (
                                 // Muestra un valor formateado para objetos o arrays
                                 formatValue(value)
