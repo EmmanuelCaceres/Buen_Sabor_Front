@@ -7,7 +7,7 @@ export default interface ISucursalDto{
     horarioApertura:string;
     horarioCierre: string;
     baja: boolean;
-    casaMatriz: boolean,
+    esCasaMatriz: boolean,
     domicilio:IDomicilio
     empresa:IEmpresa
 }

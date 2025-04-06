@@ -6,12 +6,14 @@ import masObject from '../../assets/circle-plus-svgrepo-com.svg';
 import { Container, Row, Col, Form, Button, Modal } from 'react-bootstrap';
 import GrillaGenerica from './GrillaGenerica';
 import ICategoria from '../../Entities/ICategoria';
+import { useSucursal } from '../../context/SucursalContext';
+
 
 export default function GrillaArticulo() {
 
     const apiUrl = import.meta.env.VITE_URL_API_BACK
 
-    const [sucursalSeleccionada] = useState<number | null>(2);
+    const { sucursalId } = useSucursal();
     const [searchTerm, setSearchTerm] = useState("");
     const [articulosManufacturados, setArticulosManufacturados] = useState<IArticuloManufacturado[]>([]);
     const [categorias, setCategorias] = useState<ICategoria[]>([]);
@@ -55,11 +57,11 @@ export default function GrillaArticulo() {
     }, [apiUrl]); // `apiUrl` es una dependencia que puede cambiar
     
     useEffect(() => {
-        if (sucursalSeleccionada) {
-            cargarTodosLosDatos(sucursalSeleccionada);
+        if (sucursalId) {
+            cargarTodosLosDatos(sucursalId);
             setCurrentPage(1);
         }
-    }, [sucursalSeleccionada, cargarTodosLosDatos]);
+    }, [sucursalId, cargarTodosLosDatos]);
     
 
     // Función para obtener categorías
@@ -168,11 +170,11 @@ export default function GrillaArticulo() {
 
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
-        if (sucursalSeleccionada) {
-            cargarTodosLosDatos(sucursalSeleccionada);
+        if (sucursalId) {
+            cargarTodosLosDatos(sucursalId);
             setCurrentPage(1); // Reinicia la página al cambiar de sucursal
         }
-    }, [sucursalSeleccionada, cargarTodosLosDatos]);
+    }, [sucursalId, cargarTodosLosDatos]);
 
     useEffect(() => {
         if (categoriaSeleccionada !== null) {

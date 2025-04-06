@@ -40,7 +40,6 @@ export class GenericFetch<T>{
     }
 
     public async put(id: number, data: T): Promise<T> {
-        console.log("ESTOY EN EL PUT!!!!!!!!!!!!!!");
         const response = await fetch(`${this.baseUrl}/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },

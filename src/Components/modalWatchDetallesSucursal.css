@@ -1,0 +1,84 @@
+.modalPropio {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* Cambiado de center a flex-start */
+  padding-top: 5vh; /* Espacio desde arriba */
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+
+
+.modalPropio.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modalPropio .container {
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  position: relative;
+  border: 2px solid red;
+  width: auto;
+  max-width: 90vw;
+  overflow-y: visible; /* ⬅️ Permití que crezca sin scroll */
+}
+
+
+.modalPropio-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  cursor: pointer;
+}
+
+h2 {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.sucursal-lista {
+  display: flex;
+  flex-direction: row;
+  gap: 1.5rem;
+  overflow-x: auto;
+  padding-bottom: 1rem;
+  flex-wrap: wrap;
+  max-height: calc(90vh - 100px); 
+  overflow-y: auto;
+}
+
+.tabla-sucursal {
+  max-width: 100%;
+  word-break: break-word;
+}
+
+.tabla-sucursal td {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+}
+
+.tabla-sucursal .label {
+  background-color: #f5f5f5;
+  font-weight: bold;
+  width: 180px;
+  white-space: nowrap;
+}
+
+.tabla-sucursal .value {
+  color: #555;
+}
+
+
+

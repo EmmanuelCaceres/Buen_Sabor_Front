@@ -30,8 +30,6 @@ export default function SaveArticulo() {
     const [sucursales, setSucursales] = useState<{ id: number, nombre: string }[]>([]);
     const [show, setShow] = useState(false);
     const [, setCantidades] = useState<{ [key: number]: number }>({});
-
-
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
     

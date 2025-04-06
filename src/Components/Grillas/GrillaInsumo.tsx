@@ -6,10 +6,12 @@ import IArticuloInsumo from "../../Entities/IArticuloInsumo";
 import { Button, Form, Modal} from "react-bootstrap";
 import ICategoria from "../../Entities/ICategoria";
 import GrillaGenerica from "./GrillaGenerica";
+import { useSucursal } from "../../context/SucursalContext";
+
 export default function GrillaInsumo() {
     const apiUrl = import.meta.env.VITE_URL_API_BACK;
 
-    const [sucursalSeleccionada] = useState<number | null>(2);
+    const { sucursalId } = useSucursal();
     const [allArticulosInsumos, setAllArticulosInsumos] = useState<IArticuloInsumo[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState("");
@@ -79,12 +81,12 @@ export default function GrillaInsumo() {
     }, [categoriaSeleccionada]);
 
     useEffect(() => {
-        if (sucursalSeleccionada) {
-            cargarTodosLosDatos(sucursalSeleccionada);
+        if (sucursalId) {
+            cargarTodosLosDatos(sucursalId);
             setCurrentPage(1); // Reinicia la página al cambiar de sucursal
             
         }
-    }, [sucursalSeleccionada, cargarTodosLosDatos]);
+    }, [sucursalId, cargarTodosLosDatos]);
 
     // const getStockColor = (stock: number, min: number, max: number) => {
     //     if (stock <= min) return "#ff4d4d"; // Rojo

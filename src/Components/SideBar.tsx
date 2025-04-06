@@ -22,9 +22,9 @@ export default function SideBar() {
                     </CNavItem>
 
                     <CNavItem>
-                        <Link to="/panel-usuario/empresas" className="nav-link">
+                        <Link to="/panel-usuario/sucursales" className="nav-link">
                             <CIcon customClassName="nav-icon" icon={cilBuilding} />
-                            Empresa
+                            Sucursales
                         </Link>
                     </CNavItem>
                     <CNavGroup
