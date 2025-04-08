@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams,useNavigate } from "react-router-dom"
 import { Link } from "react-router-dom";
 import IArticuloInsumo from "../Entities/IArticuloInsumo";
@@ -28,7 +28,7 @@ export default function SaveInsumo() {
     const [articuloInsumo, setArticulosInsumo] = useState<IArticuloInsumo>({
         id: Number(id),
         baja:false,
-        Denominación: '',
+        denominacion: '',
         sucursal: {
             id: 0,
             nombre: '',
@@ -73,11 +73,11 @@ export default function SaveInsumo() {
             id: 0,
             denominacion: '',
         },
-        Imagen: [],
+        imagenes: [],
         categoria: {
             id: 0,
             baja:false,
-            Denominación: '',
+            denominacion: '',
             subCategorias: [],
             articulos: [],
             esInsumo: false,
@@ -85,7 +85,7 @@ export default function SaveInsumo() {
             categoriaPadre: { // Inicialización correcta
                 id: 0,
                 baja:false,
-                Denominación: '',
+                denominacion: '',
                 subCategorias: [],
                 articulos: [],
                 esInsumo: false,
@@ -99,9 +99,6 @@ export default function SaveInsumo() {
         stockMinimo:0,
         esParaElaborar: true,
     });
-    
-    
-    
 
     const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -119,14 +116,11 @@ export default function SaveInsumo() {
     
 
     useEffect(() => {
-        if (articuloInsumo.Imagen.length > 0) {
-            const firstImageUrl = articuloInsumo.Imagen[0].url;
+        if (articuloInsumo.imagenes.length > 0) {
+            const firstImageUrl = articuloInsumo.imagenes[0].url;
             setSelectedImage(firstImageUrl); // Establece la imagen inicial desde los datos
         }
-    }, [articuloInsumo.Imagen]);
-
-    
-    
+    }, [articuloInsumo.imagenes]);
 
     const getArticuloInsumo = async (baseUrl: string, id: number) => {
         const result = new ArticuloInsumoService(baseUrl);
@@ -145,7 +139,7 @@ export default function SaveInsumo() {
     };
 
 
-    const obtenerCategorias = async () => {
+    const obtenerCategorias = useCallback( async () => {
             try {
                 const result = new ArticuloInsumoService(apiUrl);
                 const data = await result.getCategorias();
@@ -153,9 +147,9 @@ export default function SaveInsumo() {
             } catch (error) {
                 console.error("Error al obtener categorías:", error);
             }
-        };
+        },[apiUrl]);
     
-    const getAllUnidad = async () => {
+    const getAllUnidad = useCallback( async () => {
         try {
             const result = new UnidadMedidaService(`${apiUrl}unidadesMedidas`);
             const unidadMedidaResult = await result.getAll(); // Llama al método genérico
@@ -174,7 +168,7 @@ export default function SaveInsumo() {
             console.error("Error fetching unidad de medida:", error);
             setUnidadMedida([]); // Maneja errores y asegura un estado consistente
         }
-    };
+    },[apiUrl]);
 
     async function obtenerSucursalPorId(id: number): Promise<ISucursalDto> {
         const sucursalService = new SucursalService(`${apiUrl}sucursales`);
@@ -204,35 +198,41 @@ export default function SaveInsumo() {
         }
     };
 
-    const getAllSucursales = async () => {
+    const getAllSucursales = useCallback(async () => {
         try {
             const result = await fetch(`${apiUrl}sucursales`);
-            const data = await result.json();
+    
+            const text = await result.text(); // Obtén el contenido como texto primero
+    
+            const data = JSON.parse(text); // Intenta convertirlo en JSON
             setSucursales(data);
         } catch (error) {
             console.error("Error al obtener las sucursales:", error);
         }
-    };
+    }, [apiUrl]);
+    
+    
 
     const saveArticulo = async () => {
-
         if (!validarFormulario()) {
             return; // Detiene el proceso si la validación falla
         }
-        
-        console.log("Sucursales seleccionadas al guardar:", sucursalesSeleccionadas);  // Log para ver las sucursales seleccionadas al guardar
+    
         if (Number(id) === 0 && sucursalesSeleccionadas.length === 0) {
             alert("Debe seleccionar al menos una sucursal.");
             return;
         }
     
-        // Eliminar imagen anterior si existe
-        if (articuloInsumo.Imagen.length > 0) {
-            const imageUrl = articuloInsumo.Imagen[0].url;
-            const publicIdToDelete = imageUrl.split('/')[6].split('.')[0];
+        // Verificar si hay una nueva imagen diferente
+        const currentImageUrl = articuloInsumo.imagenes.length > 0 ? articuloInsumo.imagenes[0].url : null;
+        const isNewImage = selectedImage && selectedImage !== currentImageUrl;
+    
+        // Eliminar imagen anterior solo si hay una nueva diferente
+        if (isNewImage && currentImageUrl) {
+            const publicIdToDelete = currentImageUrl.split('/')[6].split('.')[0];
             try {
                 const resultDelete = new ImagenArticuloService(`${apiUrl}images`);
-                await resultDelete.deleteImagen(publicIdToDelete, articuloInsumo.Imagen[0].id);
+                await resultDelete.deleteImagen(publicIdToDelete, articuloInsumo.imagenes[0].id);
                 console.log("Imagen anterior eliminada correctamente");
             } catch (error) {
                 console.error("Error al eliminar la imagen anterior:", error);
@@ -241,8 +241,8 @@ export default function SaveInsumo() {
             }
         }
     
-        // Subir nueva imagen si está seleccionada
-        if (selectedImage) {
+        // Subir nueva imagen si está seleccionada y es diferente de la actual
+        if (isNewImage) {
             try {
                 const blob = await fetch(selectedImage).then((res) => res.blob());
                 const file = new File([blob], "imagen.jpg", { type: "image/jpeg" });
@@ -251,7 +251,7 @@ export default function SaveInsumo() {
                 const result = new ImagenArticuloService(`${apiUrl}images/uploads`);
                 const uploadedImage = await result.postImagen(formData);
                 if (uploadedImage && uploadedImage.id) {
-                    articuloInsumo.Imagen = [{
+                    articuloInsumo.imagenes = [{
                         id: uploadedImage.id,
                         url: uploadedImage.url,
                     }];
@@ -265,6 +265,8 @@ export default function SaveInsumo() {
                 alert("Error al subir la nueva imagen. El artículo no será guardado.");
                 return;
             }
+        } else {
+            console.log("La imagen no ha cambiado, no se subirá nuevamente.");
         }
     
         // Verificar datos del artículo con sucursales asociadas
@@ -273,7 +275,7 @@ export default function SaveInsumo() {
         // Guardar el artículo en el backend
         try {
             const articuloService = new ArticuloInsumoService(`${apiUrl}articulosInsumos`);
-
+    
             if (Number(id) !== 0) {
                 console.log("Actualizando artículo existente...");
                 await articuloService.put(Number(id), articuloInsumo);
@@ -292,7 +294,7 @@ export default function SaveInsumo() {
                     await articuloService.post(articuloConSucursal);
                 }
             }            
-
+    
             alert("Insumo guardado con éxito!");
             navigate(-1);
         } catch (error) {
@@ -301,16 +303,7 @@ export default function SaveInsumo() {
         }
     };
     
-  
-    // const handleFileChange = (e)=>{
-    //     const selectedFile = e.target.files[0];
-    //     const imageUrl = selectedFile.name; // Suponiendo que aquí guardas la URL de la imagen
-
-    //     setImgUrl({
-    //     id: Number(id) !== 0 ? articuloManufacturado.imagenes[0].id : 0,
-    //     url: imageUrl
-    //     });
-    // }
+    
     const handleRadioChange = (e: { target: { value: string; }; }) => {
         const esParaElaborar = e.target.value === 'true';
         setArticulosInsumo({ 
@@ -331,21 +324,30 @@ export default function SaveInsumo() {
     };
 
 
+    // Carga los datos iniciales solo una vez
+    useEffect(() => {
+        getAllUnidad();
+        obtenerCategorias();
+        getAllSucursales();
+    }, [apiUrl]); // Solo se ejecuta cuando `apiUrl` cambia
+
+    // Obtiene el insumo solo si el ID es distinto de 0
     useEffect(() => {
         if (Number(id) !== 0) {
-            getArticuloInsumo(`${apiUrl}articulosInsumos`, Number(id)).then(() => {
-                if (articuloInsumo.sucursal && articuloInsumo.sucursal.id) {
-                    setSucursalesSeleccionadas([articuloInsumo.sucursal.id]); // Marcar la sucursal asociada
-                }
-            });
+            getArticuloInsumo(`${apiUrl}articulosInsumos`, Number(id));
         }
-        obtenerCategorias();
-        getAllUnidad();
-        getAllSucursales();
-    }, [id]);
+    }, [id, apiUrl]); // Solo depende del `id` y `apiUrl`
+
+    // Actualiza las sucursales seleccionadas cuando `articuloInsumo` cambie
+    useEffect(() => {
+        if (articuloInsumo?.sucursal?.id) {
+            setSucursalesSeleccionadas([articuloInsumo.sucursal.id]); // Marcar la sucursal asociada
+        }
+    }, [articuloInsumo]); // Solo depende de `articuloInsumo`
+
 
     const validarFormulario = (): boolean => {
-        if (!articuloInsumo.Denominación.trim()) {
+        if (!articuloInsumo.denominacion.trim()) {
             alert("El nombre del insumo es obligatorio.");
             return false;
         }
@@ -387,7 +389,7 @@ export default function SaveInsumo() {
             </Link>
             <form action="" className="formContainer">
                 <label htmlFor="denominacion">Nombre del insumo</label>
-                <input type="text" id="denominacion" name="denominacion" value={articuloInsumo.Denominación} onChange={(e) => setArticulosInsumo({ ...articuloInsumo, Denominación: e.target.value })} />
+                <input type="text" id="denominacion" name="denominacion" value={articuloInsumo.denominacion} onChange={(e) => setArticulosInsumo({ ...articuloInsumo, denominacion: e.target.value })} />
                 <label htmlFor="precioCompra">Precio de compra </label>
                 <input type="number" id="precioCompra" name="precioCompra" value={articuloInsumo.precioCompra} onChange={(e) => setArticulosInsumo({ ...articuloInsumo, precioCompra: Number(e.target.value) })}></input>
                 <label htmlFor="stockActual">Stock actual</label>
@@ -410,7 +412,7 @@ export default function SaveInsumo() {
                             {
                                 categoria.map((categoria: ICategoria) => {
                                     return (
-                                        <option key={categoria.id} value={categoria.id}>{categoria.Denominación}</option>
+                                        <option key={categoria.id} value={categoria.id}>{categoria.denominacion}</option>
                                     )
                                 })
                             }

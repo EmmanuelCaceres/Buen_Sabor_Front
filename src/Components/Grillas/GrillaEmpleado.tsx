@@ -5,11 +5,13 @@ import IEmpleado from "../../Entities/IEmpleado";
 import EmpleadoService from "../../Functions/Services/EmpleadoService";
 import GrillaGenerica from "./GrillaGenerica";
 import { InputSearch } from "../../Components";
+import { useSucursal } from "../../context/SucursalContext";
 
 export default function GrillaEmpleado() {
     const apiUrl = import.meta.env.VITE_URL_API_BACK;
 
     const [empleados, setEmpleados] = useState<IEmpleado[]>([]);
+    const { sucursalId } = useSucursal();
 
     const mostrarEmpleados = (url: string) => {
         const result = new EmpleadoService(url);
@@ -27,9 +29,16 @@ export default function GrillaEmpleado() {
         })
     }
     const searchItem = (value: string) => {
-        const result  =new EmpleadoService(`${apiUrl}empleados/filter?keyword=`);
-        result.filterByKeyword(true,value)
-        .then((data)=>{
+        if (!sucursalId) return;
+    
+        if (!value.trim()) {
+            // Si el valor está vacío, volver a cargar empleados solo de la sucursal actual
+            mostrarEmpleados(`${apiUrl}empleados/porSucursal/${sucursalId}`);
+            return;
+        }
+    
+        const result = new EmpleadoService(`${apiUrl}empleados/filter?keyword=${value}&sucursalId=${sucursalId}`);
+        result.getAll().then(data => {
             if (Array.isArray(data)) {
                 setEmpleados(data);
             } else if ('content' in data && Array.isArray(data.content)) {
@@ -37,16 +46,17 @@ export default function GrillaEmpleado() {
             } else {
                 setEmpleados([]);
             }
-        })
-        .catch((err)=>{
-            console.error(err);
-            
-        })
+        }).catch(err => console.error(err));
     };
+    
+    
 
     useEffect(() => {
-        mostrarEmpleados(`${apiUrl}empleados`)
-    }, [apiUrl])
+        if (!sucursalId) return;
+    
+        mostrarEmpleados(`${apiUrl}empleados/porSucursal/${sucursalId}`);
+    }, [apiUrl, sucursalId]);
+    
 
     return (
         <section className="container">

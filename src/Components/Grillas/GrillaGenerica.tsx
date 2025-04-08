@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import GrillaRow from "./GrillaRow";
 import { Table } from "react-bootstrap";
 import { useDiccionario } from "../../Hooks/useDiccionario";

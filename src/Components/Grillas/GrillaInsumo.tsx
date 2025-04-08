@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import ArticuloInsumoService from "../../Functions/Services/ArticuloInsumoService";
 import masObject from "../../assets/circle-plus-svgrepo-com.svg";
@@ -6,13 +6,12 @@ import IArticuloInsumo from "../../Entities/IArticuloInsumo";
 import { Button, Form, Modal} from "react-bootstrap";
 import ICategoria from "../../Entities/ICategoria";
 import GrillaGenerica from "./GrillaGenerica";
-
+import { useSucursal } from "../../context/SucursalContext";
 
 export default function GrillaInsumo() {
     const apiUrl = import.meta.env.VITE_URL_API_BACK;
 
-    // const [sucursales, setSucursales] = useState<ISucursalDto[]>([]);
-    const [sucursalSeleccionada] = useState<number | null>(2);
+    const { sucursalId } = useSucursal();
     const [allArticulosInsumos, setAllArticulosInsumos] = useState<IArticuloInsumo[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState("");
@@ -22,13 +21,10 @@ export default function GrillaInsumo() {
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     const [insumoToDelete, setInsumoToDelete] = useState<IArticuloInsumo | null>(null);
     const [showFilterModal, setShowFilterModal] = useState(false);
-
     const itemsPerPage = 15; // Número de elementos por página
 
-    
-
     // Función para obtener categorías
-    const obtenerCategorias = async () => {
+    const obtenerCategorias = useCallback(async () => {
         try {
             const result = new ArticuloInsumoService(apiUrl);
             const data = await result.getCategorias();
@@ -38,11 +34,11 @@ export default function GrillaInsumo() {
         } catch (error) {
             console.error("Error al obtener categorías:", error);
         }
-    };
+    },[apiUrl]);
     
 
     // Función para cargar todos los datos en un solo array
-    const cargarTodosLosDatos = async (idSucursal: number) => {
+    const cargarTodosLosDatos = useCallback(async (idSucursal: number) => {
         const allData: IArticuloInsumo[] = [];
         let page = 0;
 
@@ -71,12 +67,12 @@ export default function GrillaInsumo() {
         } catch (error) {
             console.error("Error al cargar todos los datos:", error);
         }
-    };
+    },[apiUrl]);
 
     useEffect(() => {
         // obtenerSucursales();
         obtenerCategorias();
-    }, []);
+    }, [obtenerCategorias]);
 
     useEffect(() => {
         if (categoriaSeleccionada !== null) {
@@ -85,12 +81,12 @@ export default function GrillaInsumo() {
     }, [categoriaSeleccionada]);
 
     useEffect(() => {
-        if (sucursalSeleccionada) {
-            cargarTodosLosDatos(sucursalSeleccionada);
+        if (sucursalId) {
+            cargarTodosLosDatos(sucursalId);
             setCurrentPage(1); // Reinicia la página al cambiar de sucursal
             
         }
-    }, [sucursalSeleccionada]);
+    }, [sucursalId, cargarTodosLosDatos]);
 
     // const getStockColor = (stock: number, min: number, max: number) => {
     //     if (stock <= min) return "#ff4d4d"; // Rojo
@@ -104,7 +100,6 @@ export default function GrillaInsumo() {
         
     //     return `rgb(${red}, ${green}, 50)`;
     // };
-    
 
     const handlePageChange = (newPage: number) => {
         if (newPage > 0 && newPage <= Math.ceil(filteredInsumos.length / itemsPerPage)) {
@@ -128,7 +123,6 @@ export default function GrillaInsumo() {
     const handleShowFilterModal = () => setShowFilterModal(true);
 
     const filteredInsumos = allArticulosInsumos.filter((insumo) => {
-        console.log(`insumo:`, JSON.stringify(insumo, null, 2));
         // Verificar si la categoría seleccionada es válida
         const categoriaSeleccionadaObj = categorias.find(categoria => categoria.id === categoriaSeleccionada?.id);
     
@@ -140,24 +134,15 @@ export default function GrillaInsumo() {
         }
     
         // Si la categoría seleccionada es una categoría padre, incluir sus subcategorías
-        //console.log("insumo.categoria:", insumo);
         const perteneceACategoria = categoriaSeleccionadaObj?.categoriaPadre === null
     ? insumo.categoria?.id === categoriaSeleccionadaObj.id || 
       categorias.some(c => c.categoriaPadre?.id === categoriaSeleccionadaObj.id && insumo.categoria?.id === c.id)
     : insumo.categoria?.id === categoriaSeleccionadaObj?.id;
-
-    
-        // Verificar si se está filtrando correctamente por denominación y categoría
-        // console.log("Filtrando insumo:", insumo.denominacion);
-        // console.log("perteneceACategoria:", perteneceACategoria);
     
         // Filtrar insumos por denominación y por categoría
         return insumo.denominacion.toLowerCase().includes(searchTerm.toLowerCase()) && perteneceACategoria;
     });
     
-    
-    
-
     // Datos paginados para la página actual
     const paginatedInsumos = filteredInsumos.slice(
         (currentPage - 1) * itemsPerPage,
@@ -274,59 +259,6 @@ export default function GrillaInsumo() {
                     {categoriaSeleccionada.denominacion} ✖
                 </div>
             )}
-
-            {/* Tabla de Insumos */}
-            {/* <Table striped bordered hover>
-                <thead>
-                    <tr>
-                    <th className="text-center align-middle">Imagen</th>
-                        <th className="text-center align-middle">Denominación</th>
-                        <th className="text-center align-middle">Categoría</th>
-                        <th className="text-center align-middle">Stock Actual</th>
-                        <th className="text-center align-middle">U. Medida</th>
-                        <th className="text-center align-middle">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {paginatedInsumos.length > 0 ? (
-                        paginatedInsumos.map((insumo) => (
-                            <tr key={insumo.id}>
-                                <td className="text-center align-middle">
-                                    {insumo.Imagen?.[0]?.url ? (
-                                        <img
-                                            width={200}
-                                            height={200}
-                                            style={{ objectFit: "contain", maxWidth: "90px", maxHeight: "90px" }}
-                                            src={`${insumo.Imagen[0].url}`}
-                                            alt="imagenArticulo"
-                                        />
-                                    ) : null}
-                                </td>
-                                <td className="text-center align-middle">{insumo.Denominación}</td>
-                                <td className="text-center align-middle">{insumo.categoria.Denominación}</td>
-                                <td className="text-center align-middle" style={{ backgroundColor: getStockColor(insumo.stockActual, insumo.stockMinimo, insumo.stockMaximo) }}>
-                                    <OverlayTrigger placement="top" overlay={<Tooltip>{`Stock: ${insumo.stockActual}`}</Tooltip>}>
-                                        <span>{insumo.stockActual}</span>
-                                    </OverlayTrigger>
-                                </td>
-                                <td className="text-center align-middle">{insumo.unidadMedida.denominacion}</td>
-                                <td className="text-center align-middle">
-                                    <Link to={"save/" + insumo.id} className="btn btn-warning me-2">
-                                        Editar
-                                    </Link>
-                                    <Button variant="danger"onClick={() => handleDelete(insumo)}>
-                                        Eliminar
-                                    </Button>
-                                </td>
-                            </tr>
-                        ))
-                    ) : (
-                        <tr>
-                            <td colSpan={5}>No se encontraron insumos.</td>
-                        </tr>
-                    )}
-                </tbody>
-            </Table> */}
 
             <GrillaGenerica
                 data={paginatedInsumos}

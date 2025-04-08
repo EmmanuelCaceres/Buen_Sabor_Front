@@ -4,7 +4,7 @@ import EmpresaService from "../Functions/Services/EmpresaService";
 import { useState, useEffect } from "react";
 import IEmpresa from "../Entities/IEmpresa";
 
-export default function SaveEmpresa() {
+export default function SaveSucursal() {
     const apiUrl = import.meta.env.VITE_URL_API_BACK;
 
     const { id } = useParams();

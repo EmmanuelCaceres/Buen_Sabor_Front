@@ -1,12 +1,10 @@
 import { Route, Routes } from "react-router-dom"
-import { AuthenticationGuard, Profile, CallBack, Header,Home } from "./Components"
+import { AuthenticationGuard, Profile, CallBack, Home } from "./Components"
 import Root from "./Components/Root";
 import GrillaArticulo from "./Components/Grillas/GrillaArticuloManufacturado";
 import SaveArticulo from "./FormSave/SaveArticuloManufacturado";
 import SaveInsumo from "./FormSave/SaveInsumo";
 import SaveCategoria from "./FormSave/SaveCategoria";
-import GrillaEmpresa from "./Components/Grillas/GrillaEmpresa";
-import SaveEmpresa from "./FormSave/SaveEmpresa";
 import GrillaEmpleado from "./Components/Grillas/GrillaEmpleado";
 import GrillaRol from "./Components/Grillas/GrillaRol";
 import GrillaPromocion from "./Components/Grillas/GrillaPromocion";
@@ -15,74 +13,42 @@ import Pedidos from "./Components/Pedidos";
 import GrillaInsumo from "./Components/Grillas/GrillaInsumo";
 import GrillaCategoria from "./Components/Grillas/GrillaCategoria";
 import SaveEmpleado from "./FormSave/SaveEmpleado";
+import GrillaSucursal from "./Components/Grillas/GrillaSucursal";
+import SaveSucursal from "./FormSave/SaveSucursal";
+import { useSucursal } from "./context/SucursalContext"; // 👈 importá el hook
 
 export const App = () => {
-    
+    const { sucursalNombre } = useSucursal(); // 👈 usá el contexto
+
     return (
         <>
-            {/* <Header/> */}
+            <header style={{ background: "#f0f0f0", padding: "10px 20px", marginBottom: "15px" }}>
+                <h5 style={{ margin: 0 }}>
+                    Sucursal seleccionada: <strong>{sucursalNombre || "Ninguna"}</strong>
+                </h5>
+            </header>
+
             <Routes>
-                <Route path="/" element={<Home/>} />
+                <Route path="/" element={<Home />} />
                 <Route path="/profile" element={<AuthenticationGuard component={Profile} />} />
                 <Route path="/callback" element={<CallBack />} />
-                <Route path="/panel-usuario" element={<Root/>}>
-                    <Route path="articulos" element={<GrillaArticulo/>}/>
-                    <Route path="articulos/save/:id" element={<SaveArticulo/>}/>
-                    <Route path="insumos/save/:id" element={<SaveInsumo/>}></Route>
-                    <Route path="categorias/save/:id" element={<SaveCategoria/>}></Route>
-                    <Route path="empresas" element={<GrillaEmpresa/>}></Route>
-                    <Route path="empresas/save/:id" element={<SaveEmpresa/>}></Route>
-                    <Route path="categorias" element={<GrillaCategoria/>}></Route>
-                    <Route path="empleados" element={<GrillaEmpleado/>}></Route>
-                    <Route path="empleados/save/:id" element={<SaveEmpleado/>}></Route>
-                    <Route path="roles" element={<GrillaRol/>}></Route>
-                    <Route path="promociones" element={<GrillaPromocion/>}></Route>
-                    <Route path="promociones/save/:id" element={<SavePromocion/>}></Route>
-                    <Route path="insumos" element={<GrillaInsumo/>}></Route>
-                    <Route path="pedidos" element={<Pedidos/>}></Route>
-
+                <Route path="/panel-usuario" element={<Root />}>
+                    <Route path="articulos" element={<GrillaArticulo />} />
+                    <Route path="articulos/save/:id" element={<SaveArticulo />} />
+                    <Route path="insumos/save/:id" element={<SaveInsumo />} />
+                    <Route path="categorias/save/:id" element={<SaveCategoria />} />
+                    <Route path="sucursales" element={<GrillaSucursal />} />
+                    <Route path="sucursales/save/:id" element={<SaveSucursal />} />
+                    <Route path="categorias" element={<GrillaCategoria />} />
+                    <Route path="empleados" element={<GrillaEmpleado />} />
+                    <Route path="empleados/save/:id" element={<SaveEmpleado />} />
+                    <Route path="roles" element={<GrillaRol />} />
+                    <Route path="promociones" element={<GrillaPromocion />} />
+                    <Route path="promociones/save/:id" element={<SavePromocion />} />
+                    <Route path="insumos" element={<GrillaInsumo />} />
+                    <Route path="pedidos" element={<Pedidos />} />
                 </Route>
             </Routes>
         </>
     )
 }
-
- // {
-  //   path: "/",
-  //   element: <Root/>,
-  //   errorElement:<ErrorPage/>,
-  //   children: [
-  //     {
-  //       path:"categorias",
-  //       element:<GrillaCategoria/>
-  //     },
-  //     {
-  //       path:"insumos",
-  //       element:<GrillaInsumo/>
-  //     },
-  //   ],
-  // },
-  // {
-  //   path:"/homeEmpresa",
-  //   element:<HomeEmpresa/>
-  // },
-  // {
-  //   path:"/sucursales/:id",
-  //   element:<Sucursales/>
-  // },
-  // {
-  //   path:"/cliente/menu",
-  //   element:<Menu/>
-  // }
-  // {
-  //   path:"/",
-  //   element:<Empresas/>
-  // },
-  // {
-  //   path:"/empresa/:id",
-  //   element:{<AuthenticationGuard component={Sucursales}/>}
-  // }
-  // {
-  //   path="/profile",
-  //   element={<AuthenticationGuard component={Profile}/>}
-  // }
