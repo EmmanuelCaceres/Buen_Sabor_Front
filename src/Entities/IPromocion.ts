@@ -1,4 +1,6 @@
 import { TipoPromocion } from "./TipoPromocion"
+import IImagenPromocion  from "./IImagenPromocion"
+import { IPromocionDetalle } from "./IPromocionDetalle"
 
 export default interface IPromocion{
     id:number
@@ -7,7 +9,10 @@ export default interface IPromocion{
     fechaHasta: Date
     horaDesde : Date
     horaHasta : Date
+    denominacion: string
     descripcionDescuento : string
     precioPromocional : number
     tipoPromocion: TipoPromocion
+    promocionDetalle: IPromocionDetalle[]
+    imagenes: IImagenPromocion[];
 }
