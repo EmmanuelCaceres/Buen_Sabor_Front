@@ -9,3 +9,5 @@ export * from "./Loader/Loader.tsx";
 export * from "./ButtonEdit/ButtonEdit.tsx";
 export * from "./InputSearch/InputSearch.tsx";
 export * from "./Modal/Modal.tsx";
+export * from "./CardPromotion/CardPromotion.tsx";
+export * from "./CustomSelect/CustomSelect.tsx";

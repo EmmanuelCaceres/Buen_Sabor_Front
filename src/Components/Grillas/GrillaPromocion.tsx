@@ -2,49 +2,47 @@ import { useEffect, useState } from "react";
 import IPromocion from "../../Entities/IPromocion";
 import PromocionService from "../../Functions/Services/PromocionService";
 import { Link } from "react-router-dom";
-/*import CardPromocionDashboard from "../CardPromocionDashboard";*/
+import { CardPromotion } from "../../Components";
 
 export default function GrillaPromocion() {
     
     const apiUrl = import.meta.env.VITE_URL_API_BACK
-   
 
-    const [/*promociones*/, setPromociones] = useState<IPromocion[]>([]);
+    const [promociones, setPromociones] = useState<IPromocion[]>([]);
 
     const mostrarDatos = (url: string) => {
         const result = new PromocionService(url);
         result.getAll()
             .then(data => {
-                setPromociones(data);
+                console.log(data);
+                if (Array.isArray(data)) {
+                    setPromociones(data);
+                } else if ('content' in data && Array.isArray(data.content)) {
+                    setPromociones(data.content);
+                } else {
+                    setPromociones([]);
+                }
             })
             .catch(error => {
                 console.log(error)
             })
+
     }
 
     useEffect(() => {
-        mostrarDatos(`${apiUrl}empresas/includeDeleted`)
+        mostrarDatos(`${apiUrl}promociones`)
+        console.log(promociones);
+        
     }, [apiUrl])
 
     return(
-        <>
-        <section className="containerColumn">
-
-            {/* <Link to={'save/0'} className='btn btn-primary'>
-                        <img src={masObject} alt="Crear Artículo" style={{ marginRight: '8px' }} />
-                        Añadir empresa
-            </Link> */}
-            <div className="containerCardEmpresa">
-                {/*
-                    promociones && promociones.map((promocion: IPromocion, key = promocion.id) => (
-                        /*<CardPromocionDashboard key={key} data={promocion}></CardPromocionDashboard>
-                    ))*/
-                }
-                <Link to={'save/0'} className="cardEmpresa cardEmpresaSave">
-                    Agregar Promoción
-                </Link>
-            </div>
+        <section className="containerCardEmpresa">
+            {promociones && promociones.map((promocion: IPromocion) => (
+                <CardPromotion key={promocion.id} promocion={promocion}/>
+            ))}
+            <Link to={'save/0'} className="cardEmpresa cardEmpresaSave">
+                Agregar Promoción
+            </Link>
         </section>
-        </>
     )
 }
