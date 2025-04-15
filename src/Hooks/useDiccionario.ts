@@ -32,4 +32,12 @@ const useDiccionario = (clave:string)=>{
     return translates[clave] || clave;
 }
 
-export{useDiccionario}
+const translatesEnum:Translates={
+    HappyHour:"HAPPY_HOUR",
+    Descuento:"PROMOCION",
+}
+const useDiccionarioEnum = (clave:string)=>{
+    return translatesEnum[clave] || clave;
+}
+
+export{useDiccionario,useDiccionarioEnum}

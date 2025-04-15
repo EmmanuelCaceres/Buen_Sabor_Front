@@ -37,9 +37,9 @@ export default function GrillaPromocion() {
 
     return(
         <section className="containerCardEmpresa">
-            {promociones && promociones.map((promocion: IPromocion) => (
+            {/* {promociones && promociones.map((promocion: IPromocion) => (
                 <CardPromotion key={promocion.id} promocion={promocion}/>
-            ))}
+            ))} */}
             <Link to={'save/0'} className="cardEmpresa cardEmpresaSave">
                 Agregar Promoción
             </Link>
