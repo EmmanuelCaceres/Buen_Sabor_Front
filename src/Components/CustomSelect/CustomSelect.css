@@ -1,0 +1,30 @@
+/* .custom-select{
+    width: 100%;
+} */
+
+.selector-personalizado{
+    width: 100%;
+    position: relative;
+}
+.selector-cabecera{
+    display: flex;
+    gap: 1rem;
+    background: lightblue;
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+
+}
+.selector-lista{
+    width: 100%;
+    position: absolute;
+    top: 3.5rem;
+    left: 0;
+    background: white;
+    overflow-y: scroll;
+    height: 150px;
+}
+li.seleccionada{
+    background: lightblue;
+    color: white;
+    font-weight: bold;
+}

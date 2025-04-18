@@ -1,0 +1,28 @@
+.card{
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+  gap: 8px;
+  background-color: white;
+  border-radius: 10px;
+  padding: 1rem 2rem;
+  box-shadow: 10px 10px 20px -2px rgba(15, 45, 107,.3);
+  cursor: pointer;
+  transition-duration: .5s;
+  transition-property: scale;
+  & div{
+    width: 100%;
+    height: 50%;
+    & img{
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 10px;
+        border: 1px solid #c6dedb;
+    }
+  }
+}
+.card:hover{
+    scale: 1.05;
+}
