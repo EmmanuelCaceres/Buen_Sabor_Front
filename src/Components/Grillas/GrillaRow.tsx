@@ -4,6 +4,7 @@ import './GrillaRow.css'
 import { Modal } from "../../Components";
 import { useModalContext } from "../Modal/context/ModalContext";
 import { useDiccionario } from "../../Hooks/useDiccionario";
+import { useState } from "react";
 // import { formatValue } from "../../Hooks/useFormatData";
 
 // Tipado de la fila con un tipo genérico
@@ -21,6 +22,7 @@ interface ComplexValue {
     denominacion?: string;
     url?: string; // Esto permite que tenga otras propiedades que no hemos especificado
 }
+
 
 // Función para formatear valores de propiedades complejas
 const formatValue = (value: unknown): string => {
@@ -60,9 +62,12 @@ export default function GrillaRow<T extends { id: number }>({
 }: InfoRow<T>) {
     // const [isOpen,openModal,closeModal] = useModal(false)
     const {setState} = useModalContext();
-    const openModal = () =>{
-        setState(true)
-    }
+    const [itemSeleccionado, setItemSeleccionado] = useState<T | null>(null);
+
+    const openModal = (item: T) => {
+        setItemSeleccionado(item);
+        setState(true);
+    };
 
     return (
         <>
@@ -72,25 +77,33 @@ export default function GrillaRow<T extends { id: number }>({
                     //console.log('Property:', property); // Esto mostrará el nombre de la propiedad.
                     //console.log('Value:', value); // Esto mostrará el valor de la propiedad.
                     return (
-                        <td key={index}>
-                            {property === "imagenes" && Array.isArray(value) && value.length > 0 ? (
+                        <td key={index} >
+                            {property === "imagenes" && Array.isArray(value) && value.length > 0 && value[0]?.url ? (
                                 <img 
-                                src={value[0].url} 
-                                alt="Imagen" 
-                                width="50" 
-                                height="50" 
-                                style={{ objectFit: "contain", display: "block" }} 
-                            />
+                                    src={value[0].url} 
+                                    alt="Imagen" 
+                                    width="50" 
+                                    height="50" 
+                                    style={{ objectFit: "contain", display: "block" }} 
+                                />
+                            ) : property === "imagenPersona" && typeof value === "object" && value !== null && "url" in value ? (
+                                <img 
+                                    src={(value as { url: string }).url} 
+                                    alt="Imagen" 
+                                    width="70" 
+                                    height="70" 
+                                    style={{ objectFit: "contain", display: "block" }} 
+                                />
                             ) : (
-                                // Muestra un valor formateado para objetos o arrays
                                 formatValue(value)
                             )}
+
                         </td>
                     );
                 })}
                 {isActions && (
                     <td>
-                        <button className="ver" onClick={openModal}>Ver</button>
+                        <button onClick={() => openModal(data)}>Ver</button>
                         <ButtonEdit label="Editar" url={urlParent ? `${urlParent}${data.id}` : "#"} />
                         <button
                             className="btn btn-danger"
@@ -103,20 +116,23 @@ export default function GrillaRow<T extends { id: number }>({
             </tr>
 
             {/* Modal fuera de la tabla */}
-            <Modal children={
-                <>
-                    <h3>Detalles</h3>
-                    <ul style={{listStyle:"none",padding:"0"}}>
+            {itemSeleccionado && (
+    <Modal
+        children={
+            <>
+                <h3>Detalles</h3>
+                <ul style={{ listStyle: "none", padding: "0" }}>
+                    {Object.entries(itemSeleccionado)
+                        .filter(([key]) => key !== "Imagen")
+                        .map(([key, value]) => (
+                            <li key={key}>{useDiccionario(key)}: {formatValue(value)}</li>
+                        ))}
+                </ul>
+            </>
+        }
+    />
+)}
 
-                        {Object.entries(data)
-                            .filter(([key]) => key !== "Imagen") // Filtramos la propiedad Imagen
-                            .map(([key, value]) => (
-                                <li key={key}>{useDiccionario(key)} : {formatValue(value)}</li>
-                            ))}
-                    </ul>
-                </>
-                    
-            }/>
 
         </>
     );

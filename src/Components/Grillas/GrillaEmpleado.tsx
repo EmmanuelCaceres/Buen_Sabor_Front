@@ -55,6 +55,7 @@ export default function GrillaEmpleado() {
         if (!sucursalId) return;
     
         mostrarEmpleados(`${apiUrl}empleados/porSucursal/${sucursalId}`);
+        console.log(empleados)
     }, [apiUrl, sucursalId]);
     
 
@@ -68,7 +69,7 @@ export default function GrillaEmpleado() {
                 </Link>
             </div>
             <InputSearch label="Buscar empleados" customMethod={searchItem}/>
-            <GrillaGenerica data={empleados} propertiesToShow={["nombre", "apellido"]} editItem={`/panel-usuario/empleados/save/`} />
+            <GrillaGenerica data={empleados} propertiesToShow={["imagenPersona","nombre", "apellido"]} editItem={`/panel-usuario/empleados/save/`} />
         </section>
     )
 }

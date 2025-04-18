@@ -55,22 +55,12 @@ export default function SideBar() {
                             Promociones
                         </Link>
                     </CNavItem>
-
-                    <CNavGroup
-                        toggler={
-                            <>
-                                <CIcon customClassName="nav-icon" icon={cilPeople} />
-                                Empleados
-                            </>
-                        }
-                    >
-                        <CNavItem>
-                            <Link to="/panel-usuario/empleados" className="nav-link" >
-                                <span className="nav-icon"><span className="nav-icon-bullet"></span></span>
-                                Lista de Empleados
-                            </Link>
-                        </CNavItem>
-                    </CNavGroup>
+                    <CNavItem>
+                        <Link to="/panel-usuario/empleados" className="nav-link" >
+                            <CIcon customClassName="nav-icon" icon={cilPeople} />
+                            Empleados
+                        </Link>
+                    </CNavItem>
                     <CNavItem>
                         <Link to="/panel-usuario/insumos" className="nav-link">
                             <CIcon customClassName="nav-icon" icon={cilCart} />

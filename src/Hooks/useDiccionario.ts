@@ -7,7 +7,7 @@ const translates:Translates={
     nombre:"Nombre",
     apellido:"Apellido",
     telefono:"Teléfono",
-    imagenPersona:"Imagen de persona",
+    imagenPersona:"Imagen",
     usuario:"Usuario",
     sucursal:"Sucursal",
     stockMinimo:"Stock mínimo",
@@ -25,7 +25,8 @@ const translates:Translates={
     precioCompra: "Precio de compra",
     esParaElaborar: "¿Es para elaborar?",
     tiempoEstimadoMinutos: "Tiempo estimado en minutos",
-    articuloManufacturadoDetalles:"Ingredientes"
+    articuloManufacturadoDetalles:"Ingredientes",
+    imagen:"Imagen"
 }
 
 const useDiccionario = (clave:string)=>{

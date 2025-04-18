@@ -31,3 +31,17 @@ button {
 button:hover {
     background-color: #0056b3;
 }
+
+.td-img-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px; /* podés ajustar esto si tus filas son más altas o bajas */
+}
+
+.grilla-img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    display: block;
+}

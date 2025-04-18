@@ -9,5 +9,5 @@ export default interface IPersona{
     telefono:string,
     fechaNac: Date,
     usuario: Usuario,
-    imagen: ImagenPersona,
+    imagenPersona: ImagenPersona,
 }
