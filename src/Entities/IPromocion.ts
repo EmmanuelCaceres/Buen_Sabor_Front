@@ -7,12 +7,12 @@ export default interface IPromocion{
     baja:boolean
     fechaDesde : Date
     fechaHasta: Date
-    horaDesde : String
-    horaHasta : String
+    horaDesde : string
+    horaHasta : string
     denominacion: string
     descripcionDescuento : string
     precioPromocional : number
     tipoPromocion: TipoPromocion
-    promocionDetalle: IPromocionDetalle[]
+    promocionDetalles: IPromocionDetalle[]
     imagenes: IImagenPromocion[];
 }

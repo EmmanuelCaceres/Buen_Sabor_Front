@@ -25,24 +25,33 @@ interface ComplexValue {
 
 
 // Función para formatear valores de propiedades complejas
-const formatValue = (value: unknown): string => {
-    if (Array.isArray(value)) {
-        if (value.length === 0) return "No tiene";
-        return value.map((item) => {
-            if (typeof item === "object" && item !== null) {
-                return formatComplexValue(item); // Reutiliza lógica para objetos
-            }
-            return String(item);
-        }).join(", ");
-    } else if (typeof value === "boolean") {
-        return value ? "Sí" : "No";
-    } else if (value === null || value === undefined) {
-        return "No tiene";
-    } else if (typeof value === "object" && value !== null) {
-        return formatComplexValue(value); // Formatear objetos complejos
-    }
-    return String(value);
-};
+// Cambiar firma para que reciba también el nombre de la propiedad
+    const formatValue = (value: unknown, propertyName?: string): string => {
+        if (propertyName === "promocionDetalles" && Array.isArray(value)) {
+            return value
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                .map((item: any) => `${item.cantidad} x ${item.articulo?.denominacion ?? "Artículo desconocido"}`)
+                .join("\n");
+        }
+
+        if (Array.isArray(value)) {
+            if (value.length === 0) return "No tiene";
+            return value.map((item) => {
+                if (typeof item === "object" && item !== null) {
+                    return formatComplexValue(item); // sin propiedad
+                }
+                return String(item);
+            }).join(", ");
+        } else if (typeof value === "boolean") {
+            return value ? "Sí" : "No";
+        } else if (value === null || value === undefined) {
+            return "No tiene";
+        } else if (typeof value === "object" && value !== null) {
+            return formatComplexValue(value);
+        }
+        return String(value);
+    };
+
 
 // Función para formatear objetos complejos de forma inteligente
 const formatComplexValue = (value: ComplexValue): string => {
@@ -95,7 +104,10 @@ export default function GrillaRow<T extends { id: number }>({
                                     style={{ objectFit: "contain", display: "block" }} 
                                 />
                             ) : (
-                                formatValue(value)
+                                <span style={{ whiteSpace: "pre-line" }}>
+                                    {formatValue(value, String(property))}
+                                </span>
+
                             )}
 
                         </td>
@@ -117,23 +129,21 @@ export default function GrillaRow<T extends { id: number }>({
 
             {/* Modal fuera de la tabla */}
             {itemSeleccionado && (
-    <Modal
-        children={
-            <>
-                <h3>Detalles</h3>
-                <ul style={{ listStyle: "none", padding: "0" }}>
-                    {Object.entries(itemSeleccionado)
-                        .filter(([key]) => key !== "Imagen")
-                        .map(([key, value]) => (
-                            <li key={key}>{useDiccionario(key)}: {formatValue(value)}</li>
-                        ))}
-                </ul>
-            </>
-        }
-    />
-)}
-
-
+                <Modal
+                    children={
+                        <>
+                            <h3>Detalles</h3>
+                            <ul style={{ listStyle: "none", padding: "0" }}>
+                                {Object.entries(itemSeleccionado)
+                                    .filter(([key]) => key !== "Imagen")
+                                    .map(([key, value]) => (
+                                        <li key={key}>{useDiccionario(key)}: {formatValue(value, key)}</li>
+                                    ))}
+                            </ul>
+                        </>
+                    }
+                />
+            )}
         </>
     );
 }
