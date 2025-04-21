@@ -30,7 +30,7 @@ const SavePromocion = () => {
         horaHasta: "",
         tipoPromocion: TipoPromocion.HappyHour,
         imagenes: [],
-        promocionDetalle: [],
+        promocionDetalles: [],
     });
     const [articuloManufacturado, setArticuloManufacturado] = useState<IArticuloManufacturado[]>([]);
     const [articuloManufacturadoPromocion, setArticuloManufacturadoPromocion] = useState<IArticuloManufacturadoPromocion[]>([]);
@@ -74,7 +74,7 @@ const SavePromocion = () => {
         }));
         console.log(detallePromocion);
         
-        setPromocion({...promocion, promocionDetalle: detallePromocion});
+        setPromocion({...promocion, promocionDetalles: detallePromocion});
         
 
         console.log(promocion);

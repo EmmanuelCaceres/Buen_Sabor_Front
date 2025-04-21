@@ -35,7 +35,7 @@ export default function SaveInsumo() {
             horarioApertura: '',
             horarioCierre: '',
             baja: false,
-            casaMatriz: false,
+            esCasaMatriz: false,
             domicilio:{
                 id: 0,
                 baja: false,
@@ -82,6 +82,7 @@ export default function SaveInsumo() {
             articulos: [],
             esInsumo: false,
             sucursales: [],
+            esParaVender: false,
             categoriaPadre: { // Inicialización correcta
                 id: 0,
                 baja:false,
@@ -90,7 +91,8 @@ export default function SaveInsumo() {
                 articulos: [],
                 esInsumo: false,
                 categoriaPadre: null, // O undefined, dependiendo de tu lógica
-                sucursales: []
+                sucursales: [],
+                esParaVender:false
             }
         },
         precioCompra: 0,
@@ -140,14 +142,14 @@ export default function SaveInsumo() {
 
 
     const obtenerCategorias = useCallback( async () => {
-            try {
-                const result = new ArticuloInsumoService(apiUrl);
-                const data = await result.getCategorias();
-                setCategoria(data.filter((categoria: ICategoria) => categoria.esInsumo) || []);
-            } catch (error) {
-                console.error("Error al obtener categorías:", error);
-            }
-        },[apiUrl]);
+        try {
+            const result = new ArticuloInsumoService(apiUrl);
+            const data = await result.getCategorias();
+            setCategoria(data.filter((categoria: ICategoria) => categoria.esInsumo) || []);
+        } catch (error) {
+            console.error("Error al obtener categorías:", error);
+        }
+    },[apiUrl]);
     
     const getAllUnidad = useCallback( async () => {
         try {

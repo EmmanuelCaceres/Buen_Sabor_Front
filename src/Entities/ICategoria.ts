@@ -10,4 +10,5 @@ export default interface ICategoria{
     esInsumo: boolean;
     categoriaPadre: ICategoria | null;
     sucursales: ISucursalDto[];
+    esParaVender: boolean;
 }

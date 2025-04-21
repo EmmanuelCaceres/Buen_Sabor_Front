@@ -16,9 +16,9 @@ export default function GrillaSucursal() {
         result.getAll(true)
             .then(data => {
                 if ("content" in data) {
-                    setSucursales(data.content); // ✅ así estás seguro
+                    setSucursales(data.content);
                 } else {
-                    setSucursales(data); // por si alguna vez te devuelven T[] (aunque parece que no)
+                    setSucursales(data); // por si alguna vez te devuelven T[]
                 }
             })
             .catch(error => {

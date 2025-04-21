@@ -17,4 +17,16 @@ export default class CategoriaService extends GenericFetch<ICategoria>{
     async getAllCategorias(isPaginated: boolean = false): Promise<ICategoria[] | IPaginatedResponse<ICategoria>> {
         return await this.getAll(isPaginated);
     }
+
+    async getAllParents(): Promise<ICategoria[]> {
+        const response = await fetch(`${this.baseUrl}categorias/parents`);
+    
+        if (!response.ok) {
+            throw new Error(`Error al obtener categorías padre. Status: ${response.status}`);
+        }
+    
+        const data = await response.json();
+        return data as ICategoria[];
+    }
+    
 }

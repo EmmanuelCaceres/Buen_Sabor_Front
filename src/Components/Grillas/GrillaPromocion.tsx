@@ -16,7 +16,7 @@ export default function GrillaPromocion() {
         const result = new PromocionService(url);
         result.getAll()
             .then(data => {
-                console.log("🔍 DATA CRUDA:", JSON.stringify(data, null, 2)); // <-- Esto te muestra bien estructurado el JSON
+                //console.log(" DATA PRomociones:", JSON.stringify(data, null, 2));
                 if (Array.isArray(data)) {
                     setPromociones(data);
                 } else if ('content' in data && Array.isArray(data.content)) {
@@ -48,7 +48,7 @@ export default function GrillaPromocion() {
                     fechaHasta: "Hasta",
                     promocionDetalles: "Artículos"
                 }}
-                editItem="promociones/save/"
+                editItem="save/"
                 deleteFunction={(id) => console.log("Eliminar promo", id)}
             />
     )
