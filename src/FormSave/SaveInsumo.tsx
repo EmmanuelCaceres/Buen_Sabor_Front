@@ -331,7 +331,7 @@ export default function SaveInsumo() {
         getAllUnidad();
         obtenerCategorias();
         getAllSucursales();
-    }, [apiUrl]); // Solo se ejecuta cuando `apiUrl` cambia
+    }, []); 
 
     // Obtiene el insumo solo si el ID es distinto de 0
     useEffect(() => {

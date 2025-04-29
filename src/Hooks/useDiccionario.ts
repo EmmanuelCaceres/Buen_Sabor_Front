@@ -33,12 +33,15 @@ const useDiccionario = (clave:string)=>{
     return translates[clave] || clave;
 }
 
-const translatesEnum:Translates={
-    HappyHour:"HAPPY_HOUR",
-    Descuento:"PROMOCION",
-}
-const useDiccionarioEnum = (clave:string)=>{
-    return translatesEnum[clave] || clave;
-}
+// Hook correcto
+const useDiccionarioEnum = () => {
+    const translatesEnum: Translates = {
+        HappyHour: "HAPPY_HOUR",
+        Descuento: "PROMOCION",
+    };
+
+    return (clave: string) => translatesEnum[clave] || clave;
+};
+
 
 export{useDiccionario,useDiccionarioEnum}

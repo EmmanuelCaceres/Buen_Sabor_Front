@@ -1,6 +1,7 @@
 import { TipoPromocion } from "./TipoPromocion"
 import IImagenPromocion  from "./IImagenPromocion"
 import { IPromocionDetalle } from "./IPromocionDetalle"
+//import ISucursalDto from "./ISucursalDto"
 
 export default interface IPromocion{
     id:number
@@ -15,4 +16,5 @@ export default interface IPromocion{
     tipoPromocion: TipoPromocion
     promocionDetalles: IPromocionDetalle[]
     imagenes: IImagenPromocion[];
+    idsSucursal:number;
 }

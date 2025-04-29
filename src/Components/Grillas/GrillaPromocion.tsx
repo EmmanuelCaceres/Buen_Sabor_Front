@@ -33,7 +33,7 @@ export default function GrillaPromocion() {
 
     useEffect(() => {
         mostrarDatos(`${apiUrl}promociones/porSucursal/${sucursalId}`)
-    }, [apiUrl])
+    }, [apiUrl,sucursalId])
 
     return(
             <GrillaGenerica

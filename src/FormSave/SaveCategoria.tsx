@@ -73,11 +73,11 @@ export default function SaveCategoria() {
         if (Number(id) !== 0) {
             getCategoryByDenominacion(`${apiUrl}categorias`, Number(id));
         }
-    }, [id]);
+    }, [id,apiUrl,obtenerCategoriasPadre]);
 
     return (
         <div className="container">
-            <Link to="/categorias" className="btnVolver">
+            <Link to="/panel-usuario/categorias" className="btnVolver">
                 <img width={24} height={24} src={arrow_left} alt="arrow_left" />
                 <p style={{ margin: "0" }}>Volver</p>
             </Link>
