@@ -1,0 +1,51 @@
+.navbar-public{
+    width: 100%;
+    height: 80px;
+    display: flex; 
+    justify-content: space-around;
+    align-items: center;
+    position:absolute;
+    bottom:0;
+    border-radius:20px 20px 0 0;
+    box-shadow:0px -5px 18px 3px rgba(0,0,0,0.1);
+
+    & > ul {
+        width:100%; 
+        display: flex; 
+        justify-content: space-evenly; 
+        align-items: center; 
+        list-style: none;
+        margin: 0; 
+        padding: 0;
+
+        & > li {
+
+            & > .link-menu{
+                text-decoration: none;
+                color: white;
+
+                & > p{
+                    display: none;
+                }
+            }
+        }
+    }
+}
+
+@media (width>768px){
+    .navbar-public{
+        position: relative;
+        border-radius: 0;
+
+        & svg{
+            display: none;
+        }
+        & > ul > li > .link-menu > p{
+            color: white;
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+            display: block;
+        }
+    }
+}

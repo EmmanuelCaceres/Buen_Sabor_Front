@@ -11,3 +11,5 @@ export * from "./InputSearch/InputSearch.tsx";
 export * from "./Modal/Modal.tsx";
 export * from "./CardPromotion/CardPromotion.tsx";
 export * from "./CustomSelect/CustomSelect.tsx";
+export * from "./PublicComponents/NavBarPublic/NavBarPublic.tsx";
+export * from "./PublicComponents/LabelPublic/LabelPublic.tsx";

@@ -1,0 +1,88 @@
+/* Variables */
+
+:root{
+    --primary-color: #F57C00;
+    --secondary-color:#FFEB3B;
+    --background-color:#F5F5F5;
+    --background-cta:#1976D2;
+}
+
+/* Estilos para fondos */
+
+.background-naranja{
+    background-color: var(--primary-color);
+}
+.background-amarillo{
+    background-color: var(--secondary-color);
+}
+.bacground-gris-claro{
+    background-color: var(--background-color);
+}
+.background-cta{
+    background-color: var(--background-cta);
+}/* Estilos para fondos con opacidad */
+
+.background-naranja-10 {
+    background-color: rgba(245, 124, 0, 0.1);
+}
+.background-naranja-20 {
+    background-color: rgba(245, 124, 0, 0.2);
+}
+.background-naranja-30 {
+    background-color: rgba(245, 124, 0, 0.3);
+}
+.background-naranja-40 {
+    background-color: rgba(245, 124, 0, 0.4);
+}
+.background-naranja-50 {
+    background-color: rgba(245, 124, 0, 0.5);
+}
+.background-naranja-60 {
+    background-color: rgba(245, 124, 0, 0.6);
+}
+.background-naranja-70 {
+    background-color: rgba(245, 124, 0, 0.7);
+}
+.background-naranja-80 {
+    background-color: rgba(245, 124, 0, 0.8);
+}
+.background-naranja-90 {
+    background-color: rgba(245, 124, 0, 0.9);
+}
+
+.background-amarillo-10 {
+    background-color: rgba(255, 235, 59, 0.1);
+}
+.background-amarillo-20 {
+    background-color: rgba(255, 235, 59, 0.2);
+}
+.background-amarillo-30 {
+    background-color: rgba(255, 235, 59, 0.3);
+}
+.background-amarillo-40 {
+    background-color: rgba(255, 235, 59, 0.4);
+}
+.background-amarillo-50 {
+    background-color: rgba(255, 235, 59, 0.5);
+}
+.background-amarillo-60 {
+    background-color: rgba(255, 235, 59, 0.6);
+}
+.background-amarillo-70 {
+    background-color: rgba(255, 235, 59, 0.7);
+}
+.background-amarillo-80 {
+    background-color: rgba(255, 235, 59, 0.8);
+}
+
+/* Estilos para texto */
+
+.text-secondary{
+    color:#FFF;
+}
+
+/**/
+.container{
+    margin: 0 auto;
+    /* padding: ; */
+}
