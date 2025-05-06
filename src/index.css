@@ -1,4 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,300..900;1,300..900&display=swap');
+@import "../public/variables.css";
+
 html {
   box-sizing: border-box;
   height: 100%;

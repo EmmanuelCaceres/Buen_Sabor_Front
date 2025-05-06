@@ -15,21 +15,26 @@ import GrillaCategoria from "./Components/Grillas/GrillaCategoria";
 import SaveEmpleado from "./FormSave/SaveEmpleado";
 import GrillaSucursal from "./Components/Grillas/GrillaSucursal";
 import SaveSucursal from "./FormSave/SaveSucursal";
+import Categories from "./PublicLandings/Categories"
+import Promotions from "./PublicLandings/Promotions"
 import { useSucursal } from "./context/SucursalContext"; // 👈 importá el hook
 
 export const App = () => {
     const { sucursalNombre } = useSucursal(); // 👈 usá el contexto
 
     return (
-        <>
-            <header style={{ background: "#f0f0f0", padding: "10px 20px", marginBottom: "15px" }}>
+        <> 
+            {/* <header style={{ background: "#f0f0f0", padding: "10px 20px", marginBottom: "15px" }}>
                 <h5 style={{ margin: 0 }}>
                     Sucursal seleccionada: <strong>{sucursalNombre || "Ninguna"}</strong>
                 </h5>
-            </header>
+            </header> */}
 
             <Routes>
-                <Route path="/" element={<Home />} />
+                <Route path="/" element={<Home />}> 
+                    <Route path="categorias" element={<Categories />} />
+                    <Route path="promociones" element={<Promotions />} />
+                </Route>
                 <Route path="/profile" element={<AuthenticationGuard component={Profile} />} />
                 <Route path="/callback" element={<CallBack />} />
                 <Route path="/panel-usuario" element={<Root />}>
