@@ -469,6 +469,23 @@ p{
   row-gap: 32px;
 }
 
+.slider-container {
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  gap: 20px;
+  padding-bottom: 15px;
+  scrollbar-width: none;
+  -ms-overflow-style: none; 
+}
+
+.slider-container::-webkit-scrollbar {
+  display: none;
+}
+
+
+
+
 /* 
 
 .cardEmpresa{

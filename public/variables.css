@@ -3,7 +3,7 @@
 :root{
     --primary-color: #F57C00;
     --secondary-color:#FFEB3B;
-    --background-color:#F5F5F5;
+    --background-color:#eff6ff;
     --background-cta:#1976D2;
 }
 
@@ -15,7 +15,7 @@
 .background-amarillo{
     background-color: var(--secondary-color);
 }
-.bacground-gris-claro{
+.background-gris-claro{
     background-color: var(--background-color);
 }
 .background-cta{

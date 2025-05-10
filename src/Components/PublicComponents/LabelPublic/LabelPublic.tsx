@@ -1,4 +1,4 @@
-
+import "./LabelPublic.css"
 
 interface LabelPublicProps {
     text: string;
@@ -6,6 +6,6 @@ interface LabelPublicProps {
 
 export const LabelPublic = ({ text }: LabelPublicProps) => {
     return (
-        <h2 style={{fontSize:"20px",fontWeight:"600",color:"rgb(16,4,35)"}}>{text}</h2>
+        <h2 className="label-public">{text}</h2>
     );
 }

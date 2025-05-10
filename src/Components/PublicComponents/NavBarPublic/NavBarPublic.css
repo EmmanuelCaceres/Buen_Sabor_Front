@@ -1,6 +1,5 @@
 .navbar-public{
     width: 100%;
-    height: 80px;
     display: flex; 
     justify-content: space-around;
     align-items: center;
@@ -37,15 +36,22 @@
         position: relative;
         border-radius: 0;
 
-        & svg{
+        /* & svg{
             display: none;
-        }
+        } */
         & > ul > li > .link-menu > p{
-            color: white;
+            color: var(--primary-color);
             margin: 0;
             font-size: 24px;
             font-weight: 600;
             display: block;
         }
+    }
+}
+
+@media (width>1024px){
+    .navbar-public-2{
+        padding: 12px 90px;
+        justify-content: space-between;
     }
 }
