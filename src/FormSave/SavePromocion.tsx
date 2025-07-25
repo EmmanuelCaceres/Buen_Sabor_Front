@@ -32,48 +32,10 @@ export default function SavePromocion () {
         fechaHasta: new Date(),
         horaDesde: "",
         horaHasta: "",
-        tipoPromocion: TipoPromocion.HappyHour,
+        tipoPromocion: TipoPromocion.Descuento,
         imagenes: [],
         promocionDetalles: [],
-        idsSucursal: 0/*{
-            id: 0,
-            nombre: '',
-            horarioApertura: '',
-            horarioCierre: '',
-            baja: false,
-            esCasaMatriz: false,
-            domicilio:{
-                id: 0,
-                baja: false,
-                calle: '',
-                numero: 0,
-                cp: 0,
-                piso: 0,
-                nroDpto: 0,
-                localidad: {
-                    id: 0,
-                    baja: false,
-                    nombre: '',
-                    provincia: {
-                        id: 0,
-                        baja: false,
-                        nombre: '',
-                        pais: {
-                            id: 0,
-                            baja: false,
-                            nombre: '',
-                        },
-                    },
-                },
-            },
-            empresa: {
-                id: 0,
-                baja: false,
-                nombre: '',
-                razonSocial: '',
-                cuil: '',
-            },
-        }*/,   
+        idsSucursal: 0 
     });
     const [articuloManufacturado, setArticuloManufacturado] = useState<IArticuloManufacturado[]>([]);
     const [articuloManufacturadoPromocion, setArticuloManufacturadoPromocion] = useState<IArticuloManufacturadoPromocion[]>([]);
@@ -95,6 +57,7 @@ export default function SavePromocion () {
         console.log(data);
         
     }
+    
     const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
     
@@ -119,8 +82,10 @@ export default function SavePromocion () {
     const getPromocionById = async (id: number) => {
         const result = new PromocionService(`${apiUrl}promociones`);
         const data = await result.get(id);
+
         if (data) {
-            console.log("PROMO DATA:", data); // 👈 Acá podés ver en consola cómo viene
+            console.log("PROMO DATA:", data); // 👈 Acá podés ver en consola cómo viene // Verifica qué valor tiene
+
             setPromocion(data);
             // Si tiene detalles (artículos), también los podés setear
             const detalles = data.promocionDetalles.map((detalle: IPromocionDetalle) => ({
@@ -160,8 +125,11 @@ export default function SavePromocion () {
             },
         }));
     
+        const tipoTraducido = traducirEnum(promocion.tipoPromocion);
+
         const promocionConSucursal: IPromocion = {
             ...promocion,
+            tipoPromocion: tipoTraducido as TipoPromocion, // asegurás el tipo
             promocionDetalles: detallePromocion,
             idsSucursal: sucursalId!,
         };
@@ -239,9 +207,6 @@ export default function SavePromocion () {
             }
     }
     
-    
-    
-
     useEffect(() => {
         obtenerArticulos();
         if (Number(id) !== 0) {
@@ -249,7 +214,6 @@ export default function SavePromocion () {
         }
     }, [id]);
     
-
     return (
         <>
             <div className='container'>
@@ -347,15 +311,18 @@ export default function SavePromocion () {
                         <select
                             id="promType"
                             value={promocion.tipoPromocion}
-                            onChange={(e) =>
+                            onChange={(e) => {
                                 setPromocion({
-                                    ...promocion,
-                                    tipoPromocion: traducirEnum(e.target.value) as TipoPromocion,
-                                })
-                            }
+                                ...promocion,
+                                tipoPromocion: e.target.value as TipoPromocion,
+                                });
+                            }}
                         >
-                            <option value="HappyHour">Happy Hour</option>
-                            <option value="Descuento">Promocion</option>
+                            {Object.values(TipoPromocion).map((tipo) => (
+                                <option key={tipo} value={tipo}>
+                                    {tipo}
+                                </option>
+                            ))}
                         </select>
 
                     </div>
@@ -368,19 +335,17 @@ export default function SavePromocion () {
                         <div style={{display: "flex", justifyContent: "space-between",height:"200px"}}>
                             <CustomSelect options={articuloManufacturado} onChange={setArticuloManufacturadoPromocion} initialSelected={articuloManufacturadoPromocion}/>
                             <div>
-                                
-                                        {articuloManufacturadoPromocion.map((articulo) => (
-                                            <div key={articulo.id}>
-                                                <p>{articulo.denominacion}</p>
-                                                <input type="number" 
-                                                    name={`cant-${articulo.id}`} 
-                                                    id={`cant-${articulo.id}`} 
-                                                    value={articulo.cantidad} 
-                                                    onChange={(e) => handleCantidadChange(articulo.id, parseInt(e.target.value, 10))}
-                                                    min="1"/>
-                                            </div>
-                                        ))}
-                                 
+                                {articuloManufacturadoPromocion.map((articulo) => (
+                                    <div key={articulo.id}>
+                                        <p>{articulo.denominacion}</p>
+                                        <input type="number" 
+                                            name={`cant-${articulo.id}`} 
+                                            id={`cant-${articulo.id}`} 
+                                            value={articulo.cantidad} 
+                                            onChange={(e) => handleCantidadChange(articulo.id, parseInt(e.target.value, 10))}
+                                            min="1"/>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                         </>

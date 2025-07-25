@@ -1,11 +1,12 @@
-import { CContainer, CNavbar, CNavbarBrand, CNavbarToggler } from "@coreui/react"
+import { CContainer, CNavbar, CNavbarBrand, CNavbarToggler, CButton } from "@coreui/react"
 import { useState } from "react"
 import logoImage from "../assets/imagenes/hamburguesa.svg";
 import "../index.css"
-
+import { useAuth0 } from "@auth0/auth0-react";
 
 export default function NavBar() {
     const [sidebarVisible, setSidebarVisible] = useState(false)
+    const { loginWithRedirect, logout, isAuthenticated, user } = useAuth0();
 
     const toggleSidebar = () => {
         setSidebarVisible(!sidebarVisible);
@@ -20,6 +21,24 @@ export default function NavBar() {
                         EL BUEN SABOR
                     </CNavbarBrand>
                 </div>
+
+                <div>
+                    {!isAuthenticated ? (
+                        <CButton color="primary" onClick={() => loginWithRedirect()}>
+                            Login
+                        </CButton>
+                    ) : (
+                        <>
+                            <span style={{ color: '#c6c9de', marginRight: '10px' }}>
+                                Hola, {user?.name}
+                            </span>
+                            <CButton color="secondary" onClick={() => logout({ returnTo: window.location.origin })}>
+                                Logout
+                            </CButton>
+                        </>
+                    )}
+                </div>
+
                 <CNavbarToggler onClick={toggleSidebar} className="me-3" style={{color: '#c6c9de'}}/>
             </CContainer>
         </CNavbar>
