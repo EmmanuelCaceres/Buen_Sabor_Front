@@ -18,6 +18,8 @@ import SaveSucursal from "./FormSave/SaveSucursal";
 import Categories from "./PublicLandings/Categories"
 import Promotions from "./PublicLandings/Promotions"
 import { useSucursal } from "./context/SucursalContext"; // 👈 importá el hook
+import Index from "./PublicLandings/Index";
+import DescriptionPromotion from "./PublicLandings/DescriptionPromotion";
 
 export const App = () => {
     const { sucursalNombre } = useSucursal(); // 👈 usá el contexto
@@ -31,9 +33,11 @@ export const App = () => {
             </header> */}
 
             <Routes>
-                <Route path="/" element={<Home />}> 
+                <Route path="/" element={<Index />}> 
+                    <Route index element={<Home />} />
                     <Route path="categorias" element={<Categories />} />
                     <Route path="promociones" element={<Promotions />} />
+                    <Route path="description/:id" element={<DescriptionPromotion/> } />
                 </Route>
                 <Route path="/profile" element={<AuthenticationGuard component={Profile} />} />
                 <Route path="/callback" element={<CallBack />} />
