@@ -14,8 +14,9 @@ export const Auth0ProviderWithNavigate = ({ children }: Props) => {
   const redirectUri = import.meta.env.VITE_AUTH0_CALLBACK_URL || window.location.origin;
 
   const onRedirectCallback = (appState: AppState | undefined) => {
-    navigate(appState?.returnTo || window.location.pathname);
-  };
+  navigate(appState?.returnTo || "/completar-perfil");
+};
+
 
   if (!(domain && clientId && redirectUri && audience)) {
     return <div>Faltan variables de entorno para Auth0</div>;

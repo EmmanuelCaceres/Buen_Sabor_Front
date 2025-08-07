@@ -24,10 +24,11 @@ import GrillaSucursal from "./Components/Grillas/GrillaSucursal";
 import SaveSucursal from "./FormSave/SaveSucursal";
 import Categories from "./PublicLandings/Categories";
 import Promotions from "./PublicLandings/Promotions";
-import { useSucursal } from "./context/SucursalContext";
+//import { useSucursal } from "./context/SucursalContext";
+import CompletarPerfil from "./public/Login/CompletarPerfil";
 
 export const App = () => {
-  const { sucursalNombre } = useSucursal();
+  //const { sucursalNombre } = useSucursal();
   const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
 
   useEffect(() => {
@@ -58,8 +59,8 @@ export const App = () => {
         body: JSON.stringify({
         nombre: user.name,
         email: user.email,
-        username: user.nickname, // o alguna lógica tuya
-        rol: 2, // o el rol por defecto que asignes
+        username: user.nickname, 
+        rol: 2, 
         auth0Id: user.sub,
         }),
 
@@ -67,7 +68,7 @@ export const App = () => {
 
       console.log("Respuesta del backend:", res.status, res.statusText);
 
-      if (!res.ok && res.status !== 409) { // 409 = conflicto, usuario ya existe (opcional)
+      if (!res.ok && res.status !== 409) { 
         const text = await res.text();
         console.error("Error al guardar usuario:", text);
       } else if (res.status === 409) {
@@ -108,6 +109,9 @@ export const App = () => {
           <Route path="promociones/save/:id" element={<SavePromocion />} />
           <Route path="insumos" element={<GrillaInsumo />} />
           <Route path="pedidos" element={<Pedidos />} />
+          {user && (
+            <Route path="completar-perfil" element={<CompletarPerfil auth0User={user} />} />
+          )}
         </Route>
       </Routes>
     </>
