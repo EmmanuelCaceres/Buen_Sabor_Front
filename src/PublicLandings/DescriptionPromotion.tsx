@@ -3,7 +3,8 @@ import { useParams } from "react-router-dom";
 import PromocionService from "../Functions/Services/PromocionService";
 import imagenPorDefecto from "../assets/imagenes/empresa.jpg"
 import IPromocionDetalleGet from "../Entities/IPromocionDetalleGet";
-
+import { useDispatch } from "react-redux";
+import { addItem } from "../redux/slices/cartSlice";
 
 
 export default function DescriptionPromotion() {
@@ -11,6 +12,7 @@ export default function DescriptionPromotion() {
     const apiUrl = import.meta.env.VITE_URL_API_BACK
     const { id } = useParams();
     const [promocion, setPromocion] = useState<any>();
+    const dispatch = useDispatch();
 
     const getPromocion = async (baseUrl: string, id: number) => {
         try {
@@ -31,6 +33,16 @@ export default function DescriptionPromotion() {
             // const response = await fetch(`${apiUrl}promociones/${id}`);
         } catch (error) {
             console.error("Error fetching promociones:", error);
+        }
+    };
+
+    const handleAddItem = () => {
+        if (promocion) {
+            dispatch(addItem({
+                id: promocion.id,
+                tipo: 'PROMOCION',
+                productData: { ...promocion, precioVenta: promocion.precioPromocional } // Aseguramos que el precio se pase correctamente
+            }));
         }
     };
 
@@ -74,7 +86,7 @@ export default function DescriptionPromotion() {
                         }
                     </ul>
                 </div>
-                <button style={{backgroundColor:"#FF9F00",borderRadius:"10px", maxWidth:"225px" }}>
+                <button onClick={handleAddItem} style={{backgroundColor:"#FF9F00",borderRadius:"10px", maxWidth:"225px", border: "none", padding: "10px", color: "white", fontWeight: "bold" }}>
                     Añadir al carrito
                 </button>
             </div>

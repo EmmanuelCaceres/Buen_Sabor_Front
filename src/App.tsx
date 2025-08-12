@@ -27,6 +27,7 @@ import Promotions from "./PublicLandings/Promotions"
 import { useSucursal } from "./context/SucursalContext"; // 👈 importá el hook
 import Index from "./PublicLandings/Index";
 import DescriptionPromotion from "./PublicLandings/DescriptionPromotion";
+import Carrito from "./Components/Lado Cliente/Carrito";
 
 
 export const App = () => {

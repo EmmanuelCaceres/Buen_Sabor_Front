@@ -45,7 +45,7 @@ export const Home = () => {
                 <div style={{ display: "flex", gap: "16px", overflowX: "auto", padding: "24px 0" }}>
                     {
                         promociones.map((promocion: IPromocionGet) => (
-                            <Link to={`/description/${promocion.id}`} className="card-producto">
+                            <Link key={promocion.id} to={`/description/${promocion.id}`} className="card-producto">
                                 <img src={``}
                                     alt=""
                                     onError={(e) => {
@@ -63,7 +63,7 @@ export const Home = () => {
                 <div style={{ display: "flex", gap: "16px", overflowX: "auto", padding: "24px 0" }}>
                     {
                         categories.map((category: ICategoria) => (
-                            <Link to='/description' className="card-producto">
+                            <Link key={category.id} to='/description' className="card-producto">
                                 <img src={`/${category.denominacion}-home.jpg`}
                                     alt=""
                                     onError={(e) => {
