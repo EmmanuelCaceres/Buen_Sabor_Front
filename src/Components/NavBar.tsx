@@ -1,7 +1,5 @@
 import { CContainer, CNavbar, CNavbarBrand, CNavbarToggler, CButton } from "@coreui/react"
 import { useState } from "react"
-import logoImage from "../assets/imagenes/hamburguesa.svg";
-import "../index.css"
 import { useAuth0 } from "@auth0/auth0-react";
 
 export default function NavBar() {
@@ -32,7 +30,7 @@ export default function NavBar() {
                             <span style={{ color: '#c6c9de', marginRight: '10px' }}>
                                 Hola, {user?.name}
                             </span>
-                            <CButton color="secondary" onClick={() => logout({ returnTo: window.location.origin })}>
+                            <CButton color="secondary" onClick={() => logout({ logoutParams: { returnTo: window.location.origin }})}>
                                 Logout
                             </CButton>
                         </>
