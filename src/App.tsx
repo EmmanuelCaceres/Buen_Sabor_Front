@@ -22,16 +22,18 @@ import GrillaCategoria from "./Components/Grillas/GrillaCategoria";
 import SaveEmpleado from "./FormSave/SaveEmpleado";
 import GrillaSucursal from "./Components/Grillas/GrillaSucursal";
 import SaveSucursal from "./FormSave/SaveSucursal";
-import Categories from "./PublicLandings/Categories"
-import Promotions from "./PublicLandings/Promotions"
 import { useSucursal } from "./context/SucursalContext"; // 👈 importá el hook
 import Index from "./PublicLandings/Index";
 import DescriptionPromotion from "./PublicLandings/DescriptionPromotion";
-import Carrito from "./Components/Lado Cliente/Carrito";
+import Categories from "./PublicLandings/Categories";
+import Promotions from "./PublicLandings/Promotions";
+//import { useSucursal } from "./context/SucursalContext";
+import CompletarPerfil from "./public/Login/CompletarPerfil";
 
 
 export const App = () => {
     const { sucursalNombre } = useSucursal();
+    //const { sucursalNombre } = useSucursal();
     const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
 
     useEffect(() => {
@@ -53,36 +55,36 @@ export const App = () => {
                     sub: user.sub,
                 });
 
-                const res = await fetch(`${import.meta.env.VITE_URL_API_BACK}usuarios/registerIfNotExists`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({
-                        nombre: user.name,
-                        email: user.email,
-                        username: user.nickname, // o alguna lógica tuya
-                        rol: 2, // o el rol por defecto que asignes
-                        auth0Id: user.sub,
-                    }),
+      const res = await fetch(`${import.meta.env.VITE_URL_API_BACK}usuarios/registerIfNotExists`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+        nombre: user.name,
+        email: user.email,
+        username: user.nickname, 
+        rol: 2, 
+        auth0Id: user.sub,
+        }),
 
                 });
 
                 console.log("Respuesta del backend:", res.status, res.statusText);
 
-                if (!res.ok && res.status !== 409) { // 409 = conflicto, usuario ya existe (opcional)
-                    const text = await res.text();
-                    console.error("Error al guardar usuario:", text);
-                } else if (res.status === 409) {
-                    console.log("Usuario ya existe en la base de datos (409 Conflict).");
-                } else {
-                    console.log("Usuario guardado o confirmado correctamente en backend.");
-                }
-            } catch (err) {
-                console.error("Error al autenticar o guardar usuario:", err);
-            }
-        };
+      if (!res.ok && res.status !== 409) { 
+        const text = await res.text();
+        console.error("Error al guardar usuario:", text);
+      } else if (res.status === 409) {
+        console.log("Usuario ya existe en la base de datos (409 Conflict).");
+      } else {
+        console.log("Usuario guardado o confirmado correctamente en backend.");
+      }
+    } catch (err) {
+      console.error("Error al autenticar o guardar usuario:", err);
+    }
+  };
 
         saveUserToBackend();
     }, [isAuthenticated, user, getAccessTokenSilently]);
@@ -114,6 +116,9 @@ export const App = () => {
                     <Route path="promociones/save/:id" element={<SavePromocion />} />
                     <Route path="insumos" element={<GrillaInsumo />} />
                     <Route path="pedidos" element={<Pedidos />} />
+                    {user && (
+            <Route path="completar-perfil" element={<CompletarPerfil auth0User={user} />} />
+          )}
                 </Route>
             </Routes>
         </>
