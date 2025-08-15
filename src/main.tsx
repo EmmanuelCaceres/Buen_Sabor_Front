@@ -7,18 +7,23 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
 import { ModalProvider } from './Components/Modal/context/ModalContext';
 import { SucursalProvider } from './context/SucursalContext';
+// Importacion para store de Redux
+import { Provider } from 'react-redux';
+import { store } from './redux/store';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
-      <ModalProvider>
-        <SucursalProvider>
-          <Auth0ProviderWithNavigate>
-            <App />
-          </Auth0ProviderWithNavigate>
-        </SucursalProvider>
-      </ModalProvider>
-    </BrowserRouter>
+    <Provider store={store}>
+      <BrowserRouter>
+        <ModalProvider>
+          <SucursalProvider>
+            <Auth0ProviderWithNavigate>
+              <App />
+            </Auth0ProviderWithNavigate>
+          </SucursalProvider>
+        </ModalProvider>
+      </BrowserRouter>
+    </Provider>
   </StrictMode>,
 );
 
