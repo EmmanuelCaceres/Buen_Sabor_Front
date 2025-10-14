@@ -96,34 +96,36 @@ export const App = () => {
     return (
         <>
             <Routes>
-                <Route path="/" element={<Index />}>
-                    <Route index element={<Home />} />
-                    <Route path="categorias" element={<Categories />} />
-                    <Route path="promociones" element={<Promotions />} />
-                    <Route path="description/:id" element={<DescriptionPromotion />} />
-                </Route>
-                <Route path="/profile" element={<AuthenticationGuard component={Profile} />} />
-                <Route path="/callback" element={<CallBack />} />
-                <Route path="/panel-usuario" element={<Root />}>
-                    <Route path="articulos" element={<GrillaArticulo />} />
-                    <Route path="articulos/save/:id" element={<SaveArticulo />} />
-                    <Route path="insumos/save/:id" element={<SaveInsumo />} />
-                    <Route path="categorias/save/:id" element={<SaveCategoria />} />
-                    <Route path="sucursales" element={<GrillaSucursal />} />
-                    <Route path="sucursales/save/:id" element={<SaveSucursal />} />
-                    <Route path="categorias" element={<GrillaCategoria />} />
-                    <Route path="empleados" element={<GrillaEmpleado />} />
-                    <Route path="empleados/save/:id" element={<SaveEmpleado />} />
-                    <Route path="roles" element={<GrillaRol />} />
-                    <Route path="promociones" element={<GrillaPromocion />} />
-                    <Route path="promociones/save/:id" element={<SavePromocion />} />
-                    <Route path="insumos" element={<GrillaInsumo />} />
-                    <Route path="pedidos" element={<Pedidos />} />
-                    {user && (
-            <Route path="completar-perfil" element={<CompletarPerfil auth0User={user} />} />
-          )}
-                </Route>
+              <Route path="/" element={<Index />}>
+                <Route index element={<Home />} />
+                <Route path="categorias" element={<Categories />} />
+                <Route path="promociones" element={<Promotions />} />
+                <Route path="description/:id" element={<DescriptionPromotion />} />
+              </Route>
+
+              <Route path="/profile" element={<AuthenticationGuard component={Profile} />} />
+              <Route path="/callback" element={<CallBack />} />
+
+              <Route path="/completar-perfil" element={<CompletarPerfil />} />  
+
+              <Route path="/panel-usuario" element={<Root />}>
+                <Route path="articulos" element={<GrillaArticulo />} />
+                <Route path="articulos/save/:id" element={<SaveArticulo />} />
+                <Route path="insumos/save/:id" element={<SaveInsumo />} />
+                <Route path="categorias/save/:id" element={<SaveCategoria />} />
+                <Route path="sucursales" element={<GrillaSucursal />} />
+                <Route path="sucursales/save/:id" element={<SaveSucursal />} />
+                <Route path="categorias" element={<GrillaCategoria />} />
+                <Route path="empleados" element={<GrillaEmpleado />} />
+                <Route path="empleados/save/:id" element={<SaveEmpleado />} />
+                <Route path="roles" element={<GrillaRol />} />
+                <Route path="promociones" element={<GrillaPromocion />} />
+                <Route path="promociones/save/:id" element={<SavePromocion />} />
+                <Route path="insumos" element={<GrillaInsumo />} />
+                <Route path="pedidos" element={<Pedidos />} />
+              </Route>
             </Routes>
+
         </>
     );
 };

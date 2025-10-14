@@ -41,7 +41,7 @@ const CompletarPerfil: React.FC = () => {
     if (isAuthenticated && user) {
       setPersona((prev) => ({
         ...prev,
-        nombre: user. || "",
+        nombre: user.name || "",
         usuario: {
           ...prev.usuario,
           email: user.email || "",
@@ -138,6 +138,8 @@ const CompletarPerfil: React.FC = () => {
       console.error("Error en el envío:", err);
     }
   };
+
+  console.log({ isAuthenticated, user, persona });
 
   return (
     <div className="container mt-4" style={{ maxWidth: "600px" }}>
