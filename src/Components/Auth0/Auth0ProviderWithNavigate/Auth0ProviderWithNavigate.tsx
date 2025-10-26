@@ -1,5 +1,6 @@
 import { AppState, Auth0Provider } from '@auth0/auth0-react';
 import { useNavigate } from 'react-router-dom';
+import { AuthRedirectHandler } from './AuthRedirectHandler';
 
 type Props = {
   children: JSX.Element;
@@ -14,9 +15,8 @@ export const Auth0ProviderWithNavigate = ({ children }: Props) => {
   const redirectUri = import.meta.env.VITE_AUTH0_CALLBACK_URL || window.location.origin;
 
   const onRedirectCallback = (appState: AppState | undefined) => {
-  navigate(appState?.returnTo || "/completar-perfil");
-};
-
+    navigate(appState?.returnTo || "/post-login");
+  };
 
   if (!(domain && clientId && redirectUri && audience)) {
     return <div>Faltan variables de entorno para Auth0</div>;
@@ -27,11 +27,13 @@ export const Auth0ProviderWithNavigate = ({ children }: Props) => {
       domain={domain}
       clientId={clientId}
       authorizationParams={{
-        audience: audience,
+        audience,
         redirect_uri: redirectUri,
       }}
       onRedirectCallback={onRedirectCallback}
     >
+      {/* Este componente maneja la lógica de redirección */}
+      <AuthRedirectHandler />
       {children}
     </Auth0Provider>
   );

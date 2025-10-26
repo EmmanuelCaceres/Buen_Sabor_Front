@@ -28,6 +28,7 @@ import DescriptionPromotion from "./PublicLandings/DescriptionPromotion";
 import Categories from "./PublicLandings/Categories";
 import Promotions from "./PublicLandings/Promotions";
 import CompletarPerfil from "./public/Login/CompletarPerfil";
+import PostLoginRedirect from "./public/Login/PostLoginRedirect";
 
 
 export const App = () => {
@@ -105,7 +106,7 @@ export const App = () => {
 
               <Route path="/profile" element={<AuthenticationGuard component={Profile} />} />
               <Route path="/callback" element={<CallBack />} />
-
+              <Route path="/post-login" element={<PostLoginRedirect />} />
               <Route path="/completar-perfil" element={<CompletarPerfil />} />  
 
               <Route path="/panel-usuario" element={<Root />}>

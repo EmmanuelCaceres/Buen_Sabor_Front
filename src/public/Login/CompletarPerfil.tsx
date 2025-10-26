@@ -17,6 +17,7 @@ interface PersonaData {
 const CompletarPerfil: React.FC = () => {
   const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
   const navigate = useNavigate();
+  const apiUrl = import.meta.env.VITE_URL_API_BACK;
 
   const [imagenFile, setImagenFile] = useState<File | null>(null);
 
@@ -25,16 +26,8 @@ const CompletarPerfil: React.FC = () => {
     apellido: "",
     telefono: "",
     fechaNac: "",
-    imagenPersona: {
-      id: 0,
-      baja: false,
-      name: "",
-      url: "",
-    },
-    usuario: {
-      email: "",
-      rol: IRol.CLIENTE,
-    },
+    imagenPersona: { id: 0, baja: false, name: "", url: "" },
+    usuario: { email: "", rol: IRol.CLIENTE },
   });
 
   useEffect(() => {
@@ -42,10 +35,7 @@ const CompletarPerfil: React.FC = () => {
       setPersona((prev) => ({
         ...prev,
         nombre: user.name || "",
-        usuario: {
-          ...prev.usuario,
-          email: user.email || "",
-        },
+        usuario: { ...prev.usuario, email: user.email || "" },
       }));
     }
   }, [isAuthenticated, user]);
@@ -56,197 +46,88 @@ const CompletarPerfil: React.FC = () => {
       setImagenFile(file);
       setPersona((prev) => ({
         ...prev,
-        imagenPersona: {
-          ...prev.imagenPersona,
-          name: file.name,
-        },
+        imagenPersona: { ...prev.imagenPersona, name: file.name },
       }));
     }
   };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-
     if (name.startsWith("imagenPersona.")) {
       const field = name.split(".")[1];
       setPersona((prev) => ({
         ...prev,
-        imagenPersona: {
-          ...prev.imagenPersona,
-          [field]: value,
-        },
-      }));
-    } else if (name.startsWith("usuario.")) {
-      const field = name.split(".")[1];
-      setPersona((prev) => ({
-        ...prev,
-        usuario: {
-          ...prev.usuario,
-          [field]: value,
-        },
+        imagenPersona: { ...prev.imagenPersona, [field]: value },
       }));
     } else {
-      setPersona((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
+      setPersona((prev) => ({ ...prev, [name]: value }));
     }
-  };
-
-  const handleDateChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setPersona((prev) => ({
-      ...prev,
-      fechaNac: e.target.value,
-    }));
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      const token = await getAccessTokenSilently();
-
-      const formData = new FormData();
-      formData.append("nombre", persona.nombre);
-      formData.append("apellido", persona.apellido);
-      formData.append("telefono", persona.telefono);
-      formData.append("fechaNac", persona.fechaNac);
-      formData.append("usuario.email", persona.usuario.email);
-      formData.append("usuario.rol", persona.usuario.rol?.toString() || "");
+      let imagenUrl = persona.imagenPersona.url;
 
       if (imagenFile) {
-        formData.append("imagen", imagenFile);
+        const data = new FormData();
+        data.append("file", imagenFile);
+        data.append("upload_preset", "TU_UPLOAD_PRESET");
+
+        const cloudRes = await fetch(
+          `https://api.cloudinary.com/v1_1/TU_CLOUD_NAME/image/upload`,
+          { method: "POST", body: data }
+        );
+        const cloudData = await cloudRes.json();
+        imagenUrl = cloudData.secure_url;
       }
 
-      const res = await fetch(
-        `${import.meta.env.VITE_URL_API_BACK}personas`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formData,
-        }
-      );
+      const token = await getAccessTokenSilently();
 
-      if (res.ok) {
-        console.log("Datos guardados correctamente");
-        navigate("/dashboard");
-      } else {
-        console.error("Error al guardar Persona");
-      }
+      await fetch(`${apiUrl}personas/completar`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nombre: persona.nombre,
+          apellido: persona.apellido,
+          telefono: persona.telefono,
+          fechaNacimiento: persona.fechaNac,
+          imagenPersona: { url: imagenUrl, name: imagenFile?.name || persona.imagenPersona.name, baja: false },
+        }),
+      });
+
+      navigate("/"); // redirigir al home
     } catch (err) {
-      console.error("Error en el envío:", err);
+      console.error("Error al completar perfil:", err);
     }
   };
-
-  console.log({ isAuthenticated, user, persona });
 
   return (
     <div className="container mt-4" style={{ maxWidth: "600px" }}>
       <h2 className="mb-4">Completar Perfil</h2>
       <form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <label htmlFor="nombre" className="form-label">
-            Nombre
-          </label>
-          <input
-            id="nombre"
-            name="nombre"
-            value={persona.nombre}
-            onChange={handleChange}
-            className="form-control"
-            placeholder="Nombre"
-            required
-          />
-        </div>
+        {/* Nombre */}
+        <input name="nombre" value={persona.nombre} onChange={handleChange} required />
 
-        <div className="mb-3">
-          <label htmlFor="apellido" className="form-label">
-            Apellido
-          </label>
-          <input
-            id="apellido"
-            name="apellido"
-            value={persona.apellido}
-            onChange={handleChange}
-            className="form-control"
-            placeholder="Apellido"
-            required
-          />
-        </div>
+        {/* Apellido */}
+        <input name="apellido" value={persona.apellido} onChange={handleChange} required />
 
-        <div className="mb-3">
-          <label htmlFor="telefono" className="form-label">
-            Teléfono
-          </label>
-          <input
-            id="telefono"
-            name="telefono"
-            value={persona.telefono}
-            onChange={handleChange}
-            className="form-control"
-            placeholder="Teléfono"
-            type="tel"
-          />
-        </div>
+        {/* Teléfono */}
+        <input name="telefono" value={persona.telefono} onChange={handleChange} />
 
-        <div className="mb-3">
-          <label htmlFor="fechaNac" className="form-label">
-            Fecha de Nacimiento
-          </label>
-          <input
-            id="fechaNac"
-            type="date"
-            name="fechaNac"
-            value={persona.fechaNac}
-            onChange={handleDateChange}
-            className="form-control"
-          />
-        </div>
+        {/* Fecha de nacimiento */}
+        <input type="date" name="fechaNac" value={persona.fechaNac} onChange={handleChange} />
 
-        <div className="mb-3">
-          <label htmlFor="usuario.email" className="form-label">
-            Email (desde Auth0)
-          </label>
-          <input
-            id="usuario.email"
-            name="usuario.email"
-            value={persona.usuario.email}
-            readOnly
-            className="form-control-plaintext"
-          />
-        </div>
+        {/* Email readonly */}
+        <input name="usuario.email" value={persona.usuario.email} readOnly />
 
-        <div className="mb-3">
-          <label htmlFor="imagen" className="form-label">
-            Foto de perfil
-          </label>
-          <input
-            id="imagen"
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="form-control"
-          />
-        </div>
+        {/* Imagen */}
+        <input type="file" accept="image/*" onChange={handleFileChange} />
 
-        <div className="mb-3">
-          <label htmlFor="imagenPersona.url" className="form-label">
-            URL de la imagen
-          </label>
-          <input
-            id="imagenPersona.url"
-            name="imagenPersona.url"
-            value={persona.imagenPersona.url}
-            onChange={handleChange}
-            className="form-control"
-            placeholder="URL de la imagen"
-          />
-        </div>
-
-        <button type="submit" className="btn btn-primary w-100">
-          Guardar
-        </button>
+        <button type="submit">Guardar</button>
       </form>
     </div>
   );
