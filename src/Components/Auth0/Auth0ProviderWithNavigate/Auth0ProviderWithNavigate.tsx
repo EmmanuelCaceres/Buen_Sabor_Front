@@ -1,6 +1,5 @@
 import { AppState, Auth0Provider } from '@auth0/auth0-react';
 import { useNavigate } from 'react-router-dom';
-import { AuthRedirectHandler } from './AuthRedirectHandler';
 
 type Props = {
   children: JSX.Element;
@@ -15,6 +14,7 @@ export const Auth0ProviderWithNavigate = ({ children }: Props) => {
   const redirectUri = import.meta.env.VITE_AUTH0_CALLBACK_URL || window.location.origin;
 
   const onRedirectCallback = (appState: AppState | undefined) => {
+    // Al terminar el login de Auth0, nos manda a /post-login
     navigate(appState?.returnTo || "/post-login");
   };
 
@@ -31,9 +31,11 @@ export const Auth0ProviderWithNavigate = ({ children }: Props) => {
         redirect_uri: redirectUri,
       }}
       onRedirectCallback={onRedirectCallback}
+      // AGREGÁ ESTO PARA LAS COOKIES DE CHROME:
+      useRefreshTokens={true}
+      cacheLocation="localstorage"
     >
-      {/* Este componente maneja la lógica de redirección */}
-      <AuthRedirectHandler />
+      {/* ELIMINAMOS <AuthRedirectHandler /> DE ACÁ */}
       {children}
     </Auth0Provider>
   );

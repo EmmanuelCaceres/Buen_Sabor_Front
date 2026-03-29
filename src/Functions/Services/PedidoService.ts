@@ -23,4 +23,26 @@ export default class PedidoService extends GenericFetch<IPedido>{
         }
       }
 
+      static async cambiarEstado(id: number, estadoDto: { estado: string }) {
+    const url = `http://localhost:8080/pedidos/cambiarEstado/${id}`; // Ajustá la URL si es necesario
+    try {
+      const response = await fetch(url, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(estadoDto),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error al cambiar estado: ${response.statusText}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Error en PedidoService.cambiarEstado:", error);
+      throw error;
+    }
+  }
+
 }

@@ -7,7 +7,7 @@ export default interface IPersona{
     nombre:string,
     apellido:string,
     telefono:string,
-    fechaNac: Date,
+    fechaNacimiento: string,
     usuario: Usuario,
     imagenPersona: ImagenPersona,
 }

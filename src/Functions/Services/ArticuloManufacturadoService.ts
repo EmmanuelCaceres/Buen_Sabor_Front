@@ -61,4 +61,15 @@ export default class ArticuloManufacturadoService extends GenericFetch<IArticulo
             throw new Error(`Error deleting articulo: ${response.status} - ${errorData?.message || response.statusText}`);
         }
     }
+
+    async getActivos(): Promise<IArticuloManufacturado[]> {
+    try {
+        const response = await fetch(`${this.baseUrl}`); // Llama al @GetMapping() base
+        if (!response.ok) return [];
+        return await response.json();
+    } catch (error) {
+        console.error("Error al traer manufacturados activos", error);
+        return [];
+    }
+}
 }

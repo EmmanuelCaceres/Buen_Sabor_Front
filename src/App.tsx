@@ -1,12 +1,6 @@
-import { useEffect } from "react";
-import { useAuth0 } from "@auth0/auth0-react";
 import { Route, Routes } from "react-router-dom";
-import {
-    AuthenticationGuard,
-    Profile,
-    CallBack,
-    Home
-} from "./Components";
+import { AuthenticationGuard, CallBack, Home } from "./Components";
+import MiPerfil from "./Components/Auth0/Profile/MiPerfil";
 import Root from "./Components/Root";
 import GrillaArticulo from "./Components/Grillas/GrillaArticuloManufacturado";
 import SaveArticulo from "./FormSave/SaveArticuloManufacturado";
@@ -16,117 +10,118 @@ import GrillaEmpleado from "./Components/Grillas/GrillaEmpleado";
 import GrillaRol from "./Components/Grillas/GrillaRol";
 import GrillaPromocion from "./Components/Grillas/GrillaPromocion";
 import SavePromocion from "./FormSave/SavePromocion";
-import Pedidos from "./Components/Pedidos";
+//import Pedidos from "./Components/Pedidos";
 import GrillaInsumo from "./Components/Grillas/GrillaInsumo";
 import GrillaCategoria from "./Components/Grillas/GrillaCategoria";
 import SaveEmpleado from "./FormSave/SaveEmpleado";
 import GrillaSucursal from "./Components/Grillas/GrillaSucursal";
 import SaveSucursal from "./FormSave/SaveSucursal";
-import { useSucursal } from "./context/SucursalContext"; // 👈 importá el hook
 import Index from "./PublicLandings/Index";
 import DescriptionPromotion from "./PublicLandings/DescriptionPromotion";
 import Categories from "./PublicLandings/Categories";
 import Promotions from "./PublicLandings/Promotions";
 import CompletarPerfil from "./public/Login/CompletarPerfil";
 import PostLoginRedirect from "./public/Login/PostLoginRedirect";
-
+import Checkout from "./Components/Lado Cliente/CheckOut";
+import MisPedidos from "./Components/Auth0/Profile/MisPedidos";
+import { PagoConfirmado } from "./Components/Lado Cliente/PagoConfirmado";
+import MonitorPedidos from "./Components/MonitorPedidos";
 
 export const App = () => {
-    const { sucursalNombre } = useSucursal();
-    const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
+  return (
+    <>
+      <Routes>
+        {/* 1. RUTA PÚBLICA / LANDING */}
+        <Route path="/" element={<Index />}>
+          <Route index element={<Home />} />
+          <Route path="categorias" element={<Categories />} />
+          <Route path="promociones" element={<Promotions />} />
+          <Route
+            path="description/:tipo/:id"
+            element={<DescriptionPromotion />}
+          />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/pago-confirmado" element={<PagoConfirmado />} />
+        </Route>
 
-    useEffect(() => {
-        const saveUserToBackend = async () => {
-            if (!isAuthenticated || !user) {
-                console.log("No está autenticado o no hay usuario aún");
-                return;
+        {/* 2. AUTHENTICATION & LOGIN FLOW */}
+        <Route
+          path="/mi-perfil"
+          element={<AuthenticationGuard component={MiPerfil} />}
+        />
+        <Route path="/callback" element={<CallBack />} />
+        <Route path="mis-pedidos" element={<MisPedidos />} />
+
+        {/* PostLoginRedirect es el encargado de:
+                  - Guardar el usuario en la BD (registerIfNotExists).
+                  - Verificar si faltan datos de 'Persona'.
+                  - Redirigir a '/' o a '/completar-perfil'.
+                */}
+        <Route path="/post-login" element={<PostLoginRedirect />} />
+        <Route path="/completar-perfil" element={<CompletarPerfil />} />
+
+        {/* 3. PANEL DE ADMINISTRACIÓN (BACKOFFICE) */}
+        <Route path="/panel-usuario" element={<Root />}>
+          {/* Operaciones */}
+          <Route
+            path="pedidos/monitor"
+            element={<MonitorPedidos />}
+          />
+          <Route
+            path="pedidos/historial"
+            element={
+              <div>
+                <h2>Historial de Pedidos</h2>
+              </div>
             }
+          />
+          <Route
+            path="clientes"
+            element={
+              <div>
+                <h2>Grilla de Clientes Registrados</h2>
+              </div>
+            }
+          />
 
-    try {
-      const token = await getAccessTokenSilently();
-      console.log("Token obtenido:", token);
-      console.log("🔐 Usuario desde Auth0:", user);
+          {/* Catálogo */}
+          <Route path="articulos" element={<GrillaArticulo />} />
+          <Route path="articulos/save/:id" element={<SaveArticulo />} />
+          <Route path="categorias" element={<GrillaCategoria />} />
+          <Route path="categorias/save/:id" element={<SaveCategoria />} />
+          <Route path="promociones" element={<GrillaPromocion />} />
+          <Route path="promociones/save/:id" element={<SavePromocion />} />
 
-      // Mapeo manual al DTO que espera el backend
-      const registroUsuarioDto = {
-        email: user.email || "",
-        password: null, // no lo usas porque Auth0 maneja esto
-        nombre: user.given_name || user.name || "",
-        apellido: user.family_name || "",
-        telefono: null, // lo podrás pedir en "completar perfil"
-        fechaNacimiento: null, // lo podrás pedir después
-        rol: "CLIENTE", // el enum en tu backend es Rol.CLIENTE
-        sucursalId: null,
-        auth0Id: user.sub,
-        username: user.nickname,
-      };
+          {/* Logística */}
+          <Route path="insumos" element={<GrillaInsumo />} />
+          <Route path="insumos/save/:id" element={<SaveInsumo />} />
+          <Route
+            path="unidades-medida"
+            element={
+              <div>
+                <h2>Grilla Unidades de Medida</h2>
+              </div>
+            }
+          />
 
-      console.log("📦 Usuario a guardar en backend:", registroUsuarioDto);
+          {/* Administración */}
+          <Route path="sucursales" element={<GrillaSucursal />} />
+          <Route path="sucursales/save/:id" element={<SaveSucursal />} />
+          <Route path="empleados" element={<GrillaEmpleado />} />
+          <Route path="empleados/save/:id" element={<SaveEmpleado />} />
+          <Route path="roles" element={<GrillaRol />} />
 
-      const res = await fetch(
-        `${import.meta.env.VITE_URL_API_BACK}usuarios/registerIfNotExists`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(registroUsuarioDto),
-        }
-      );
-
-                console.log("Respuesta del backend:", res.status, res.statusText);
-
-      if (!res.ok && res.status !== 409) {
-        const text = await res.text();
-        console.error("Error al guardar usuario:", text);
-      } else if (res.status === 409) {
-        console.log("Usuario ya existe en la base de datos (409 Conflict).");
-      } else {
-        console.log("Usuario guardado o confirmado correctamente en backend.");
-      }
-    } catch (err) {
-      console.error("Error al autenticar o guardar usuario:", err);
-    }
-  };
-
-  saveUserToBackend();
-  }, [isAuthenticated, user, getAccessTokenSilently]);
-
-
-    return (
-        <>
-            <Routes>
-              <Route path="/" element={<Index />}>
-                <Route index element={<Home />} />
-                <Route path="categorias" element={<Categories />} />
-                <Route path="promociones" element={<Promotions />} />
-                <Route path="description/:id" element={<DescriptionPromotion />} />
-              </Route>
-
-              <Route path="/profile" element={<AuthenticationGuard component={Profile} />} />
-              <Route path="/callback" element={<CallBack />} />
-              <Route path="/post-login" element={<PostLoginRedirect />} />
-              <Route path="/completar-perfil" element={<CompletarPerfil />} />  
-
-              <Route path="/panel-usuario" element={<Root />}>
-                <Route path="articulos" element={<GrillaArticulo />} />
-                <Route path="articulos/save/:id" element={<SaveArticulo />} />
-                <Route path="insumos/save/:id" element={<SaveInsumo />} />
-                <Route path="categorias/save/:id" element={<SaveCategoria />} />
-                <Route path="sucursales" element={<GrillaSucursal />} />
-                <Route path="sucursales/save/:id" element={<SaveSucursal />} />
-                <Route path="categorias" element={<GrillaCategoria />} />
-                <Route path="empleados" element={<GrillaEmpleado />} />
-                <Route path="empleados/save/:id" element={<SaveEmpleado />} />
-                <Route path="roles" element={<GrillaRol />} />
-                <Route path="promociones" element={<GrillaPromocion />} />
-                <Route path="promociones/save/:id" element={<SavePromocion />} />
-                <Route path="insumos" element={<GrillaInsumo />} />
-                <Route path="pedidos" element={<Pedidos />} />
-              </Route>
-            </Routes>
-
-        </>
-    );
+          {/* Ruta por defecto del panel (Dashboard inicial) */}
+          <Route
+            index
+            element={
+              <div>
+                <h2>Bienvenido al Dashboard de El Buen Sabor</h2>
+              </div>
+            }
+          />
+        </Route>
+      </Routes>
+    </>
+  );
 };

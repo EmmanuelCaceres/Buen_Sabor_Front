@@ -1,0 +1,25 @@
+export enum Estado {
+    PREPARACION = "PREPARACION",
+    PENDIENTE = "PENDIENTE",
+    CANCELADO = "CANCELADO",
+    RECHAZADO = "RECHAZADO",
+    DELIVERY = "DELIVERY",
+    ENTREGADO = "ENTREGADO",
+    PENDIENTE_ENTREGA = "PENDIENTE_ENTREGA",
+    PENDIENTE_PAGO = "PENDIENTE_PAGO"
+}
+
+export enum FormaPago {
+    EFECTIVO = "EFECTIVO",
+    MERCADO_PAGO = "MERCADO_PAGO"
+}
+
+export enum TipoEnvio {
+    DELIVERY = "DELIVERY",
+    TAKE_AWAY = "TAKE_AWAY"
+}
+
+export enum TipoDetalle {
+    ARTICULO = "ARTICULO",
+    PROMOCION = "PROMOCION"
+}
