@@ -4,6 +4,11 @@ import "./Home.css";
 import { useEffect, useState } from "react";
 import ICategoria from "../../Entities/ICategoria";
 import imagenPorDefecto from "../../assets/imagenes/empresa.jpg";
+import imgGaseosas from "../../assets/imagenes/gaseosas.jpg";
+import imgLomos from "../../assets/imagenes/lomos.png";
+import imgPanchos from "../../assets/imagenes/panchos.png";
+import imgPapas from "../../assets/imagenes/papas.png";
+import imgPizza from "../../assets/imagenes/pizza.png";
 import IPromocionGet from "../../Entities/IPromocionGet";
 import IArticuloManufacturado from "../../Entities/IArticuloManufacturado";
 import { ModalSucursal } from "../Modal/ModalSucursal";
@@ -12,11 +17,21 @@ export const Home = () => {
   const apiUrl = import.meta.env.VITE_URL_API_BACK;
   const [categories, setCategories] = useState<ICategoria[]>([]);
   const [promociones, setPromociones] = useState<IPromocionGet[]>([]);
-  const [productosEstrella, setProductosEstrella] = useState<IArticuloManufacturado[]>([]);
+  const [productosEstrella, setProductosEstrella] = useState<
+    IArticuloManufacturado[]
+  >([]);
   const [idSucursal, setIdSucursal] = useState<number | null>(() => {
     const saved = localStorage.getItem("selectedSucursalId");
     return saved ? parseInt(saved) : null;
   });
+
+  const imagenesCategorias: { [key: string]: string } = {
+    bebidas: imgGaseosas,
+    sandwichs: imgLomos,
+    "papas fritas": imgPapas,
+    pizzas: imgPizza,
+    panchos: imgPanchos
+  };
 
   const handleSelectSucursal = (id: number) => {
     localStorage.setItem("selectedSucursalId", id.toString());
@@ -29,20 +44,24 @@ export const Home = () => {
 
     try {
       // Categorías
-      const resCat = await fetch(`${apiUrl}categorias/getAll`);
+      const resCat = await fetch(`${apiUrl}categorias/parents`);
       const dataCat = await resCat.json();
       setCategories(dataCat);
+      console.log("Categorias: ", dataCat);
 
       // Promociones filtradas
-      const resPromo = await fetch(`${apiUrl}promociones/porSucursal/${idSucursal}`);
+      const resPromo = await fetch(
+        `${apiUrl}promociones/porSucursal/${idSucursal}`,
+      );
       const dataPromo = await resPromo.json();
       setPromociones(dataPromo.content || dataPromo);
 
       // Artículos filtrados
-      const resArt = await fetch(`${apiUrl}articulosManufacturados/porSucursal/${idSucursal}`);
+      const resArt = await fetch(
+        `${apiUrl}articulosManufacturados/porSucursal/${idSucursal}`,
+      );
       const dataArt = await resArt.json();
       setProductosEstrella(dataArt.content || dataArt);
-
     } catch (error) {
       console.error("Error al cargar los datos de la sucursal:", error);
     }
@@ -59,7 +78,12 @@ export const Home = () => {
 
   return (
     <>
-    <button onClick={() => { localStorage.removeItem("selectedSucursalId"); setIdSucursal(null); }}>
+      <button
+        onClick={() => {
+          localStorage.removeItem("selectedSucursalId");
+          setIdSucursal(null);
+        }}
+      >
         Cambiar Sucursal
       </button>
       <section>
@@ -106,30 +130,38 @@ export const Home = () => {
             padding: "24px 0",
           }}
         >
-          {categories.map((category: ICategoria) => (
-            <Link
-              key={category.id}
-              to={`/tienda?categoria=${category.id}`}
-              className="card-producto"
-            >
-              <img
-                src={`/${category.denominacion.toLowerCase()}-home.jpg`}
-                alt={category.denominacion}
-                onError={(e) => {
-                  e.currentTarget.onerror = null;
-                  e.currentTarget.src = imagenPorDefecto;
-                }}
-              />
-              <p>{category.denominacion}</p>
-            </Link>
-          ))}
+          {categories.map((category: ICategoria) => {
+            // Buscamos si la denominación existe en nuestro diccionario de imágenes mapeadas
+            const nombreNormalizado = category.denominacion
+              .toLowerCase()
+              .trim();
+            const imagenRenderizar =
+              imagenesCategorias[nombreNormalizado] || imagenPorDefecto;
+
+            return (
+              <Link
+                key={category.id}
+                to={`/tienda?categoria=${category.id}`}
+                className="card-producto"
+              >
+                <img
+                  src={imagenRenderizar} // 👈 Usamos la imagen real importada
+                  alt={category.denominacion}
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = imagenPorDefecto;
+                  }}
+                />
+                <p>{category.denominacion}</p>
+              </Link>
+            );
+          })}
         </div>
       </section>
 
       {/* SECCIÓN PRODUCTOS ESTRELLA EN GRID */}
       <section style={{ padding: "20px" }}>
         <LabelPublic text="Descubre nuestros productos estrellas" />
-
         <div
           style={{
             display: "grid",
@@ -143,7 +175,7 @@ export const Home = () => {
               key={producto.id}
               to={`/description/articulo/${producto.id}`}
               className="card-producto"
-              style={{ width: "100%", margin: "0" }} // Quitamos anchos fijos para que el grid mande
+              style={{ width: "100%", margin: "0" }}
             >
               <img
                 src={

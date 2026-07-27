@@ -10,6 +10,7 @@ import { SucursalProvider } from './context/SucursalContext';
 // Importacion para store de Redux
 import { Provider } from 'react-redux';
 import { store } from './redux/store';
+import { RolProvider } from './context/RolContext';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -18,7 +19,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <ModalProvider>
           <SucursalProvider>
             <Auth0ProviderWithNavigate>
-              <App />
+              <RolProvider>
+                <App />
+              </RolProvider>
             </Auth0ProviderWithNavigate>
           </SucursalProvider>
         </ModalProvider>

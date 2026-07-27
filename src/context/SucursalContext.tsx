@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState } from "react";
 
 interface SucursalContextType {
   sucursalId: number | null;
@@ -15,14 +15,24 @@ const SucursalContext = createContext<SucursalContextType>({
 export const useSucursal = () => useContext(SucursalContext);
 
 export const SucursalProvider = ({ children }: { children: React.ReactNode }) => {
-  const [sucursalId, setSucursalId] = useState<number | null>(null);
-  const [sucursalNombre, setSucursalNombre] = useState<string | null>(null);
+  // 1. Inicializamos leyendo del localStorage (a prueba de F5)
+  const [sucursalId, setSucursalId] = useState<number | null>(() => {
+    const saved = localStorage.getItem("sucursalId");
+    return saved ? parseInt(saved, 10) : null;
+  });
 
+  const [sucursalNombre, setSucursalNombre] = useState<string | null>(() => {
+    return localStorage.getItem("sucursalNombre") || null;
+  });
+
+  // 2. Al setear, actualizamos estado y memoria persistente
   const setSucursal = (id: number, nombre: string) => {
     setSucursalId(id);
     setSucursalNombre(nombre);
     localStorage.setItem("sucursalId", id.toString());
     localStorage.setItem("sucursalNombre", nombre);
+    // Por retrocompatibilidad por si tu Home usó el otro nombre de clave:
+    localStorage.setItem("selectedSucursalId", id.toString()); 
   };
 
   return (
